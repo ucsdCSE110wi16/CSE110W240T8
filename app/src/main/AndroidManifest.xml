@@ -6,13 +6,22 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:name="droidsquad.voyage.ParseApplication"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.parse.APPLICATION_ID"
+            android:value="UyyjGRsklkBU7Zs9EZhUY1wSGFF0z8JCCZZI0wO7" />
+        <meta-data
+            android:name="com.parse.CLIENT_KEY"
+            android:value="mElQZrcXoLhEJYxptd9GFBvc1qGs9OBVYjHseOgt" />
         <activity
             android:name=".activity.LoginActivity"
             android:label="@string/app_name">
@@ -22,7 +31,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.CreateTripActivity" />
         <activity android:name=".activity.CreateUserActivity"></activity>
     </application>
 
