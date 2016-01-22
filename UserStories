@@ -1,33 +1,71 @@
-DROID SQUAD (TENTATIVE) ITERATIONS SCHEDULE (refer to user stories for more detailed description of features)
+DROID SQUAD USER STORIES (1 = greatest priority, 5 = lowest priority)
 
-Features Done by WEEK 4:
 Create New Trip
+As a travelers' group leader, I want to create a new trip with all its info so that I can begin the trip planning process.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 1
+
 Register New User
-Create Profile
+As a traveler client, I want to register an account via Facebook or email so that I can be able to access my saved trips later.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 1
+
 User Login
+As a traveler client, I want to login via Facebook or email so that I can access my saved trips.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 1
 
-Features Done by WEEK 5:
 View All Current Trips
-Invite Members to Current Trip
-View Profile
+As a traveler client, I want to be able to view all the current trips I am currently signed up for so that the trip information is accessible.
+Estimation of Time for Completion: 2-3 days
+Customer Priority: 1
 
-Features Done by WEEK 6:
+Invite members to current trip
+As a group leader for a trip, I want to be able to add/delete friends from the trip so that I can form traveling group.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 2
+
 Member Request Notifications
+As a traveler who is not currently a member of the group that invited me, I want to receive notifications for invites to join that existing trip group, so that I can know that I have the opportunity to join in.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 2
+
+Create Profile
+As a traveler client, I want to create a user profile with my information (Full Name, Age, Location, Picture, and Bio) so that other travelers can get a quick overview of who I am.
+Estimation of Time for Completion: 2-3 days
+Customer Priority: 3
+
 Trip Notifications
+As a member of a planned trip, I want to receive notifications about updates for their current trip so that I'll be up-to-date with any changes or upcoming dates.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 3
 
-Features Done by WEEK 7:
+View Profile 
+As a traveler client, I want to be able to view others' profiles, which contains name, age, location, picture, trip history, and bio, so that I can get a quick overview of who they are.
+Estimation of Time for Completion: 1 day
+Customer Priority: 3
+
 User Ranking
-Friends’ Update
+As a traveler client, I want to see another user's ratings based on cleanliness and friendliness, shown on their profile, so that I can figure out whether I would like to travel with them.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 4
 
-Features Done by WEEK 8:
-Popular Nearby Trips
 View Own Trip History
+As a traveler client, I want to be able to view their own trip history so that I can keep track of where I've been in the past.
+Estimation of Time for Completion: 1 day
+Customer Priority: 4
+
+Popular Nearby Trips
+As a traveler interested in joining an existing trip, I want to be able to search for popular trips near my location so that I can travel with others. 
+Estimation of Time for Completion: 1 wk
+Customer Priority: 5
+
+Friend's Updates
+As a traveler client, I want to be able to see my friends' and/or public trips so that I can keep updated with what my friends are doing.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 5
+
 Delete Account
-
-Features Done by WEEK 9:
-Chat feature/New Features?
-Finalization Testing
-
-Features Done by WEEK 10
-Polishing up/last-min new features?
-MILESTONE/BASELINE
+As a traveler client, I want to be able to delete my account so that I will not be affiliated with this app's services anymore.
+Estimation of Time for Completion: 2-3 days
+Customer Priority: 5
