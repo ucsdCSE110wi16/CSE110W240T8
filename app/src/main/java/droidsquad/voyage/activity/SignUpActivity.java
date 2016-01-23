@@ -3,21 +3,19 @@ package droidsquad.voyage.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.app.DatePickerDialog;
 import android.app.LoaderManager.LoaderCallbacks;
-
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -27,61 +25,66 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.parse.LogInCallback;
-import com.parse.ParseException;
-import com.parse.ParseUser;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.LoginController;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    private LoginController controller;
+public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    private boolean currentlyLoggingIn = false;
-
-
-
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
+    // Id to identity READ_CONTACTS permission request.
     private static final int REQUEST_READ_CONTACTS = 0;
 
+    private final String TAG = SignUpActivity.class.getSimpleName();
+
+    /**
+     * Keep track of the login task to ensure we can cancel it if requested.
+     */
+    private boolean currentlySigningUp = false;
+
     // UI references.
+    private EditText mFirstNameView;
+    private EditText mLastNameView;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
+    private EditText mMobileNumberView;
+    private Spinner mGenderSpinner;
+    private Button mDobButton;
     private View mProgressView;
     private View mLoginFormView;
-    private TextView signupTextView;
-    private final String TAG = LoginActivity.class.getSimpleName();
+    private int mYear;
+    private int mMonth;
+    private int mDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_sign_up);
 
-        controller = new LoginController(this);
-
+        Log.d(TAG, "Sign up Activity opened");
 
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.signup_email);
         populateAutoComplete();
 
-        mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordView = (EditText) findViewById(R.id.signup_password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                if (id == R.id.signup || id == EditorInfo.IME_NULL) {
                     attemptLogin();
                     return true;
                 }
@@ -89,26 +92,68 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+
+        mFirstNameView = (EditText) findViewById(R.id.signup_first_name);
+        mLastNameView = (EditText) findViewById(R.id.signup_last_name);
+        mMobileNumberView = (EditText) findViewById(R.id.signup_mobile);
+        mGenderSpinner = (Spinner) findViewById(R.id.signup_gender_spinner);
+
+        // Setting up the gender spinner
+        ArrayAdapter<CharSequence> adapter1 = new ArrayAdapter<CharSequence>(this,
+                R.layout.support_simple_spinner_dropdown_item,
+                getResources().getStringArray(R.array.genders));
+
+        mGenderSpinner.setAdapter(adapter1);
+
+
+        // Setting up the DOB Button
+        mDobButton = (Button) findViewById(R.id.choose_dob_button);
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+        final Calendar calendar = Calendar.getInstance();
+        mYear = calendar.get(Calendar.YEAR);
+        mMonth = calendar.get(Calendar.MONTH);
+        mDate = calendar.get(Calendar.DATE);
+        mDobButton.setText(dateFormat.format(calendar.getTime()));
+        mDobButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "DOB picker button clicked");
+
+                // show Date picker dialog
+                DatePickerDialog dialog = new DatePickerDialog(SignUpActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        mYear = year;
+                        mMonth = monthOfYear;
+                        mDate = dayOfMonth;
+
+                        // Set the text value of the button
+                        calendar.set(Calendar.YEAR, year);
+                        calendar.set(Calendar.MONTH, monthOfYear);
+                        calendar.set(Calendar.DATE, dayOfMonth);
+
+                        mDobButton.setText(dateFormat.format(calendar.getTime()));
+
+                        Log.d(TAG, "DOB changed to " + dateFormat.format(calendar.getTime()));
+                    }
+                },
+                        mYear, mMonth, mDate);
+
+                dialog.show();
+            }
+        });
+
+
+        Button mSignUpButton = (Button) findViewById(R.id.signup_button);
+        mSignUpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
-
-        signupTextView = (TextView) findViewById(R.id.signup_link);
-        signupTextView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Take the user to the sign up page
-                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-                startActivity(intent);
-            }
-        });
+        mLoginFormView = findViewById(R.id.signup_form);
+        mProgressView = findViewById(R.id.signup_progress);
     }
 
     private void populateAutoComplete() {
@@ -161,24 +206,42 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (currentlyLoggingIn) {
+        if (currentlySigningUp) {
             return;
         }
 
         // Reset errors.
+        mFirstNameView.setError(null);
+        mLastNameView.setError(null);
         mEmailView.setError(null);
         mPasswordView.setError(null);
+        mMobileNumberView.setError(null);
 
         // Store values at the time of the login attempt.
-        final String email = mEmailView.getText().toString();
+        String firstName = mFirstNameView.getText().toString();
+        String lastName = mLastNameView.getText().toString();
+        String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String mobileNum = mMobileNumberView.getText().toString();
+
 
         boolean cancel = false;
         View focusView = null;
 
+        // Check the validity of Mobile Number
+        if (mobileNum.isEmpty()) {
+            mMobileNumberView.setError(getString(R.string.error_empty_mobile_num));
+            focusView = mMobileNumberView;
+            cancel = true;
+        } else if (!isMobileNumValid(mobileNum)) {
+            mMobileNumberView.setError(getString(R.string.error_invalid_mobile_num));
+            focusView = mMobileNumberView;
+            cancel = true;
+        }
+
         // Check for a valid password, if the user entered one.
-        if (password.isEmpty()) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
+        if (getPasswordError(password) != null) {
+            mPasswordView.setError(getPasswordError(password));
             focusView = mPasswordView;
             cancel = true;
         }
@@ -194,38 +257,50 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 
+        // Check if First and last name are non-empty
+        if (TextUtils.isEmpty(lastName)) {
+            mLastNameView.setError(getString(R.string.error_field_required));
+            focusView = mLastNameView;
+            cancel = true;
+        }
+        if (TextUtils.isEmpty(firstName)) {
+            mFirstNameView.setError(getString(R.string.error_field_required));
+            focusView = mFirstNameView;
+            cancel = true;
+        }
+
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
         } else {
-            Log.d(TAG, "Attempting to login " + email);
-
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            currentlyLoggingIn = true;
-
-            ParseUser.logInInBackground(email, password, new LogInCallback() {
-                public void done(ParseUser user, ParseException e) {
-                    currentlyLoggingIn = false;
-                    if (user != null) {
-                        // Hooray! The user is logged in.
-                        Log.d(TAG, "Successfully logged in " + email);
-                    } else {
-                        // Signup failed. Look at the ParseException to see what happened.
-                        showProgress(false);
-                        if (e.getCode() == 101) {
-                            Log.d(TAG, "Couldn't login " + email + "\nInvalid email or password");
-                            mEmailView.setError(getString(R.string.invalid_login_credentials_error));
-                        } else {
-                            Log.d(TAG, "Unknown error: " + e.getMessage());
-                        }
-                        mEmailView.requestFocus();
-                    }
-                }
-            });
+            // TODO register the new ParseUser and then log him in
         }
+    }
+
+    private boolean isMobileNumValid(String mobileNum) {
+        /*
+         *   matching phone number with regex
+         *   Examples: Matches following phone numbers:
+         *   (123)456-7890, 123-456-7890, 1234567890, (123)-456-7890
+         */
+        Pattern p = Pattern.compile("^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$");
+        Matcher m = p.matcher(mobileNum);
+        return m.matches();
+    }
+
+    private String getPasswordError(String password) {
+        if (password.length() < 8) {
+            return getString(R.string.error_short_password);
+        }
+
+        // TODO must have at least 1 alphabet
+        // TODO must have at least 1 number
+        // TODO must have at least 1 upper case character
+        return null;
     }
 
     private boolean isEmailValid(String email) {
@@ -307,7 +382,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginActivity.this,
+                new ArrayAdapter<>(SignUpActivity.this,
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         mEmailView.setAdapter(adapter);

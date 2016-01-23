@@ -5,7 +5,8 @@
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="action_signup">Sign Up</string>
+    <string name="error_invalid_email">Please enter a valid email</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
@@ -14,4 +15,19 @@
     </string>
     <string name="title_activity_create_user">CreateUserActivity</string>
     <string name="invalid_login_credentials_error">Invalid Email or Password</string>
+    <string name="title_activity_sign_up">Sign Up</string>
+    <string name="signup_prompt">Don\'t have an account?</string>
+    <string name="prompt_first_name">First Name</string>
+    <string name="prompt_last_name">Last Name</string>
+    <string name="prompt_mobile_number">Mobile Number</string>
+    <string name="prompt_gender">Gender</string>
+    <string name="prompt_date_of_birth">Date of Birth</string>
+    <string-array name="genders">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
+    <string name="error_empty_mobile_num">Please enter a mobile number</string>
+    <string name="error_invalid_mobile_num">Please enter a valid mobile number</string>
+    <string name="error_short_password">Password should be at least 8 characters</string>
 </resources>
