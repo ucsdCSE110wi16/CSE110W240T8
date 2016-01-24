@@ -18,7 +18,5 @@ public class ParseModel {
     private Context context;
 
     public ParseModel(Context context) {
-        // Parse.enableLocalDatastore(context);
-        // Parse.initialize(context);
     }
 }
