@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -72,6 +73,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
     private Spinner mGenderSpinner;
     private Button mDobButton;
     private View mProgressView;
+    private TextView errorView;
     private View mLoginFormView;
     private int mYear;
     private int mMonth;
@@ -89,22 +91,12 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.signup_password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.signup || id == EditorInfo.IME_NULL) {
-                    attemptSignup();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-
         mFirstNameView = (EditText) findViewById(R.id.signup_first_name);
         mLastNameView = (EditText) findViewById(R.id.signup_last_name);
         mMobileNumberView = (EditText) findViewById(R.id.signup_mobile);
         mGenderSpinner = (Spinner) findViewById(R.id.signup_gender_spinner);
+        errorView = (TextView) findViewById(R.id.signup_error_text_view);
+        errorView.setText("");
 
         // Setting up the gender spinner
         ArrayAdapter<CharSequence> adapter1 = new ArrayAdapter<CharSequence>(this,
@@ -228,8 +220,8 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         // Store values at the time of the login attempt.
         String firstName = mFirstNameView.getText().toString();
         String lastName = mLastNameView.getText().toString();
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        final String email = mEmailView.getText().toString();
+        final String password = mPasswordView.getText().toString();
         String mobileNum = mMobileNumberView.getText().toString();
         String gender = mGenderSpinner.getSelectedItem().toString();
         JSONObject dOB = new JSONObject();
@@ -294,6 +286,8 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
+            Log.d(TAG, "Attempting to login user: " + firstName + " " + lastName + "\nemail: "
+                    + email + "\nGender: " + gender + "\nDOB: " + dateOfBirth);
             currentlySigningUp = true;
             showProgress(true);
 
@@ -307,28 +301,49 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             user.put("gender", gender);
             user.put("dateOfBirth", dateOfBirth);
 
-            // TODO after user signs up (also handle duplicate email registration here)
             user.signUpInBackground(new SignUpCallback() {
                 @Override
                 public void done(ParseException e) {
-                    if(e == null) {
+                    currentlySigningUp = false;
+                    if (e == null) {
+                        // User successfully signed up
+                        Log.d(TAG, "User successfully signed up");
+                        ParseUser.logInInBackground(email, password, new LogInCallback() {
+                            @Override
+                            public void done(ParseUser user, ParseException e) {
+                                if (user != null) {
+                                    // Successfully logged user in
+                                    Log.d(TAG, "Successfully logged user in.");
+                                    // Taking the user to the main activity and
+                                    // killing all other activities in the BG
 
-                    }
-                    else {
+                                    // TODO replace BlahActivity with the main activity
+//                                    Intent intent = new Intent(SignUpActivity.this, BlahActivity.class);
+//                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                    startActivity(intent);
+                                } else {
+                                    Log.d(TAG, "Unable to log user in." +
+                                            ((e != null) ? (" ParseException occured. Code: " +
+                                            e.getCode() + ". Message: " + e.getMessage()) : ""));
 
-                    }
-                }
-            });
+                                    // TODO take the user to the 404 (unknown error) page
+                                }
+                            }
+                        });
+                    } else {
+                        // Excpetion happened
+                        Log.d(TAG, "ParseException occured. Code: " + e.getCode()
+                                + " Message: " + e.getMessage());
 
-            // TODO after user login
-            ParseUser.logInInBackground(email, password, new LogInCallback() {
-                @Override
-                public void done(ParseUser user, ParseException e) {
-                    if (user != null) {
-
-                    }
-                    else {
-
+                        if (e.getCode() == 202) {
+                            mEmailView.setError(getString(R.string.error_email_already_taken));
+                            mEmailView.requestFocus();
+                        } else if (e.getCode() == 100) {
+                            errorView.setText(getString(R.string.error_no_internet_connection));
+                        } else {
+                            errorView.setText(e.getMessage());
+                        }
+                        showProgress(false);
                     }
                 }
             });

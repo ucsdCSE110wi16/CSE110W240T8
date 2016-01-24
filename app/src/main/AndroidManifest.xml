@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.CreateUserActivity" />
-        <activity android:name=".activity.SignUpActivity"/>
+        <activity android:name=".activity.SignUpActivity" />
     </application>
 
 </manifest>
