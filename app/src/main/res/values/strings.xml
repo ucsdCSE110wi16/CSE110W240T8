@@ -30,4 +30,7 @@
     <string name="error_empty_mobile_num">Please enter a mobile number</string>
     <string name="error_invalid_mobile_num">Please enter a valid mobile number</string>
     <string name="error_short_password">Password should be at least 8 characters</string>
+    <string name="error_password_lowercase">Password must contain at least 1 lowercase character</string>
+    <string name="error_password_uppercase">Password must contain at least 1 uppercase character</string>
+    <string name="error_password_number">Password must contain at least 1 number</string>
 </resources>

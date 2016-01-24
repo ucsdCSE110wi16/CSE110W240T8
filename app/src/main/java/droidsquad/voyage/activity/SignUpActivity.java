@@ -38,6 +38,14 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
+
 import droidsquad.voyage.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -85,7 +93,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.signup || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+                    attemptSignup();
                     return true;
                 }
                 return false;
@@ -148,7 +156,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         mSignUpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                attemptSignup();
             }
         });
 
@@ -205,7 +213,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    private void attemptSignup() {
         if (currentlySigningUp) {
             return;
         }
@@ -223,7 +231,17 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
         String mobileNum = mMobileNumberView.getText().toString();
-
+        String gender = mGenderSpinner.getSelectedItem().toString();
+        JSONObject dOB = new JSONObject();
+        try {
+            dOB.put("month", mMonth);
+            dOB.put("day", mDate);
+            dOB.put("year", mYear);
+        }
+        catch(JSONException e) {
+            e.printStackTrace();
+        }
+        String dateOfBirth = dOB.toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -276,8 +294,44 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
+            currentlySigningUp = true;
             showProgress(true);
-            // TODO register the new ParseUser and then log him in
+
+            ParseUser user = new ParseUser();
+            user.setUsername(email);
+            user.setPassword(password);
+            user.setEmail(email);
+            user.put("mobile", mobileNum);
+            user.put("firstName", firstName);
+            user.put("lastName", lastName);
+            user.put("gender", gender);
+            user.put("dateOfBirth", dateOfBirth);
+
+            // TODO after user signs up (also handle duplicate email registration here)
+            user.signUpInBackground(new SignUpCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if(e == null) {
+
+                    }
+                    else {
+
+                    }
+                }
+            });
+
+            // TODO after user login
+            ParseUser.logInInBackground(email, password, new LogInCallback() {
+                @Override
+                public void done(ParseUser user, ParseException e) {
+                    if (user != null) {
+
+                    }
+                    else {
+
+                    }
+                }
+            });
         }
     }
 
@@ -296,10 +350,21 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         if (password.length() < 8) {
             return getString(R.string.error_short_password);
         }
-
-        // TODO must have at least 1 alphabet
-        // TODO must have at least 1 number
-        // TODO must have at least 1 upper case character
+        Pattern lower = Pattern.compile("[a-z]+");
+        Matcher m = lower.matcher(password);
+        if (!m.find()) {
+            return getString(R.string.error_password_lowercase);
+        }
+        Pattern num = Pattern.compile("[0-9]+");
+        m = num.matcher(password);
+        if(!m.find()) {
+            return getString(R.string.error_password_number);
+        }
+        Pattern upper = Pattern.compile("[A-Z]+");
+        m = upper.matcher(password);
+        if(!m.find()) {
+            return getString(R.string.error_password_uppercase);
+        }
         return null;
     }
 
