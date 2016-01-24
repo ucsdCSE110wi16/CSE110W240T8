@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -228,8 +229,8 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         // Store values at the time of the login attempt.
         String firstName = mFirstNameView.getText().toString();
         String lastName = mLastNameView.getText().toString();
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        final String email = mEmailView.getText().toString();
+        final String password = mPasswordView.getText().toString();
         String mobileNum = mMobileNumberView.getText().toString();
         String gender = mGenderSpinner.getSelectedItem().toString();
         JSONObject dOB = new JSONObject();
@@ -294,6 +295,8 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
+            Log.d(TAG, "Attempting to login user: " + firstName + " " + lastName + "\nemail: "
+                    + email + "\nGender: " + gender + "\nDOB: " + dateOfBirth);
             currentlySigningUp = true;
             showProgress(true);
 
@@ -307,28 +310,47 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             user.put("gender", gender);
             user.put("dateOfBirth", dateOfBirth);
 
-            // TODO after user signs up (also handle duplicate email registration here)
             user.signUpInBackground(new SignUpCallback() {
                 @Override
                 public void done(ParseException e) {
-                    if(e == null) {
+                    currentlySigningUp = false;
+                    if (e == null) {
+                        // User successfully signed up
+                        Log.d(TAG, "User successfully signed up");
+                        ParseUser.logInInBackground(email, password, new LogInCallback() {
+                            @Override
+                            public void done(ParseUser user, ParseException e) {
+                                if (user != null) {
+                                    // Successfully logged user in
+                                    Log.d(TAG, "Successfully logged user in.");
+                                    // Taking the user to the main activity and
+                                    // killing all other activities in the BG
 
-                    }
-                    else {
+                                    // TODO replace BlahActivity with the main activity
+//                                    Intent intent = new Intent(SignUpActivity.this, BlahActivity.class);
+//                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                    startActivity(intent);
+                                } else {
+                                    Log.d(TAG, "Unable to log user in." +
+                                            ((e != null) ? (" ParseException occured. Code: " +
+                                            e.getCode() + ". Message: " + e.getMessage()) : ""));
 
-                    }
-                }
-            });
+                                    // TODO take the user to the 404 (unknown error) page
+                                }
+                            }
+                        });
+                    } else {
+                        // Excpetion happened
+                        Log.d(TAG, "ParseException occured. Code: " + e.getCode()
+                                + " Message: " + e.getMessage());
 
-            // TODO after user login
-            ParseUser.logInInBackground(email, password, new LogInCallback() {
-                @Override
-                public void done(ParseUser user, ParseException e) {
-                    if (user != null) {
-
-                    }
-                    else {
-
+                        if (e.getCode() == 202) {
+                            mEmailView.setError(getString(R.string.error_email_already_taken));
+                        } else {
+                            mEmailView.setError(e.getMessage());
+                        }
+                        showProgress(false);
+                        mEmailView.requestFocus();
                     }
                 }
             });

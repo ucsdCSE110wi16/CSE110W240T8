@@ -67,6 +67,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (ParseUser.getCurrentUser() != null) {
+            // Taking the user to the main activity and killing all other activities in the BG
+
+            // TODO replace BlahActivity with the main activity
+//            Intent intent = new Intent(SignUpActivity.this, BlahActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(intent);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 

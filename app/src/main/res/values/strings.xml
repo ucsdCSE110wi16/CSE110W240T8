@@ -33,4 +33,9 @@
     <string name="error_password_lowercase">Password must contain at least 1 lowercase character</string>
     <string name="error_password_uppercase">Password must contain at least 1 uppercase character</string>
     <string name="error_password_number">Password must contain at least 1 number</string>
+    <string name="error_email_already_taken">That email is already taken</string>
+    <string name="error_unkown">Something went wrong. Please try again in a while.</string>
+    <string name="title_activity_blah">BlahActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>
