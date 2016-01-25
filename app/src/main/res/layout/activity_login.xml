@@ -30,9 +30,22 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_login_facebook"
+                android:drawableLeft="@mipmap/ic_facebook_white_36dp"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:textColor="@android:color/white"
+                android:background="@color/com_facebook_button_background_color"
+                android:id="@+id/login_with_facebook_button" />
+
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin">
 
                 <AutoCompleteTextView
                     android:id="@+id/email"
@@ -95,6 +108,14 @@
                     android:textColor="#304ffe"
                     android:textStyle="bold" />
             </LinearLayout>
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:id="@+id/login_error_text_view"
+                android:textColor="#d50000"
+                android:text="@string/error_no_internet_connection" />
 
         </LinearLayout>
     </ScrollView>

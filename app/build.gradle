@@ -21,6 +21,8 @@ android {
     }
 }
 
+repositories { mavenCentral() }
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -36,4 +38,6 @@ dependencies {
 
     compile 'com.parse.bolts:bolts-android:1.+'
     compile 'com.parse:parse-android:1.+'
+
+    compile 'com.facebook.android:facebook-android-sdk:4.6.0'
 }

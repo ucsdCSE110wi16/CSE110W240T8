@@ -30,17 +30,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.facebook.AccessToken;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.LoginController;
+import droidsquad.voyage.model.VoyageUser;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -63,18 +67,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     private TextView signupTextView;
+    private Button mLoginWithFBButton;
+    private TextView mErrorView;
     private final String TAG = LoginActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (ParseUser.getCurrentUser() != null) {
-            // Taking the user to the main activity and killing all other activities in the BG
-
-            // TODO replace BlahActivity with the main activity
-//            Intent intent = new Intent(SignUpActivity.this, BlahActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//            startActivity(intent);
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -94,6 +92,39 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     return true;
                 }
                 return false;
+            }
+        });
+
+        mErrorView = (TextView) findViewById(R.id.login_error_text_view);
+        mErrorView.setText("");
+        mLoginWithFBButton = (Button) findViewById(R.id.login_with_facebook_button);
+        mLoginWithFBButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Logging in user with Facebook.");
+                Collection<String> permissions = new ArrayList<String>();
+                permissions.add("public_profile");
+                permissions.add("email");
+                permissions.add("user_birthday");
+                ParseFacebookUtils.logInWithReadPermissionsInBackground(LoginActivity.this, permissions, new LogInCallback() {
+                    @Override
+                    public void done(ParseUser user, ParseException err) {
+                        if (user == null) {
+                            Log.d(TAG, "Uh oh. The user cancelled the Facebook login.");
+
+                            if (err != null && err.getCode() == -1) {
+                                Log.d(TAG, "No internet!");
+                                mErrorView.setText(getString(R.string.error_no_internet_connection));
+                            }
+                        } else if (user.isNew()) {
+                            Log.d(TAG, "Signing up new user.");
+                            VoyageUser.refreshInfoFromFB();
+                        } else {
+                            Log.d(TAG, "User logged in through Facebook!");
+                            VoyageUser.refreshInfoFromFB();
+                        }
+                    }
+                });
             }
         });
 
@@ -221,15 +252,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         // Hooray! The user is logged in.
                         Log.d(TAG, "Successfully logged in " + email);
                     } else {
-                        // Signup failed. Look at the ParseException to see what happened.
+                        // Login failed. Look at the ParseException to see what happened.
                         showProgress(false);
                         if (e.getCode() == 101) {
                             Log.d(TAG, "Couldn't login " + email + "\nInvalid email or password");
                             mEmailView.setError(getString(R.string.invalid_login_credentials_error));
+                            mEmailView.requestFocus();
+                        } else if (e.getCode() == 100) {
+                            mErrorView.setText(getString(R.string.error_no_internet_connection));
                         } else {
                             Log.d(TAG, "Unknown error: " + e.getMessage());
+                            mErrorView.setText(getString(R.string.error_unkown));
                         }
-                        mEmailView.requestFocus();
                     }
                 }
             });
@@ -331,5 +365,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
     }
-}
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+    }
+}

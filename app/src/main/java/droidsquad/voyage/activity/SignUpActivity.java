@@ -6,7 +6,6 @@ import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -19,10 +18,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -34,6 +31,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -44,10 +42,12 @@ import org.json.JSONObject;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.model.VoyageUser;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -73,7 +73,8 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
     private Spinner mGenderSpinner;
     private Button mDobButton;
     private View mProgressView;
-    private TextView errorView;
+    private Button mSignUpWithFBButton;
+    private TextView mErrorView;
     private View mLoginFormView;
     private int mYear;
     private int mMonth;
@@ -95,8 +96,8 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         mLastNameView = (EditText) findViewById(R.id.signup_last_name);
         mMobileNumberView = (EditText) findViewById(R.id.signup_mobile);
         mGenderSpinner = (Spinner) findViewById(R.id.signup_gender_spinner);
-        errorView = (TextView) findViewById(R.id.signup_error_text_view);
-        errorView.setText("");
+        mErrorView = (TextView) findViewById(R.id.signup_error_text_view);
+        mErrorView.setText("");
 
         // Setting up the gender spinner
         ArrayAdapter<CharSequence> adapter1 = new ArrayAdapter<CharSequence>(this,
@@ -154,6 +155,37 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
 
         mLoginFormView = findViewById(R.id.signup_form);
         mProgressView = findViewById(R.id.signup_progress);
+
+        mSignUpWithFBButton = (Button) findViewById(R.id.sign_up_with_facebook_button);
+        mSignUpWithFBButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Signing up user with Facebook.");
+                Collection<String> permissions = new ArrayList<String>();
+                permissions.add("public_profile");
+                permissions.add("email");
+                permissions.add("user_birthday");
+                ParseFacebookUtils.logInWithReadPermissionsInBackground(SignUpActivity.this, permissions, new LogInCallback() {
+                    @Override
+                    public void done(ParseUser user, ParseException err) {
+                        if (user == null) {
+                            Log.d(TAG, "Uh oh. The user cancelled the Facebook login.");
+
+                            if (err!= null && err.getCode() == -1) {
+                                Log.d(TAG, "No internet!");
+                                mErrorView.setText(getString(R.string.error_no_internet_connection));
+                            }
+                        } else if (user.isNew()) {
+                            Log.d(TAG, "Signing up new user");
+                            VoyageUser.refreshInfoFromFB();
+                        } else {
+                            Log.d(TAG, "User logged in through Facebook!");
+                            VoyageUser.refreshInfoFromFB();
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private void populateAutoComplete() {
@@ -200,11 +232,6 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
     }
 
 
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptSignup() {
         if (currentlySigningUp) {
             return;
@@ -243,7 +270,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             mMobileNumberView.setError(getString(R.string.error_empty_mobile_num));
             focusView = mMobileNumberView;
             cancel = true;
-        } else if (!isMobileNumValid(mobileNum)) {
+        } else if (!VoyageUser.isMobileNumValid(mobileNum)) {
             mMobileNumberView.setError(getString(R.string.error_invalid_mobile_num));
             focusView = mMobileNumberView;
             cancel = true;
@@ -261,7 +288,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
+        } else if (!VoyageUser.isEmailValid(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
@@ -298,7 +325,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             user.put("mobile", mobileNum);
             user.put("firstName", firstName);
             user.put("lastName", lastName);
-            user.put("gender", gender);
+            user.put("gender", gender.toLowerCase());
             user.put("dateOfBirth", dateOfBirth);
 
             user.signUpInBackground(new SignUpCallback() {
@@ -335,30 +362,19 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
                         Log.d(TAG, "ParseException occured. Code: " + e.getCode()
                                 + " Message: " + e.getMessage());
 
-                        if (e.getCode() == 202) {
+                        if (e.getCode() == 202 || e.getCode() == 203) {
                             mEmailView.setError(getString(R.string.error_email_already_taken));
                             mEmailView.requestFocus();
                         } else if (e.getCode() == 100) {
-                            errorView.setText(getString(R.string.error_no_internet_connection));
+                            mErrorView.setText(getString(R.string.error_no_internet_connection));
                         } else {
-                            errorView.setText(e.getMessage());
+                            mErrorView.setText(e.getMessage());
                         }
                         showProgress(false);
                     }
                 }
             });
         }
-    }
-
-    private boolean isMobileNumValid(String mobileNum) {
-        /*
-         *   matching phone number with regex
-         *   Examples: Matches following phone numbers:
-         *   (123)456-7890, 123-456-7890, 1234567890, (123)-456-7890
-         */
-        Pattern p = Pattern.compile("^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$");
-        Matcher m = p.matcher(mobileNum);
-        return m.matches();
     }
 
     private String getPasswordError(String password) {
@@ -381,12 +397,6 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             return getString(R.string.error_password_uppercase);
         }
         return null;
-    }
-
-    private boolean isEmailValid(String email) {
-        Pattern p = Pattern.compile(".+@.+\\.[a-z]+"); // matching email with regex
-        Matcher m = p.matcher(email);
-        return m.matches();
     }
 
     /**
