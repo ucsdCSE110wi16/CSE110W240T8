@@ -1,12 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="droidsquad.voyage.activity.CreateTripActivity">
+    android:layout_height="wrap_content">
 
-</RelativeLayout>
+    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="droidsquad.voyage.activity.CreateTripActivity">
+
+        <!-- General Section -->
+
+        <android.support.v7.widget.AppCompatTextView
+            style="@style/sectionDivider"
+            android:text="@string/section_general" />
+
+        <android.support.design.widget.TextInputLayout style="@style/formWrapper">
+            <android.support.v7.widget.AppCompatEditText
+                style="@style/formInput"
+                android:hint="@string/label_trip_name" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/formWrapper">
+            <android.support.v7.widget.AppCompatEditText
+                style="@style/formInput"
+                android:hint="@string/label_trip_members_limit"
+                android:inputType="number" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.v7.widget.AppCompatCheckBox
+            style="@style/formInput"
+            android:checked="true"
+            android:text="@string/label_trip_private"
+            android:textSize="@dimen/abc_text_size_medium_material" />
+
+
+        <!-- Details Section -->
+
+        <android.support.v7.widget.AppCompatTextView
+            style="@style/sectionDivider"
+            android:text="@string/section_details" />
+
+        <android.support.design.widget.TextInputLayout style="@style/formWrapper">
+            <android.support.v7.widget.AppCompatEditText
+                style="@style/formInput"
+                android:hint="@string/label_trip_leaving_from" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/formWrapper">
+            <android.support.v7.widget.AppCompatEditText
+                style="@style/formInput"
+                android:hint="@string/label_trip_destination" />
+        </android.support.design.widget.TextInputLayout>
+
+        <!-- Date pcikers -->
+        <LinearLayout
+            style="@style/formWrapper"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:layout_weight="0.9"
+                android:src="@drawable/ic_date_range_black_24px" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.55"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/fab_margin"
+                android:paddingRight="@dimen/fab_margin"
+                android:clickable="true">
+
+                <TextView
+                    style="@style/formInput"
+                    android:text="@string/label_trip_from"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    style="@style/formInput"
+                    android:inputType="date"
+                    android:text="21 Jan, 2016"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:layout_weight="0.9"
+                android:src="@drawable/ic_date_range_black_24px" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.55"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/fab_margin"
+                android:paddingRight="@dimen/fab_margin"
+                android:clickable="true">
+
+                <TextView
+                    style="@style/formInput"
+                    android:text="@string/label_trip_to"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    style="@style/formInput"
+                    android:inputType="date"
+                    android:text="21 Jan, 2016"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="4dp"
+            android:text="@string/label_trip_transportation"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <android.support.design.widget.TextInputLayout style="@style/formWrapper">
+            <Spinner
+                style="@style/formInput"
+                android:entries="@array/trip_transportation_array" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.v7.widget.AppCompatButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/create_button"
+            android:text="@string/label_trip_create_button"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+</ScrollView>
