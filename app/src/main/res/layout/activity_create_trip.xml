@@ -155,8 +155,8 @@
         <android.support.design.widget.TextInputLayout style="@style/formWrapper">
             <Spinner
                 style="@style/formInput"
-                android:id="@+id/transp"
-                android:entries="@array/trip_transportation_array" />
+                android:id="@+id/transportation"
+                 />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.AppCompatButton

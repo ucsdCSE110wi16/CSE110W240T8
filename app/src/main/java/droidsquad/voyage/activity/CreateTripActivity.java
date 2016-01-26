@@ -5,26 +5,28 @@ import android.app.Dialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.CreateTripController;
 import droidsquad.voyage.model.Trip;
 
 
-public class CreateTripActivity extends AppCompatActivity {
+public class CreateTripActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private CreateTripController controller;
 
@@ -33,15 +35,16 @@ public class CreateTripActivity extends AppCompatActivity {
     private CheckBox mPrivateView;
     private EditText mLeavingFromView;
     private EditText mDestinationView;
-    private EditText mTransportation;
+    private Spinner mTransportation;
     private TextView mDateFromView;
     private TextView mDateToView;
-    private DatePicker datePicker;
     private Calendar calendarFrom;
     private Calendar calendarTo;
 
     private int yearFrom, monthFrom, dayFrom;
     private int yearTo, monthTo, dayTo;
+
+    private String transportation;
 
     static final int DATE_FROM_PICKER_ID = 999;
     static final int DATE_TO_PICKER_ID = 1111;
@@ -60,11 +63,31 @@ public class CreateTripActivity extends AppCompatActivity {
         mPrivateView = (CheckBox) findViewById(R.id.private_check);
         mLeavingFromView = (EditText) findViewById(R.id.leaving_from);
         mDestinationView = (EditText) findViewById(R.id.destination);
-        //mTransportation = (EditText) findViewById(R.id.transportation);
-
+        mTransportation = (Spinner) findViewById(R.id.transportation);
         mDateFromView = (TextView) findViewById(R.id.date_from);
         mDateToView = (TextView) findViewById(R.id.date_to);
 
+        // Spinner click listener
+        mTransportation.setOnItemSelectedListener(this);
+
+        // Spinner Drop down elements
+        List<String> categories = new ArrayList<String>();
+        categories.add("Plane");
+        categories.add("Metro");
+        categories.add("Bus");
+        categories.add("Car");
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                                                android.R.layout.simple_spinner_item, categories);
+
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        mTransportation.setAdapter(dataAdapter);
+
+        // Set up default dates
         calendarFrom = new GregorianCalendar();
         calendarTo = new GregorianCalendar();
         calendarTo.add(Calendar.DAY_OF_WEEK, DEFAULT_TRIP_LENGTH);
@@ -79,6 +102,18 @@ public class CreateTripActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    //android:entries="@array/trip_transportation_array"
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // On selecting a spinner item
+        transportation = parent.getItemAtPosition(position).toString();
+
+    }
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // TODO Auto-generated method stub
     }
 
     @SuppressWarnings("deprecation")
@@ -130,23 +165,21 @@ public class CreateTripActivity extends AppCompatActivity {
         }
     };
 
+    // Show date on the Layout
     private void showDate() {
 
         yearFrom = calendarFrom.get(Calendar.YEAR);
         monthFrom = calendarFrom.get(Calendar.MONTH) + 1;
         dayFrom = calendarFrom.get(Calendar.DAY_OF_MONTH);
 
-        // TODO: Date TO set up to 1 week from TODAY
-        //calendarTo.add(Calendar.DAY_OF_WEEK, DEFAULT_TRIP_LENGTH);
-
         yearTo = calendarTo.get(Calendar.YEAR);
         monthTo = calendarTo.get(Calendar.MONTH) + 1;
         dayTo = calendarTo.get(Calendar.DAY_OF_MONTH);
 
-        mDateFromView.setText(new StringBuilder().append(dayFrom).append("/")
-                .append(monthFrom).append("/").append(yearFrom));
-        mDateToView.setText(new StringBuilder().append(dayTo).append("/")
-                .append(monthTo).append("/").append(yearTo));
+        mDateFromView.setText(new StringBuilder().append(monthFrom).append("/")
+                .append(dayFrom).append("/").append(yearFrom));
+        mDateToView.setText(new StringBuilder().append(monthTo).append("/")
+                .append(dayTo).append("/").append(yearTo));
     }
 
     /** Called when the user touches the button */
@@ -169,10 +202,13 @@ public class CreateTripActivity extends AppCompatActivity {
 
         String leavingFrom = mLeavingFromView.getText().toString();
         String destination = mDestinationView.getText().toString();
-        //String transp = mTransportation.getText().toString();
+
+        Date dateFrom = calendarFrom.getTime();
+        Date dateTo = calendarTo.getTime();
 
         // TODO: CHANGE HERE
-        Trip newTrip = new Trip(tripName, leavingFrom, destination, privateTrip);
+        Trip newTrip = new Trip(tripName, leavingFrom, destination, privateTrip,
+                                            memberLimit, dateFrom, dateTo, transportation);
         newTrip.save();
 
         System.out.print(newTrip);

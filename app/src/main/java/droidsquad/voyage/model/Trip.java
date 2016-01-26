@@ -77,7 +77,11 @@ public class Trip {
         String toReturn = "Trip Name: " + tripName + "\n";
         toReturn += "Leaving From: " + tripOrigin + "\n";
         toReturn += "Destination: " + tripDestination + "\n";
+        toReturn += "Transportation: " + transportation + "\n";
         toReturn += "Private: " + tripPrivate + "\n";
+        toReturn += "Limit: " + tripLimit + " persons\n";
+        toReturn += "Date From: " + dateFrom + "\n";
+        toReturn += "Date To: " + dateTo + "\n";
         return toReturn;
     }
 
