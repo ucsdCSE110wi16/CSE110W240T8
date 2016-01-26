@@ -22,18 +22,21 @@
         <android.support.design.widget.TextInputLayout style="@style/formWrapper">
             <android.support.v7.widget.AppCompatEditText
                 style="@style/formInput"
+                android:id="@+id/trip_name"
                 android:hint="@string/label_trip_name" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout style="@style/formWrapper">
             <android.support.v7.widget.AppCompatEditText
                 style="@style/formInput"
+                android:id="@+id/member_limit"
                 android:hint="@string/label_trip_members_limit"
                 android:inputType="number" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.AppCompatCheckBox
             style="@style/formInput"
+            android:id="@+id/private_check"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:checked="true"
             android:text="@string/label_trip_private"
@@ -51,16 +54,18 @@
         <android.support.design.widget.TextInputLayout style="@style/formWrapper">
             <android.support.v7.widget.AppCompatEditText
                 style="@style/formInput"
+                android:id="@+id/leaving_from"
                 android:hint="@string/label_trip_leaving_from" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout style="@style/formWrapper">
             <android.support.v7.widget.AppCompatEditText
                 style="@style/formInput"
+                android:id="@+id/destination"
                 android:hint="@string/label_trip_destination" />
         </android.support.design.widget.TextInputLayout>
 
-        <!-- Date pcikers -->
+        <!-- Date pickers -->
         <LinearLayout
             style="@style/formWrapper"
             android:orientation="horizontal" >
@@ -88,8 +93,9 @@
 
                 <android.support.v7.widget.AppCompatTextView
                     style="@style/formInput"
+                    android:id="@+id/date_from"
                     android:inputType="date"
-                    android:text="21 Jan, 2016"
+
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#000000"/>
             </LinearLayout>
@@ -117,6 +123,7 @@
 
                 <android.support.v7.widget.AppCompatTextView
                     style="@style/formInput"
+                    android:id="@+id/date_to"
                     android:inputType="date"
                     android:text="21 Jan, 2016"
                     android:textAppearance="?android:attr/textAppearanceMedium"
@@ -128,6 +135,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="4dp"
+            android:id="@+id/transportation"
             android:text="@string/label_trip_transportation"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -141,6 +149,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/create_button"
+            android:id="@+id/create_trip_button"
             android:text="@string/label_trip_create_button"
             android:textColor="#ffffff" />
     </LinearLayout>

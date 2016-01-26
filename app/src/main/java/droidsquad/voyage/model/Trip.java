@@ -68,7 +68,7 @@ public class Trip {
         dateTo = to;
     }
 
-    public void setTrasp( String transp ){
+    public void setTransp( String transp ){
         transportation = transp;
     }
 
