@@ -72,6 +72,15 @@ public class Trip {
         transportation = transp;
     }
 
+    @Override
+    public String toString(){
+        String toReturn = "Trip Name: " + tripName + "\n";
+        toReturn += "Leaving From: " + tripOrigin + "\n";
+        toReturn += "Destination: " + tripDestination + "\n";
+        toReturn += "Private: " + tripPrivate + "\n";
+        return toReturn;
+    }
+
     public void save() {
         ParseObject trip = new ParseObject("Trip");
         trip.put("name", tripName);
