@@ -11,12 +11,12 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        tools:context="droidsquad.voyage.activity.CreateTripActivity">
+        tools:context="droidsquad.voyage.activity.CreateTripActivity" >
 
         <!-- General Section -->
 
         <android.support.v7.widget.AppCompatTextView
-            style="@style/sectionDivider"
+            style="@style/sectionTitle"
             android:text="@string/section_general" />
 
         <android.support.design.widget.TextInputLayout style="@style/formWrapper">
@@ -34,15 +34,18 @@
 
         <android.support.v7.widget.AppCompatCheckBox
             style="@style/formInput"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:checked="true"
             android:text="@string/label_trip_private"
             android:textSize="@dimen/abc_text_size_medium_material" />
 
+        <View
+            style="@style/sectionDivider"/>
 
         <!-- Details Section -->
 
         <android.support.v7.widget.AppCompatTextView
-            style="@style/sectionDivider"
+            style="@style/sectionTitle"
             android:text="@string/section_details" />
 
         <android.support.design.widget.TextInputLayout style="@style/formWrapper">
