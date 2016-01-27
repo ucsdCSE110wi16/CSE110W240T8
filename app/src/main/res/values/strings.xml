@@ -14,4 +14,24 @@
         completions."
     </string>
     <string name="title_activity_create_user">CreateUserActivity</string>
+
+    <!-- Strings related to trip creation -->
+    <string name="label_trip_name">Trip Name</string>
+    <string name="label_trip_members_limit">Members Limit</string>
+    <string name="label_trip_private">Private</string>
+    <string name="section_general">General</string>
+    <string name="section_details">Details</string>
+    <string name="label_trip_leaving_from">Leaving From</string>
+    <string name="label_trip_destination">Destination</string>
+    <string name="label_trip_from">From</string>
+    <string name="label_trip_to">To</string>
+    <string name="label_trip_create_button">Create</string>
+    <string name="label_trip_transportation">Transportation</string>
+
+    <string-array name="trip_transportation_array">
+        <item>Plane</item>
+        <item>Metro</item>
+        <item>Bus</item>
+        <item>Car</item>
+    </string-array>
 </resources>
