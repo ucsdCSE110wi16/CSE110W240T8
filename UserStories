@@ -1,25 +1,20 @@
 DROID SQUAD USER STORIES (1 = greatest priority, 5 = lowest priority)
 
-Create New Trip
-As a travelers' group leader, I want to create a new trip with all its info so that I can begin the trip planning process.
-Estimation of Time for Completion: 1 wk
-Customer Priority: 1
-
-Register New User
-As a traveler client, I want to register an account via Facebook or email so that I can be able to access my saved trips later.
-Estimation of Time for Completion: 1 wk
-Customer Priority: 1
-
-User Login
-As a traveler client, I want to login via Facebook or email so that I can access my saved trips.
-Estimation of Time for Completion: 1 wk
-Customer Priority: 1
+********** Current Iteration **********
 
 View All Current Trips
 As a traveler client, I want to be able to view all the current trips I am currently signed up for so that the trip information is 
 accessible.
-Estimation of Time for Completion: 2-3 days
+Estimation of Time for Completion: 1 wk
 Customer Priority: 1
+
+Polish Create Trip Flow
+As a group leader for a trip, I want to be able to create a trip with more
+fluid UX that displays descriptions for the trip options and software keyboard
+that hides itself in proper contexts.
+Estimation of Time for Completion: 1 day
+
+********** TODO **********
 
 Invite members to current trip
 As a group leader for a trip, I want to be able to add/delete friends from the trip so that I can form traveling group.
@@ -75,5 +70,30 @@ Customer Priority: 5
 
 Delete Account
 As a traveler client, I want to be able to delete my account so that I will not be affiliated with this app's services anymore.
-Estimation of Time for Completion: 2-3 days
+Estimation of Time for Completion: 1 day
 Customer Priority: 5
+
+********** Done **********
+
+Create New Trip
+As a travelers' group leader, I want to create a new trip with all its info so that I can begin the trip planning process.
+Estimation of Time for Completion: 3-4 days
+Customer Priority: 1
+
+Register New User
+As a traveler client, I want to register an account via Facebook or email so that I can be able to access my saved trips later.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 1
+
+User Login
+As a traveler client, I want to login via Facebook or email so that I can access my saved trips.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 1
+
+
+
+
+
+
+
+
