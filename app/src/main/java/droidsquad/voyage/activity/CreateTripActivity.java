@@ -11,6 +11,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -138,6 +139,13 @@ public class CreateTripActivity extends AppCompatActivity {
         Trip newTrip = new Trip(tripName, leavingFrom, destination, privateTrip,
                 memberLimit, dateFrom, dateTo, transportation);
         newTrip.save();
+
+        //Create toast
+        CharSequence text = "Trip Created";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(this, text, duration);
+        toast.show();
     }
 
     private boolean isEmpty(EditText etText) {
