@@ -17,7 +17,7 @@ public class Trip {
     private String tripName;
     private String tripOrigin;
     private String tripDestination;
-    boolean tripPrivate;
+    private boolean tripPrivate;
 
     // Details
     private int tripLimit;
@@ -56,22 +56,6 @@ public class Trip {
         transportation = DEFAULT_TRANSP;
     }
 
-    public void setLimit( int limit ) {
-        tripLimit = limit;
-    }
-
-    public void setDateFrom( Date from ) {
-        dateFrom = from;
-    }
-
-    public void setDateto( Date to ) {
-        dateTo = to;
-    }
-
-    public void setTransp( String transp ){
-        transportation = transp;
-    }
-
     @Override
     public String toString(){
         String toReturn = "Trip Name: " + tripName + "\n";
@@ -85,17 +69,63 @@ public class Trip {
         return toReturn;
     }
 
-    public void save() {
-        ParseObject trip = new ParseObject("Trip");
-        trip.put("name", tripName);
-        trip.put("origin", tripOrigin);
-        trip.put("destination", tripDestination);
-        trip.put("private", tripPrivate);
-        trip.put("dateFrom", dateFrom);
-        trip.put("dateTo", dateTo);
-        trip.put("limit", tripLimit);
-        trip.put("transportation", transportation);
-        trip.saveInBackground();
+    public String getTripName() {
+        return tripName;
     }
 
+    public void setTripName(String tripName) {
+        this.tripName = tripName;
+    }
+
+    public String getTripOrigin() {
+        return tripOrigin;
+    }
+
+    public void setTripOrigin(String tripOrigin) {
+        this.tripOrigin = tripOrigin;
+    }
+
+    public String getTripDestination() {
+        return tripDestination;
+    }
+
+    public void setTripDestination(String tripDestination) {
+        this.tripDestination = tripDestination;
+    }
+
+    public boolean isTripPrivate() {
+        return tripPrivate;
+    }
+
+    public void setTripPrivate(boolean tripPrivate) {
+        this.tripPrivate = tripPrivate;
+    }
+
+    public int getTripLimit() {
+        return tripLimit;
+    }
+
+    public void setTripLimit(int tripLimit) {
+        this.tripLimit = tripLimit;
+    }
+
+    public Date getDateFrom() {
+        return dateFrom;
+    }
+
+    public Date getDateTo() {
+        return dateTo;
+    }
+
+    public void setDateTo(Date dateTo) {
+        this.dateTo = dateTo;
+    }
+
+    public String getTransportation() {
+        return transportation;
+    }
+
+    public void setTransportation(String transportation) {
+        this.transportation = transportation;
+    }
 }

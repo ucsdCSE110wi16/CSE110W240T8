@@ -70,7 +70,7 @@ public class CreateTripActivity extends AppCompatActivity {
 
     private void initTransportationSpinner() {
         // Spinner Drop down elements
-        // TODO: do not hardcode these
+        // TODO: do not hardcode these, move this somewhere else...
         String categories[] = {"Plane", "Metro", "Bus", "Car"};
 
         // Creating adapter for spinner
@@ -120,12 +120,7 @@ public class CreateTripActivity extends AppCompatActivity {
 
     }
 
-
-
-
-
-
-
+    /* GETTERS */
 
     public EditText getTripNameView() {
         return mTripNameView;
