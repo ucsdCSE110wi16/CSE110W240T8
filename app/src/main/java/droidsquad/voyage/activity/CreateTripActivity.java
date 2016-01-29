@@ -1,43 +1,28 @@
 package droidsquad.voyage.activity;
 
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
-
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.Locale;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.CreateTripController;
 import droidsquad.voyage.model.Trip;
 
 
-public class CreateTripActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-
+public class CreateTripActivity extends AppCompatActivity {
     private CreateTripController controller;
 
     private EditText mTripNameView;
@@ -53,16 +38,9 @@ public class CreateTripActivity extends AppCompatActivity implements AdapterView
     private Calendar calendarFrom;
     private Calendar calendarTo;
 
-    private int yearFrom, monthFrom, dayFrom;
-    private int yearTo, monthTo, dayTo;
-
-    private String transportation;
-
+    private static final int DEFAULT_TRIP_LENGTH = 7;
     private static final String TAG = CreateTripActivity.class.getSimpleName();
-
-    static final int DATE_FROM_PICKER_ID = 999;
-    static final int DATE_TO_PICKER_ID = 1111;
-    static final int DEFAULT_TRIP_LENGTH = 7;
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,20 +62,12 @@ public class CreateTripActivity extends AppCompatActivity implements AdapterView
         controller.setUpPlacesAutofill(mLeavingFromView, 0);
         controller.setUpPlacesAutofill(mDestinationView, 1);
 
-
-        // Spinner click listener
-        mTransportation.setOnItemSelectedListener(this);
-
         // Spinner Drop down elements
-        List<String> categories = new ArrayList<String>();
-        categories.add("Plane");
-        categories.add("Metro");
-        categories.add("Bus");
-        categories.add("Car");
+        String categories[] = {"Plane", "Metro", "Bus", "Car"};
 
         // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                                                android.R.layout.simple_spinner_item, categories);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, categories);
 
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -106,103 +76,47 @@ public class CreateTripActivity extends AppCompatActivity implements AdapterView
         mTransportation.setAdapter(dataAdapter);
 
         // Set up default dates
-        calendarFrom = new GregorianCalendar();
-        calendarTo = new GregorianCalendar();
+        calendarFrom = Calendar.getInstance();
+        calendarTo = Calendar.getInstance();
         calendarTo.add(Calendar.DAY_OF_WEEK, DEFAULT_TRIP_LENGTH);
-        showDate();
+        mDateFromView.setText(dateFormat.format(calendarFrom.getTime()));
+        mDateToView.setText(dateFormat.format(calendarTo.getTime()));
+    }
 
-        // Create trip button
-        Button mCreateTripButton = (Button) findViewById(R.id.create_trip_button);
-        mCreateTripButton.setOnClickListener(new View.OnClickListener() {
+    public void showFromDateDialog(View view) {
+        showDateDialogAndUpdateView(new DatePickerDialog.OnDateSetListener() {
             @Override
-            public void onClick(View view) {
-                attemptCreateTrip();
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                calendarFrom.set(year, monthOfYear, dayOfMonth);
+                mDateFromView.setText(dateFormat.format(calendarFrom.getTime()));
             }
-        });
-
+        }, calendarFrom);
     }
 
-    //android:entries="@array/trip_transportation_array"
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // On selecting a spinner item
-        transportation = parent.getItemAtPosition(position).toString();
-
-    }
-    public void onNothingSelected(AdapterView<?> arg0) {
-        // TODO Auto-generated method stub
+    public void showToDateDialog(View view) {
+        showDateDialogAndUpdateView(new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                calendarTo.set(year, monthOfYear, dayOfMonth);
+                mDateToView.setText(dateFormat.format(calendarTo.getTime()));
+            }
+        }, calendarTo);
     }
 
-    @SuppressWarnings("deprecation")
-    public void setDateFrom(View view){
-        showDialog(DATE_FROM_PICKER_ID);
+    public void showDateDialogAndUpdateView(DatePickerDialog.OnDateSetListener listener, Calendar cal) {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, listener,
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
+        );
+
+        datePickerDialog.show();
     }
 
-    @SuppressWarnings("deprecation")
-    public void setDateTo(View view){
-        System.out.println("SET DATE TO...");
-        showDialog(DATE_TO_PICKER_ID);
-    }
 
-    @Override
-    @SuppressWarnings("deprecation")
-    protected Dialog onCreateDialog(int id) {
-        if (id == DATE_FROM_PICKER_ID) {
-            return new DatePickerDialog(this, DateFromListener, yearFrom, monthFrom-1, dayFrom);
-        }
-        else if (id == DATE_TO_PICKER_ID) {
-            return new DatePickerDialog(this, DateToListener, yearTo, monthTo-1, dayTo);
-        }
-        return null;
-    }
-
-    // SET DATE TO
-    private DatePickerDialog.OnDateSetListener DateToListener = new DatePickerDialog.OnDateSetListener() {
-        @Override
-        public void onDateSet(DatePicker arg0, int arg1, int arg2, int arg3) {
-            // TODO Auto-generated method stub
-            // arg1 = year
-            // arg2 = month
-            // arg3 = day
-            calendarTo.set(arg1, arg2, arg3);
-            showDate();
-        }
-    };
-
-    // SET DATE FROM
-    private DatePickerDialog.OnDateSetListener DateFromListener = new DatePickerDialog.OnDateSetListener() {
-        @Override
-        public void onDateSet(DatePicker arg0, int arg1, int arg2, int arg3) {
-            // TODO Auto-generated method stub
-            // arg1 = year
-            // arg2 = month
-            // arg3 = day
-            calendarFrom.set(arg1, arg2, arg3);
-            showDate();
-        }
-    };
-
-    // Show date on the Layout
-    private void showDate() {
-
-        yearFrom = calendarFrom.get(Calendar.YEAR);
-        monthFrom = calendarFrom.get(Calendar.MONTH) + 1;
-        dayFrom = calendarFrom.get(Calendar.DAY_OF_MONTH);
-
-        yearTo = calendarTo.get(Calendar.YEAR);
-        monthTo = calendarTo.get(Calendar.MONTH) + 1;
-        dayTo = calendarTo.get(Calendar.DAY_OF_MONTH);
-
-        mDateFromView.setText(new StringBuilder().append(monthFrom).append("/")
-                .append(dayFrom).append("/").append(yearFrom));
-        mDateToView.setText(new StringBuilder().append(monthTo).append("/")
-                .append(dayTo).append("/").append(yearTo));
-    }
-
-    /** Called when the user touches the button */
-    public void attemptCreateTrip() {
-
+    /**
+     * Called when the user presses the create trip button
+     * TODO: Move to Controller and implement checks
+     */
+    public void attemptCreateTrip(View view) {
         String tripName = mTripNameView.getText().toString();
 
         int memberLimit = 0;
@@ -210,13 +124,7 @@ public class CreateTripActivity extends AppCompatActivity implements AdapterView
             memberLimit = Integer.parseInt(mMemberLimitView.getText().toString());
         }
 
-        boolean privateTrip;
-        if (mPrivateView.isChecked()) {
-            privateTrip = true;
-        }
-        else {
-            privateTrip = false;
-        }
+        boolean privateTrip = mPrivateView.isChecked();
 
         String leavingFrom = mLeavingFromView.getText().toString();
         String destination = mDestinationView.getText().toString();
@@ -224,49 +132,20 @@ public class CreateTripActivity extends AppCompatActivity implements AdapterView
         Date dateFrom = calendarFrom.getTime();
         Date dateTo = calendarTo.getTime();
 
+        String transportation = mTransportation.getSelectedItem().toString();
+
         // TODO: CHANGE HERE
         Trip newTrip = new Trip(tripName, leavingFrom, destination, privateTrip,
-                                            memberLimit, dateFrom, dateTo, transportation);
+                memberLimit, dateFrom, dateTo, transportation);
         newTrip.save();
-
-        System.out.print(newTrip);
-
     }
 
     private boolean isEmpty(EditText etText) {
-        if (etText.getText().toString().trim().length() > 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return etText.getText().toString().trim().length() <= 0;
     }
 
-
-    private static boolean checkDates( DatePicker from, DatePicker to ) {
-
-        Date dateFrom = getDateFromDatePicker(from);
-        Date dateTo = getDateFromDatePicker(to);
-
-        return dateFrom.before(dateTo);
-    }
-
-    private static Date getDateFromDatePicker(DatePicker datePicker){
-
-        int day = datePicker.getDayOfMonth();
-        int month = datePicker.getMonth();
-        int year =  datePicker.getYear();
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day);
-
-        System.out.println("Date: " + calendar.getTime());
-
-        return calendar.getTime();
-    }
-
-    @Override
-    protected void onStop() {
-        controller.disconnectGoogleAPIClient();
-        super.onStop();
+    private static boolean checkDates(DatePicker from, DatePicker to) {
+        // TODO: Move to Controller and implement
+        return false;
     }
 }

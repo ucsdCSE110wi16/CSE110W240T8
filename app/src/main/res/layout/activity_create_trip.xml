@@ -76,7 +76,7 @@
                 android:scaleType="fitCenter"
                 android:layout_weight="0.9"
                 android:clickable="true"
-                android:onClick="setDateFrom"
+                android:onClick="showFromDateDialog"
                 android:src="@drawable/ic_date_range_black_24px" />
 
             <LinearLayout
@@ -84,25 +84,19 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.55"
                 android:orientation="vertical"
-                android:paddingLeft="@dimen/fab_margin"
-                android:paddingRight="@dimen/fab_margin"
-                android:id="@+id/date_from_click"
                 android:clickable="true"
-                android:onClick="setDateFrom" >
+                android:onClick="showFromDateDialog"
+                android:paddingLeft="@dimen/fab_margin"
+                android:paddingRight="@dimen/fab_margin">
 
-                <TextView
+                <android.support.v7.widget.AppCompatTextView
                     style="@style/formInput"
                     android:text="@string/label_trip_from"
-                    android:clickable="true"
-                    android:onClick="setDateFrom"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <android.support.v7.widget.AppCompatTextView
                     style="@style/formInput"
                     android:id="@+id/date_from"
-                    android:inputType="date"
-                    android:clickable="true"
-                    android:onClick="setDateFrom"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#000000"/>
             </LinearLayout>
@@ -113,7 +107,7 @@
                 android:scaleType="fitCenter"
                 android:layout_weight="0.9"
                 android:clickable="true"
-                android:onClick="setDateTo"
+                android:onClick="showToDateDialog"
                 android:src="@drawable/ic_date_range_black_24px" />
 
             <LinearLayout
@@ -123,23 +117,17 @@
                 android:orientation="vertical"
                 android:paddingLeft="@dimen/fab_margin"
                 android:paddingRight="@dimen/fab_margin"
-                android:id="@+id/date_to_click"
                 android:clickable="true"
-                android:onClick="setDateTo">
+                android:onClick="showToDateDialog">
 
                 <TextView
                     style="@style/formInput"
                     android:text="@string/label_trip_to"
-                    android:clickable="true"
-                    android:onClick="setDateTo"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <android.support.v7.widget.AppCompatTextView
                     style="@style/formInput"
                     android:id="@+id/date_to"
-                    android:inputType="date"
-                    android:clickable="true"
-                    android:onClick="setDateTo"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#000000"/>
             </LinearLayout>
@@ -148,7 +136,6 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="4dp"
             android:text="@string/label_trip_transportation"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -165,6 +152,7 @@
             android:background="@drawable/create_button"
             android:id="@+id/create_trip_button"
             android:text="@string/label_trip_create_button"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:onClick="attemptCreateTrip"/>
     </LinearLayout>
 </ScrollView>
