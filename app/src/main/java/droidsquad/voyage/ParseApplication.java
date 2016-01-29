@@ -2,6 +2,8 @@ package droidsquad.voyage;
 
 import android.app.Application;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Places;
 import com.parse.Parse;
 
 /**

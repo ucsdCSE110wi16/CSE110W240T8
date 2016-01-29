@@ -52,14 +52,14 @@
             android:text="@string/section_details" />
 
         <android.support.design.widget.TextInputLayout style="@style/formWrapper">
-            <android.support.v7.widget.AppCompatEditText
+            <android.support.v7.widget.AppCompatAutoCompleteTextView
                 style="@style/formInput"
                 android:id="@+id/leaving_from"
                 android:hint="@string/label_trip_leaving_from" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout style="@style/formWrapper">
-            <android.support.v7.widget.AppCompatEditText
+            <android.support.v7.widget.AppCompatAutoCompleteTextView
                 style="@style/formInput"
                 android:id="@+id/destination"
                 android:hint="@string/label_trip_destination" />

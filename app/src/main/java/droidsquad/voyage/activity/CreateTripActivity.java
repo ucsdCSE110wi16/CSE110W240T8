@@ -4,9 +4,11 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -14,6 +16,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,8 +43,10 @@ public class CreateTripActivity extends AppCompatActivity implements AdapterView
     private EditText mTripNameView;
     private EditText mMemberLimitView;
     private CheckBox mPrivateView;
-    private EditText mLeavingFromView;
-    private EditText mDestinationView;
+
+    private AutoCompleteTextView mLeavingFromView;
+    private AutoCompleteTextView mDestinationView;
+
     private Spinner mTransportation;
     private TextView mDateFromView;
     private TextView mDateToView;
@@ -45,6 +57,8 @@ public class CreateTripActivity extends AppCompatActivity implements AdapterView
     private int yearTo, monthTo, dayTo;
 
     private String transportation;
+
+    private static final String TAG = CreateTripActivity.class.getSimpleName();
 
     static final int DATE_FROM_PICKER_ID = 999;
     static final int DATE_TO_PICKER_ID = 1111;
@@ -61,11 +75,15 @@ public class CreateTripActivity extends AppCompatActivity implements AdapterView
         mTripNameView = (EditText) findViewById(R.id.trip_name);
         mMemberLimitView = (EditText) findViewById(R.id.member_limit);
         mPrivateView = (CheckBox) findViewById(R.id.private_check);
-        mLeavingFromView = (EditText) findViewById(R.id.leaving_from);
-        mDestinationView = (EditText) findViewById(R.id.destination);
         mTransportation = (Spinner) findViewById(R.id.transportation);
         mDateFromView = (TextView) findViewById(R.id.date_from);
         mDateToView = (TextView) findViewById(R.id.date_to);
+        mLeavingFromView = (AutoCompleteTextView) findViewById(R.id.leaving_from);
+        mDestinationView = (AutoCompleteTextView) findViewById(R.id.destination);
+
+        controller.setUpPlacesAutofill(mLeavingFromView, 0);
+        controller.setUpPlacesAutofill(mDestinationView, 1);
+
 
         // Spinner click listener
         mTransportation.setOnItemSelectedListener(this);
@@ -244,5 +262,11 @@ public class CreateTripActivity extends AppCompatActivity implements AdapterView
         System.out.println("Date: " + calendar.getTime());
 
         return calendar.getTime();
+    }
+
+    @Override
+    protected void onStop() {
+        controller.disconnectGoogleAPIClient();
+        super.onStop();
     }
 }
