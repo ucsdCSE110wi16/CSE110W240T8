@@ -1,5 +1,6 @@
 package droidsquad.voyage.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -118,6 +119,11 @@ public class CreateTripActivity extends AppCompatActivity {
     // TODO: show what field is missing, navigate to it perhaps. will need more input args
     public void notifyTripInvalid() {
 
+    }
+
+    public void exitActivity() {
+        Intent intent = new Intent(getApplicationContext(), TripListActivity.class);
+        startActivity(intent);
     }
 
     /* GETTERS */

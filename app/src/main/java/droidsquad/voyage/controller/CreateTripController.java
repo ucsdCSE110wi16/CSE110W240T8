@@ -74,6 +74,7 @@ public class CreateTripController {
         }
         else {
             ParseModel.saveTrip(newTrip);
+            activity.exitActivity();
         }
     }
 
