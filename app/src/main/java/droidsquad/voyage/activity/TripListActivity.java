@@ -15,25 +15,27 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.controller.TripListController;
 
 public class TripListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private TripListController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_list);
+
+        controller = new TripListController(this);
+
+        initUI();
+
+    }
+
+    private void initUI() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), CreateTripActivity.class);
-                startActivity(intent);
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -43,6 +45,11 @@ public class TripListActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    public void createTrip(View v) {
+        Intent intent = new Intent(getApplicationContext(), CreateTripActivity.class);
+        startActivity(intent);
     }
 
     @Override
