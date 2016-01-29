@@ -1,25 +1,21 @@
 package droidsquad.voyage.activity;
 
-import android.app.DatePickerDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.CreateTripController;
-import droidsquad.voyage.model.Trip;
 
 
 public class CreateTripActivity extends AppCompatActivity {
@@ -38,9 +34,9 @@ public class CreateTripActivity extends AppCompatActivity {
     private Calendar calendarFrom;
     private Calendar calendarTo;
 
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
     private static final int DEFAULT_TRIP_LENGTH = 7;
     private static final String TAG = CreateTripActivity.class.getSimpleName();
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +45,10 @@ public class CreateTripActivity extends AppCompatActivity {
 
         controller = new CreateTripController(this);
 
+        initUI();
+    }
+
+    private void initUI() {
         // Set up the trip form.
         mTripNameView = (EditText) findViewById(R.id.trip_name);
         mMemberLimitView = (EditText) findViewById(R.id.member_limit);
@@ -62,7 +62,15 @@ public class CreateTripActivity extends AppCompatActivity {
         controller.setUpPlacesAutofill(mLeavingFromView, 0);
         controller.setUpPlacesAutofill(mDestinationView, 1);
 
+        // populate the transportation mode spinners
+        initTransportationSpinner();
+        // populate/init the from and to date pickers
+        initDatePickers();
+    }
+
+    private void initTransportationSpinner() {
         // Spinner Drop down elements
+        // TODO: do not hardcode these
         String categories[] = {"Plane", "Metro", "Bus", "Car"};
 
         // Creating adapter for spinner
@@ -71,11 +79,14 @@ public class CreateTripActivity extends AppCompatActivity {
 
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         // attaching data adapter to spinner
         mTransportation.setAdapter(dataAdapter);
+    }
 
-        // Set up default dates
+    /**
+     * Set up default dates
+     */
+    private void initDatePickers() {
         calendarFrom = Calendar.getInstance();
         calendarTo = Calendar.getInstance();
         calendarTo.add(Calendar.DAY_OF_WEEK, DEFAULT_TRIP_LENGTH);
@@ -83,69 +94,69 @@ public class CreateTripActivity extends AppCompatActivity {
         mDateToView.setText(dateFormat.format(calendarTo.getTime()));
     }
 
+    /**
+     * Called when the from date picker is pressed
+     */
     public void showFromDateDialog(View view) {
-        showDateDialogAndUpdateView(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                calendarFrom.set(year, monthOfYear, dayOfMonth);
-                mDateFromView.setText(dateFormat.format(calendarFrom.getTime()));
-            }
-        }, calendarFrom);
+        controller.showDateDialog(calendarFrom, mDateFromView);
     }
 
+    /**
+     * Called when the to date picker is pressed
+     */
     public void showToDateDialog(View view) {
-        showDateDialogAndUpdateView(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                calendarTo.set(year, monthOfYear, dayOfMonth);
-                mDateToView.setText(dateFormat.format(calendarTo.getTime()));
-            }
-        }, calendarTo);
+        controller.showDateDialog(calendarTo, mDateToView);
     }
-
-    public void showDateDialogAndUpdateView(DatePickerDialog.OnDateSetListener listener, Calendar cal) {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, listener,
-                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
-        );
-
-        datePickerDialog.show();
-    }
-
 
     /**
      * Called when the user presses the create trip button
-     * TODO: Move to Controller and implement checks
      */
-    public void attemptCreateTrip(View view) {
-        String tripName = mTripNameView.getText().toString();
-
-        int memberLimit = 0;
-        if (!isEmpty(mMemberLimitView)) {
-            memberLimit = Integer.parseInt(mMemberLimitView.getText().toString());
-        }
-
-        boolean privateTrip = mPrivateView.isChecked();
-
-        String leavingFrom = mLeavingFromView.getText().toString();
-        String destination = mDestinationView.getText().toString();
-
-        Date dateFrom = calendarFrom.getTime();
-        Date dateTo = calendarTo.getTime();
-
-        String transportation = mTransportation.getSelectedItem().toString();
-
-        // TODO: CHANGE HERE
-        Trip newTrip = new Trip(tripName, leavingFrom, destination, privateTrip,
-                memberLimit, dateFrom, dateTo, transportation);
-        newTrip.save();
+    public void createTripButtonPressed(View view) {
+        controller.attemptCreateTrip();
     }
 
-    private boolean isEmpty(EditText etText) {
-        return etText.getText().toString().trim().length() <= 0;
+    // TODO: show what field is missing, navigate to it perhaps. will need more input args
+    public void notifyTripInvalid() {
+
     }
 
-    private static boolean checkDates(DatePicker from, DatePicker to) {
-        // TODO: Move to Controller and implement
-        return false;
+
+
+
+
+
+
+
+    public EditText getTripNameView() {
+        return mTripNameView;
     }
+
+    public EditText getMemberLimitView() {
+        return mMemberLimitView;
+    }
+
+    public CheckBox getPrivateView() {
+        return mPrivateView;
+    }
+
+    public AutoCompleteTextView getLeavingFromView() {
+        return mLeavingFromView;
+    }
+
+    public AutoCompleteTextView getDestinationView() {
+        return mDestinationView;
+    }
+
+    public Calendar getCalendarFrom() {
+        return calendarFrom;
+    }
+
+    public Calendar getCalendarTo() {
+        return calendarTo;
+    }
+
+    public Spinner getTransportation() {
+        return mTransportation;
+    }
+
 }

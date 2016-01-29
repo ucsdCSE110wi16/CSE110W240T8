@@ -153,6 +153,6 @@
             android:id="@+id/create_trip_button"
             android:text="@string/label_trip_create_button"
             android:textColor="#ffffff"
-            android:onClick="attemptCreateTrip"/>
+            android:onClick="createTripButtonPressed"/>
     </LinearLayout>
 </ScrollView>
