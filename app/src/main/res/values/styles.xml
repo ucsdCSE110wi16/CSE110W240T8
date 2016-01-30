@@ -13,12 +13,17 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.coloredStatusBarOnly" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <!-- Section dividers, contain a section name and horizontal rule -->
-    <style name="sectionTitle">
+    <style name="subheader">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">@dimen/activity_vertical_margin</item>
@@ -26,22 +31,9 @@
         <item name="android:textAppearance">?android:attr/listSeparatorTextViewStyle</item>
     </style>
 
-    <style name="sectionDivider">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/divider</item>
-    </style>
-
-    <style name="formWrapper">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingBottom">@dimen/activity_vertical_margin</item>
-    </style>
-
-    <style name="formInput">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:singleLine">true</item>
+    <style name="TextAppearance.App.TextInputLayout" parent="AppTheme">
+        <item name="android:textColorHint">#9FA8DA</item>
+        <item name="colorControlNormal">#9FA8DA</item>
     </style>
 
 </resources>

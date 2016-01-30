@@ -38,7 +38,8 @@
             android:name=".activity.LoginActivity"
             android:label="@string/app_name"/>
         <activity android:name=".activity.CreateUserActivity" />
-        <activity android:name=".activity.CreateTripActivity">
+        <activity android:name=".activity.CreateTripActivity"
+            android:theme="@style/AppTheme.coloredStatusBarOnly">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
