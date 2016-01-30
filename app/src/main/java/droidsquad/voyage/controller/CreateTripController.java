@@ -1,10 +1,12 @@
 package droidsquad.voyage.controller;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.text.SimpleDateFormat;
@@ -76,6 +78,12 @@ public class CreateTripController {
             ParseModel.saveTrip(newTrip);
             activity.exitActivity();
         }
+
+        CharSequence text = "Trip Created";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(activity.getApplicationContext(), text, duration);
+        toast.show();
     }
 
     private boolean isTripValid(String tripName, int memberLimit, Date dateFrom, Date dateTo) {
