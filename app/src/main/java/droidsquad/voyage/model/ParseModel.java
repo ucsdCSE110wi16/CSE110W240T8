@@ -17,6 +17,19 @@ public class ParseModel {
 
     private Context context;
 
-    public ParseModel(Context context) {
+    public ParseModel() {
+    }
+
+    public static void saveTrip(Trip trip) {
+        ParseObject parseTrip  = new ParseObject("Trip");
+        parseTrip.put("name", trip.getTripName());
+        parseTrip.put("origin", trip.getTripOrigin());
+        parseTrip.put("destination", trip.getTripDestination());
+        parseTrip.put("private", trip.isTripPrivate());
+        parseTrip.put("dateFrom", trip.getDateFrom());
+        parseTrip.put("dateTo", trip.getDateTo());
+        parseTrip.put("limit", trip.getTripLimit());
+        parseTrip.put("transportation", trip.getTransportation());
+        parseTrip.saveInBackground();
     }
 }
