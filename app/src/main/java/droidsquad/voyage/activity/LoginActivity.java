@@ -3,6 +3,7 @@ package droidsquad.voyage.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -13,12 +14,12 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,20 +30,29 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.facebook.AccessToken;
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
+import com.parse.ParseUser;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.LoginController;
+import droidsquad.voyage.model.VoyageUser;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-/**
- * A login screen that offers login via email/password.
- */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     private LoginController controller;
+
+    private boolean currentlyLoggingIn = false;
 
 
 
@@ -51,23 +61,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
-
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private TextView signupTextView;
+    private Button mLoginWithFBButton;
+    private TextView mErrorView;
+    private final String TAG = LoginActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +95,39 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
+        mErrorView = (TextView) findViewById(R.id.login_error_text_view);
+        mErrorView.setText("");
+        mLoginWithFBButton = (Button) findViewById(R.id.login_with_facebook_button);
+        mLoginWithFBButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Logging in user with Facebook.");
+                Collection<String> permissions = new ArrayList<String>();
+                permissions.add("public_profile");
+                permissions.add("email");
+                permissions.add("user_birthday");
+                ParseFacebookUtils.logInWithReadPermissionsInBackground(LoginActivity.this, permissions, new LogInCallback() {
+                    @Override
+                    public void done(ParseUser user, ParseException err) {
+                        if (user == null) {
+                            Log.d(TAG, "Uh oh. The user cancelled the Facebook login.");
+
+                            if (err != null && err.getCode() == -1) {
+                                Log.d(TAG, "No internet!");
+                                mErrorView.setText(getString(R.string.error_no_internet_connection));
+                            }
+                        } else if (user.isNew()) {
+                            Log.d(TAG, "Signing up new user.");
+                            VoyageUser.refreshInfoFromFB();
+                        } else {
+                            Log.d(TAG, "User logged in through Facebook!");
+                            VoyageUser.refreshInfoFromFB();
+                        }
+                    }
+                });
+            }
+        });
+
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -103,6 +138,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        signupTextView = (TextView) findViewById(R.id.signup_link);
+        signupTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Take the user to the sign up page
+                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void populateAutoComplete() {
@@ -155,7 +200,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
+        if (currentlyLoggingIn) {
             return;
         }
 
@@ -164,14 +209,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
+        final String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (password.isEmpty()) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -193,22 +238,42 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // form field with an error.
             focusView.requestFocus();
         } else {
+            Log.d(TAG, "Attempting to login " + email);
+
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            currentlyLoggingIn = true;
+
+            ParseUser.logInInBackground(email, password, new LogInCallback() {
+                public void done(ParseUser user, ParseException e) {
+                    currentlyLoggingIn = false;
+                    if (user != null) {
+                        // Hooray! The user is logged in.
+                        Log.d(TAG, "Successfully logged in " + email);
+                    } else {
+                        // Login failed. Look at the ParseException to see what happened.
+                        showProgress(false);
+                        if (e.getCode() == 101) {
+                            Log.d(TAG, "Couldn't login " + email + "\nInvalid email or password");
+                            mEmailView.setError(getString(R.string.invalid_login_credentials_error));
+                            mEmailView.requestFocus();
+                        } else if (e.getCode() == 100) {
+                            mErrorView.setText(getString(R.string.error_no_internet_connection));
+                        } else {
+                            Log.d(TAG, "Unknown error: " + e.getMessage());
+                            mErrorView.setText(getString(R.string.error_unkown));
+                        }
+                    }
+                }
+            });
         }
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
+        Pattern p = Pattern.compile(".+@.+\\.[a-z]+"); // matching email with regex
+        Matcher m = p.matcher(email);
+        return m.matches();
     }
 
     /**
@@ -301,61 +366,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int IS_PRIMARY = 1;
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
     }
 }
-
