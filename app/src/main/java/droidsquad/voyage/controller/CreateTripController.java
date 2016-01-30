@@ -1,6 +1,7 @@
 package droidsquad.voyage.controller;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -28,6 +29,20 @@ public class CreateTripController {
         this.activity = activity;
         googlePlacesModel = new GooglePlacesAPI(activity);
 
+    }
+
+    public void attemptClose() {
+        activity.showAlertDialog(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                activity.exitActivity();
+            }
+        }, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
     }
 
     public void showDateDialog(final Calendar calendar, final TextView dateView) {

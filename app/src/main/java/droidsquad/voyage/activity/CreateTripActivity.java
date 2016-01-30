@@ -1,11 +1,14 @@
 package droidsquad.voyage.activity;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.design.widget.TextInputLayout;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
@@ -94,15 +97,30 @@ public class CreateTripActivity extends AppCompatActivity {
         mPrivateView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPrivateHelpView.setText(
-                        (mPrivateView.isChecked())
-                                ? R.string.help_trip_private
-                                : R.string.help_trip_public
-                );
+                if (mPrivateView.isChecked()) {
+                    mPrivateHelpView.setText(R.string.help_trip_private);
+                    mMemberLimitWrapper.setVisibility(View.GONE);
+                } else {
+                    mPrivateHelpView.setText(R.string.help_trip_public);
+                    mMemberLimitWrapper.setVisibility(View.VISIBLE);
+                }
             }
         });
 
         initDatePickers();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                // this takes the user 'back', as if they pressed the left-facing triangle icon on the main android toolbar.
+                // if this doesn't work as desired, another possibility is to call `finish()` here.
+                attemptClose();
+                return true;
+            default:
+                return super.onOptionsItemSelected(menuItem);
+        }
     }
 
     /**
@@ -176,6 +194,23 @@ public class CreateTripActivity extends AppCompatActivity {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    /**
+     * Called when user presses the close toolbar button
+     */
+    public void attemptClose() {
+        controller.attemptClose();
+    }
+
+    public void showAlertDialog(DialogInterface.OnClickListener positiveListener,
+                                DialogInterface.OnClickListener negativeListener) {
+        new AlertDialog.Builder(this)
+                .setMessage("Are you sure you want to discard the changes?")
+                .setPositiveButton(android.R.string.yes, positiveListener)
+                .setNegativeButton(android.R.string.no, negativeListener)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     /**
