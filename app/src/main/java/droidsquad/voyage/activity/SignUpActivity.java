@@ -5,7 +5,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -22,6 +24,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -76,7 +79,6 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
     private TextView mDobTextView;
     private View mProgressView;
     private Button mSignUpWithFBButton;
-    private TextView mErrorView;
     private View mLoginFormView;
     private int mYear;
     private int mMonth;
@@ -108,8 +110,6 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         mLastNameView = (EditText) findViewById(R.id.signup_last_name);
         mMobileNumberView = (EditText) findViewById(R.id.signup_mobile);
         mGenderSpinner = (Spinner) findViewById(R.id.signup_gender_spinner);
-        mErrorView = (TextView) findViewById(R.id.signup_error_text_view);
-        mErrorView.setText("");
 
         // Setting up the gender spinner
         ArrayAdapter<CharSequence> adapter1 = new ArrayAdapter<CharSequence>(this,
@@ -153,6 +153,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
                         mYear, mMonth, mDate);
 
                 dialog.show();
+                hideKeyBoard();
             }
         });
 
@@ -161,7 +162,8 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         mSignUpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptSignup();
+                hideKeyBoard();
+                attemptSignup(view);
             }
         });
 
@@ -171,31 +173,9 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         mSignUpWithFBButton = (Button) findViewById(R.id.sign_up_with_facebook_button);
         mSignUpWithFBButton.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Signing up user with Facebook.");
-                Collection<String> permissions = new ArrayList<String>();
-                permissions.add("public_profile");
-                permissions.add("email");
-                permissions.add("user_birthday");
-                ParseFacebookUtils.logInWithReadPermissionsInBackground(SignUpActivity.this, permissions, new LogInCallback() {
-                    @Override
-                    public void done(ParseUser user, ParseException err) {
-                        if (user == null) {
-                            Log.d(TAG, "Uh oh. The user cancelled the Facebook login.");
-
-                            if (err!= null && err.getCode() == -1) {
-                                Log.d(TAG, "No internet!");
-                                mErrorView.setText(getString(R.string.error_no_internet_connection));
-                            }
-                        } else if (user.isNew()) {
-                            Log.d(TAG, "Signing up new user");
-                            VoyageUser.refreshInfoFromFB();
-                        } else {
-                            Log.d(TAG, "User logged in through Facebook!");
-                            VoyageUser.refreshInfoFromFB();
-                        }
-                    }
-                });
+            public void onClick(final View v) {
+                hideKeyBoard();
+                VoyageUser.attempFBLogin(SignUpActivity.this, v);
             }
         });
     }
@@ -244,7 +224,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
     }
 
 
-    private void attemptSignup() {
+    private void attemptSignup(final View view) {
         if (currentlySigningUp) {
             return;
         }
@@ -324,8 +304,8 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             focusView.requestFocus();
         } else {
             // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            Log.d(TAG, "Attempting to login user: " + firstName + " " + lastName + "\nemail: "
+            // perform the user signup attempt.
+            Log.d(TAG, "Attempting to signup user: " + firstName + " " + lastName + "\nemail: "
                     + email + "\nGender: " + gender + "\nDOB: " + dateOfBirth);
             currentlySigningUp = true;
             showProgress(true);
@@ -378,9 +358,23 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
                             mEmailView.setError(getString(R.string.error_email_already_taken));
                             mEmailView.requestFocus();
                         } else if (e.getCode() == 100) {
-                            mErrorView.setText(getString(R.string.error_no_internet_connection));
+                            Snackbar snackbar = Snackbar.make(view, R.string.error_no_internet_connection, Snackbar.LENGTH_LONG)
+                                    .setAction("RETRY", new OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            attemptSignup(view);
+                                        }
+                                    });
+                            snackbar.show();
                         } else {
-                            mErrorView.setText(e.getMessage());
+                            Snackbar snackbar = Snackbar.make(view, e.getCode(), Snackbar.LENGTH_LONG)
+                                    .setAction("RETRY", new OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            attemptSignup(view);
+                                        }
+                                    });
+                            snackbar.show();
                         }
                         showProgress(false);
                     }
@@ -499,6 +493,21 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
 
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
+    }
+
+    private void hideKeyBoard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
     }
 }
 

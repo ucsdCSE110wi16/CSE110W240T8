@@ -187,14 +187,6 @@
                 android:text="@string/action_signup"
                 android:textStyle="bold" />
 
-            <android.support.v7.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:id="@+id/signup_error_text_view"
-                android:textColor="#d50000"
-                android:text="@string/error_no_internet_connection" />
-
         </LinearLayout>
     </ScrollView>
 

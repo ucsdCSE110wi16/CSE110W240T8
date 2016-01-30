@@ -3,6 +3,7 @@ package droidsquad.voyage.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -24,6 +25,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -68,7 +70,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
     private TextView signupTextView;
     private Button mLoginWithFBButton;
-    private TextView mErrorView;
+    private Button mEmailSignInButton;
     private final String TAG = LoginActivity.class.getSimpleName();
 
     @Override
@@ -83,56 +85,34 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
 
+        mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideKeyBoard();
+                attemptLogin(view);
+            }
+        });
+
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+                    hideKeyBoard();
+                    mEmailSignInButton.performClick();
                     return true;
                 }
                 return false;
             }
         });
 
-        mErrorView = (TextView) findViewById(R.id.login_error_text_view);
-        mErrorView.setText("");
         mLoginWithFBButton = (Button) findViewById(R.id.login_with_facebook_button);
         mLoginWithFBButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "Logging in user with Facebook.");
-                Collection<String> permissions = new ArrayList<String>();
-                permissions.add("public_profile");
-                permissions.add("email");
-                permissions.add("user_birthday");
-                ParseFacebookUtils.logInWithReadPermissionsInBackground(LoginActivity.this, permissions, new LogInCallback() {
-                    @Override
-                    public void done(ParseUser user, ParseException err) {
-                        if (user == null) {
-                            Log.d(TAG, "Uh oh. The user cancelled the Facebook login.");
-
-                            if (err != null && err.getCode() == -1) {
-                                Log.d(TAG, "No internet!");
-                                mErrorView.setText(getString(R.string.error_no_internet_connection));
-                            }
-                        } else if (user.isNew()) {
-                            Log.d(TAG, "Signing up new user.");
-                            VoyageUser.refreshInfoFromFB();
-                        } else {
-                            Log.d(TAG, "User logged in through Facebook!");
-                            VoyageUser.refreshInfoFromFB();
-                        }
-                    }
-                });
-            }
-        });
-
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
+                hideKeyBoard();
+                VoyageUser.attempFBLogin(LoginActivity.this, v);
             }
         });
 
@@ -149,6 +129,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
     }
+
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
@@ -199,7 +180,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    private void attemptLogin(final View view) {
         if (currentlyLoggingIn) {
             return;
         }
@@ -259,10 +240,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             mEmailView.setError(getString(R.string.invalid_login_credentials_error));
                             mEmailView.requestFocus();
                         } else if (e.getCode() == 100) {
-                            mErrorView.setText(getString(R.string.error_no_internet_connection));
+                            Log.d(TAG, "No internet.");
+                            Snackbar snackbar = Snackbar.make(view, R.string.error_no_internet_connection, Snackbar.LENGTH_LONG)
+                                    .setAction("RETRY", new OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            attemptLogin(view);
+                                        }
+                                    });
+                            snackbar.show();
                         } else {
                             Log.d(TAG, "Unknown error: " + e.getMessage());
-                            mErrorView.setText(getString(R.string.error_unkown));
+                            Snackbar snackbar = Snackbar.make(view, R.string.error_unkown, Snackbar.LENGTH_LONG)
+                                    .setAction("RETRY", new OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            attemptLogin(view);
+                                        }
+                                    });
+                            snackbar.show();
                         }
                     }
                 }
@@ -370,5 +366,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void hideKeyBoard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

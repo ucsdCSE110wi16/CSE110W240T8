@@ -1,19 +1,29 @@
 package droidsquad.voyage.model;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.View;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.parse.LogInCallback;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import droidsquad.voyage.R;
 
 /**
  * Created by Raghav on 1/24/2016.
@@ -81,6 +91,44 @@ public class VoyageUser {
         request.setParameters(parameters);
         request.executeAsync();
 
+    }
+
+    public static void attempFBLogin(final Activity activity, final View view) {
+        Log.d(TAG, "Logging in user with Facebook.");
+        Collection<String> permissions = new ArrayList<>();
+        permissions.add("public_profile");
+        permissions.add("email");
+        permissions.add("user_birthday");
+        ParseFacebookUtils.logInWithReadPermissionsInBackground(activity, permissions, new LogInCallback() {
+            @Override
+            public void done(ParseUser user, com.parse.ParseException err) {
+                if (user == null) {
+                    Log.d(TAG, "Uh oh. The user cancelled the Facebook login.");
+
+                    if (err != null) {
+                        Log.d(TAG, "ParseException occurred. Code: " + err.getCode()
+                                + " Message: " + err.getMessage());
+                    }
+
+                    if (err != null && err.getCode() == -1) {
+                        Snackbar snackbar = Snackbar.make(view, R.string.error_no_internet_connection, Snackbar.LENGTH_LONG)
+                                .setAction("RETRY", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        attempFBLogin(activity, view);
+                                    }
+                                });
+                        snackbar.show();
+                    }
+                } else if (user.isNew()) {
+                    Log.d(TAG, "Signing up new user.");
+                    VoyageUser.refreshInfoFromFB();
+                } else {
+                    Log.d(TAG, "User logged in through Facebook!");
+                    VoyageUser.refreshInfoFromFB();
+                }
+            }
+        });
     }
 
     public static boolean isEmailValid(String email) {
