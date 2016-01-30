@@ -164,14 +164,13 @@
                         android:layout_height="wrap_content"
                         android:text="@string/prompt_date_of_birth" />
 
-                    <Button
+                    <android.support.v7.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        style="?android:textAppearanceSmall"
-                        android:textStyle="bold"
                         android:text="4 Jul 2016"
-                        android:id="@+id/choose_dob_button"
-                        android:background="#00ffffff" />
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:id="@+id/choose_dob_textView"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 

@@ -73,7 +73,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
     private EditText mPasswordView;
     private EditText mMobileNumberView;
     private Spinner mGenderSpinner;
-    private Button mDobButton;
+    private TextView mDobTextView;
     private View mProgressView;
     private Button mSignUpWithFBButton;
     private TextView mErrorView;
@@ -120,17 +120,17 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
 
 
         // Setting up the DOB Button
-        mDobButton = (Button) findViewById(R.id.choose_dob_button);
+        mDobTextView = (TextView) findViewById(R.id.choose_dob_textView);
         final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.US);
         final Calendar calendar = Calendar.getInstance();
         mYear = calendar.get(Calendar.YEAR);
         mMonth = calendar.get(Calendar.MONTH);
         mDate = calendar.get(Calendar.DATE);
-        mDobButton.setText(dateFormat.format(calendar.getTime()));
-        mDobButton.setOnClickListener(new OnClickListener() {
+        mDobTextView.setText(dateFormat.format(calendar.getTime()));
+        mDobTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "DOB picker button clicked");
+                Log.d(TAG, "DOB picker clicked");
 
                 // show Date picker dialog
                 DatePickerDialog dialog = new DatePickerDialog(SignUpActivity.this, new DatePickerDialog.OnDateSetListener() {
@@ -145,7 +145,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
                         calendar.set(Calendar.MONTH, monthOfYear);
                         calendar.set(Calendar.DATE, dayOfMonth);
 
-                        mDobButton.setText(dateFormat.format(calendar.getTime()));
+                        mDobTextView.setText(dateFormat.format(calendar.getTime()));
 
                         Log.d(TAG, "DOB changed to " + dateFormat.format(calendar.getTime()));
                     }
