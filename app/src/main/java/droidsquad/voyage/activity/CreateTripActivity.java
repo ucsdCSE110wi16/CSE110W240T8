@@ -1,11 +1,13 @@
 package droidsquad.voyage.activity;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.support.design.widget.TextInputLayout;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -164,7 +166,16 @@ public class CreateTripActivity extends AppCompatActivity {
         );
 
         datePickerDialog.getDatePicker().setMinDate(minDateAllowed);
+        hideKeyboard();
         datePickerDialog.show();
+    }
+
+    private void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     /**
