@@ -210,7 +210,7 @@
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:background="@color/colorAccent"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:onClick="attemptCreateTrip"
+                android:onClick="createTripButtonPressed"
                 android:text="@string/label_trip_create_button"
                 android:textColor="#fff" />
         </LinearLayout>

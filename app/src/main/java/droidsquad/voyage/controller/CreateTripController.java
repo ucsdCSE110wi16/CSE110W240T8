@@ -6,6 +6,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.text.SimpleDateFormat;
@@ -45,12 +46,34 @@ public class CreateTripController {
         });
     }
 
+
+    // TODO: perhaps make this two functions for each of the date dialogs
     public void showDateDialog(final Calendar calendar, final TextView dateView) {
         showDateDialogAndUpdateView(new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                calendar.set(year, monthOfYear, dayOfMonth);
-                dateView.setText(dateFormat.format(calendar.getTime()));
+
+                Calendar calendarFrom = activity.getCalendarFrom();
+                Calendar calendarTo = activity.getCalendarTo();
+
+                if (calendar.equals(calendarFrom)) {
+                    long previousDateTime = calendarFrom.getTimeInMillis();
+
+                    // Compute difference and adjust the toDate accordingly
+                    calendarFrom.set(year, monthOfYear, dayOfMonth);
+                    long diff = calendarFrom.getTimeInMillis() - previousDateTime;
+
+                    // set to calendar
+                    calendarTo.setTimeInMillis(calendarTo.getTimeInMillis() + diff);
+
+                    // update text views
+                    activity.getDateFromView().setText(dateFormat.format(calendar.getTime()));
+                    activity.getDateToView().setText(dateFormat.format(calendarTo.getTime()));
+                }
+                else {
+                    calendar.set(year, monthOfYear, dayOfMonth);
+                    dateView.setText(dateFormat.format(calendar.getTime()));
+                }
             }
         }, calendar);
     }
@@ -59,6 +82,16 @@ public class CreateTripController {
         DatePickerDialog datePickerDialog = new DatePickerDialog(activity, listener,
                 cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
         );
+        long minDateAllowed;
+        if (cal.equals(activity.getCalendarFrom())) {
+            minDateAllowed = System.currentTimeMillis() - 1000;
+        }
+        else {
+            minDateAllowed = activity.getCalendarFrom().getTimeInMillis() - 1000;
+        }
+
+        datePickerDialog.getDatePicker().setMinDate(minDateAllowed);
+        activity.hideKeyboard();
         datePickerDialog.show();
     }
 
@@ -91,6 +124,12 @@ public class CreateTripController {
             ParseModel.saveTrip(newTrip);
             activity.exitActivity();
         }
+
+        CharSequence text = "Trip Created";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(activity.getApplicationContext(), text, duration);
+        toast.show();
     }
 
     private boolean isTripValid(String tripName, int memberLimit, Date dateFrom, Date dateTo) {
