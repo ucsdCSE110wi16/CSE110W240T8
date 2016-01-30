@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -177,9 +178,7 @@ public class CreateTripActivity extends AppCompatActivity {
         return mDestinationView;
     }
 
-    public Calendar getCalendarFrom() {
-        return calendarFrom;
-    }
+    public Calendar getCalendarFrom() { return calendarFrom; }
 
     public Calendar getCalendarTo() {
         return calendarTo;
