@@ -47,7 +47,6 @@ public class CreateTripActivity extends AppCompatActivity {
     private Calendar calendarFrom;
     private Calendar calendarTo;
 
-    private long minDateAllowed;
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
     private static final int DEFAULT_TRIP_LENGTH = 7;
     private static final String TAG = CreateTripActivity.class.getSimpleName();
@@ -115,81 +114,28 @@ public class CreateTripActivity extends AppCompatActivity {
         mDateFromView.setText(dateFormat.format(calendarFrom.getTime()));
         mDateToView.setText(dateFormat.format(calendarTo.getTime()));
 
-        // Set up Date Picker listeners
         mDateFromView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                minDateAllowed = System.currentTimeMillis() - 1000;
-                setFromDate(v);
+                controller.showDateDialog(calendarFrom, mDateFromView);
             }
         });
 
         mDateToView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                minDateAllowed = calendarFrom.getTimeInMillis() - 1000;
-                setToDate(v);
+                controller.showDateDialog(calendarTo, mDateToView);
             }
         });
     }
 
-    public void setFromDate(View view) {
-        showDateDialog(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                long previousDateTime = calendarFrom.getTimeInMillis();
-                calendarFrom.set(year, monthOfYear, dayOfMonth);
 
-                // Compute difference and adjust the toDate accordingly
-                long diff = calendarFrom.getTimeInMillis() - previousDateTime;
-                calendarTo.setTimeInMillis(calendarTo.getTimeInMillis() + diff);
-
-                mDateToView.setText(dateFormat.format(calendarTo.getTime()));
-                mDateFromView.setText(dateFormat.format(calendarFrom.getTime()));
-            }
-        }, calendarFrom);
-    }
-
-    public void setToDate(View view) {
-        showDateDialog(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                calendarTo.set(year, monthOfYear, dayOfMonth);
-                mDateToView.setText(dateFormat.format(calendarTo.getTime()));
-            }
-        }, calendarTo);
-    }
-
-    public void showDateDialog(DatePickerDialog.OnDateSetListener listener, Calendar cal) {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, listener,
-                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
-        );
-
-        datePickerDialog.getDatePicker().setMinDate(minDateAllowed);
-        hideKeyboard();
-        datePickerDialog.show();
-    }
-
-    private void hideKeyboard() {
+    public void hideKeyboard() {
         View view = this.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-    }
-
-    /**
-     * Called when the from date picker is pressed
-     */
-    public void showFromDateDialog(View view) {
-        controller.showDateDialog(calendarFrom, mDateFromView);
-    }
-
-    /**
-     * Called when the to date picker is pressed
-     */
-    public void showToDateDialog(View view) {
-        controller.showDateDialog(calendarTo, mDateToView);
     }
 
     /**
@@ -241,5 +187,13 @@ public class CreateTripActivity extends AppCompatActivity {
 
     public Spinner getTransportation() {
         return mTransportation;
+    }
+
+    public EditText getDateToView() {
+        return mDateToView;
+    }
+
+    public EditText getDateFromView() {
+        return mDateFromView;
     }
 }
