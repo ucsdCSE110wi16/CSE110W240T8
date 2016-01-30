@@ -36,7 +36,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.CreateUserActivity" />
         <activity android:name=".activity.SignUpActivity"
             android:label="@string/sign_up_activity_title" />
         <activity android:name="com.facebook.FacebookActivity"
