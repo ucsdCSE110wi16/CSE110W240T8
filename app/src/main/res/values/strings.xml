@@ -39,9 +39,40 @@
     <string name="error_email_already_taken">That email is already taken</string>
     <string name="error_unkown">Something went wrong. Please try again in a while.</string>
     <string name="title_activity_blah">BlahActivity</string>
-    <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="error_no_internet_connection">No connection.</string>
     <string name="label_login_facebook">Login with Facebook</string>
     <string name="label_sign_up_facebook">Sign Up with Facebook</string>
+
+    <!-- Strings related to trip creation -->
+    <string name="label_trip_name">Trip Name</string>
+    <string name="label_trip_members_limit">Members Limit</string>
+    <string name="label_trip_private">Private</string>
+    <string name="section_general">General</string>
+    <string name="section_details">Details</string>
+    <string name="label_trip_leaving_from">Leaving From</string>
+    <string name="label_trip_destination">Destination</string>
+    <string name="label_trip_from">From</string>
+    <string name="label_trip_to">To</string>
+    <string name="label_trip_create_button">Create</string>
+    <string name="label_trip_transportation">Transportation</string>
+    <string name="title_activity_maps">Map</string>
+
+    <!-- Error and Help messages for create trip activity -->
+    <string name="help_trip_private">Only members who you invite will see this trip.</string>
+    <string name="help_trip_public">This trip will be visible to all your friends.</string>
+
+    <string-array name="array_transportation_modes">
+        <item>Plane</item>
+        <item>Car</item>
+        <item>Bus</item>
+    </string-array>
+
+    - See more at: http://www.ahotbrew.com/android-dropdown-spinner-example/#sthash.TShO44xy.dpuf
+    <string name="title_activity_trip_list">TripListActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 </resources>

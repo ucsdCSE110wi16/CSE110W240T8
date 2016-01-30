@@ -1,6 +1,10 @@
 DROID SQUAD USER STORIES (1 = greatest priority, 5 = lowest priority)
 
 ********** Current Iteration **********
+Create New Trip
+As a travelers' group leader, I want to create a new trip with all its info so that I can begin the trip planning process.
+Estimation of Time for Completion: 3-4 days
+Customer Priority: 1
 
 View All Current Trips
 As a traveler client, I want to be able to view all the current trips I am currently signed up for so that the trip information is 

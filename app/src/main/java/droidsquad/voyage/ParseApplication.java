@@ -3,6 +3,8 @@ package droidsquad.voyage;
 import android.app.Application;
 
 import com.facebook.FacebookSdk;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Places;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 
@@ -19,13 +21,12 @@ public class ParseApplication extends Application {
         // Initialize the singletons so their instances
         // are bound to the application process.
         initSingletons();
-
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        ParseFacebookUtils.initialize(getApplicationContext());
     }
 
     private void initSingletons() {
         Parse.enableLocalDatastore(this);
         Parse.initialize(this);
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        ParseFacebookUtils.initialize(getApplicationContext());
     }
 }
