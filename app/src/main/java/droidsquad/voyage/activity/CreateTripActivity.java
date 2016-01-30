@@ -2,6 +2,7 @@ package droidsquad.voyage.activity;
 
 import android.app.DatePickerDialog;
 import android.support.design.widget.TextInputLayout;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -35,19 +36,19 @@ public class CreateTripActivity extends AppCompatActivity {
 
     private TextView mPrivateHelpView;
 
-    private CheckBox mPrivateView;
-    private Spinner mTransportation;
-
     private AutoCompleteTextView mLeavingFromView;
     private AutoCompleteTextView mDestinationView;
+
+    private CheckBox mPrivateView;
+    private Spinner mTransportation;
 
     private Calendar calendarFrom;
     private Calendar calendarTo;
 
     private long minDateAllowed;
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
     private static final int DEFAULT_TRIP_LENGTH = 7;
     private static final String TAG = CreateTripActivity.class.getSimpleName();
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,10 @@ public class CreateTripActivity extends AppCompatActivity {
 
         controller = new CreateTripController(this);
 
-        // Set up the trip form.
+        initUI();
+    }
+
+    private void initUI() {
         mTripNameView = (EditText) findViewById(R.id.trip_name);
         mPrivateView = (CheckBox) findViewById(R.id.private_check);
         mTransportation = (Spinner) findViewById(R.id.transportation);
@@ -74,6 +78,13 @@ public class CreateTripActivity extends AppCompatActivity {
         mDateFromView = mDateFromWrapper.getEditText();
         mDateToView = mDateToWrapper.getEditText();
 
+        // Set up toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.trip_toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         controller.setUpPlacesAutofill(mLeavingFromView, 0);
         controller.setUpPlacesAutofill(mDestinationView, 1);
 
@@ -83,11 +94,24 @@ public class CreateTripActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mPrivateHelpView.setText(
                         (mPrivateView.isChecked())
-                                 ? R.string.help_trip_private
-                                 : R.string.help_trip_public
+                                ? R.string.help_trip_private
+                                : R.string.help_trip_public
                 );
             }
         });
+
+        initDatePickers();
+    }
+
+    /**
+     * Set up default dates
+     */
+    private void initDatePickers() {
+        calendarFrom = Calendar.getInstance();
+        calendarTo = Calendar.getInstance();
+        calendarTo.add(Calendar.DAY_OF_WEEK, DEFAULT_TRIP_LENGTH);
+        mDateFromView.setText(dateFormat.format(calendarFrom.getTime()));
+        mDateToView.setText(dateFormat.format(calendarTo.getTime()));
 
         // Set up Date Picker listeners
         mDateFromView.setOnClickListener(new View.OnClickListener() {
@@ -105,20 +129,6 @@ public class CreateTripActivity extends AppCompatActivity {
                 setToDate(v);
             }
         });
-
-        // Set up default dates
-        calendarFrom = Calendar.getInstance();
-        calendarTo = Calendar.getInstance();
-        calendarTo.add(Calendar.DAY_OF_WEEK, DEFAULT_TRIP_LENGTH);
-        mDateFromView.setText(dateFormat.format(calendarFrom.getTime()));
-        mDateToView.setText(dateFormat.format(calendarTo.getTime()));
-
-        // Set up toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.trip_toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     public void setFromDate(View view) {
@@ -157,20 +167,68 @@ public class CreateTripActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
+    /**
+     * Called when the from date picker is pressed
+     */
+    public void showFromDateDialog(View view) {
+        controller.showDateDialog(calendarFrom, mDateFromView);
+    }
+
+    /**
+     * Called when the to date picker is pressed
+     */
+    public void showToDateDialog(View view) {
+        controller.showDateDialog(calendarTo, mDateToView);
+    }
 
     /**
      * Called when the user presses the create trip button
-     * TODO: Move to Controller and implement checks
      */
-    public void attemptCreateTrip(View view) {
-        String tripName = mTripNameView.getText().toString();
-
-        if (tripName.length() < 3) {
-            mTripNameView.setError("Trip name must be at least 3 characters long.");
-        }
+    public void createTripButtonPressed(View view) {
+        controller.attemptCreateTrip();
     }
 
-    private boolean isEmpty(EditText etText) {
-        return etText.getText().toString().trim().length() <= 0;
+    // TODO: show what field is missing, navigate to it perhaps. will need more input args
+    public void notifyTripInvalid() {
+
+    }
+
+    public void exitActivity() {
+        Intent intent = new Intent(getApplicationContext(), TripListActivity.class);
+        startActivity(intent);
+    }
+
+    /* GETTERS */
+
+    public EditText getTripNameView() {
+        return mTripNameView;
+    }
+
+    public EditText getMemberLimitView() {
+        return mMemberLimitWrapper.getEditText();
+    }
+
+    public CheckBox getPrivateView() {
+        return mPrivateView;
+    }
+
+    public AutoCompleteTextView getLeavingFromView() {
+        return mLeavingFromView;
+    }
+
+    public AutoCompleteTextView getDestinationView() {
+        return mDestinationView;
+    }
+
+    public Calendar getCalendarFrom() {
+        return calendarFrom;
+    }
+
+    public Calendar getCalendarTo() {
+        return calendarTo;
+    }
+
+    public Spinner getTransportation() {
+        return mTransportation;
     }
 }

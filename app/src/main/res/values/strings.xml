@@ -45,4 +45,10 @@
     </string-array>
 
     - See more at: http://www.ahotbrew.com/android-dropdown-spinner-example/#sthash.TShO44xy.dpuf
+    <string name="title_activity_trip_list">TripListActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 </resources>
