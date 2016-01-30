@@ -3,7 +3,11 @@ package droidsquad.voyage.model;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.method.KeyListener;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
@@ -20,6 +24,7 @@ import com.google.android.gms.location.places.Places;
 import java.util.ArrayList;
 import java.util.List;
 
+import droidsquad.voyage.R;
 import droidsquad.voyage.controller.PlaceArrayAdapter;
 
 /**
@@ -61,6 +66,23 @@ public class GooglePlacesAPI implements
                 android.R.layout.simple_list_item_1, null , filter.build());
         mAdapters.add(placeArrayAdapter);
 
+        TextWatcher watcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                mSourceCityName = null;
+                mSourceCityFullAddress = null;
+                mDestCityName = null;
+                mDestCityFullAddress = null;
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        autoCompleteTextView.addTextChangedListener(watcher);
 
         autoCompleteTextView.setAdapter(placeArrayAdapter);
 
@@ -97,6 +119,14 @@ public class GooglePlacesAPI implements
                 Log.d(TAG, "Fetching details for ID: " + item.placeId);
             }
         });
+    }
+
+    public boolean isSourceCityValid() {
+        return mSourceCityName != null;
+    }
+
+    public boolean isDestCityValid() {
+        return mDestCityName != null;
     }
 
     @Override

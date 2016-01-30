@@ -91,6 +91,9 @@ public class CreateTripController {
         // TODO: do other validation checks (check if edittext fields are empty or not, etc)
         boolean tripDatesValid = checkDates(dateFrom, dateTo);
 
+        // Use googlePlacesModel.isSourceCityValid() and googlePlacesModel.isDestCityValid()
+        // to know if the user did select a valid Google Maps location or not.
+
         return true;
     }
 
