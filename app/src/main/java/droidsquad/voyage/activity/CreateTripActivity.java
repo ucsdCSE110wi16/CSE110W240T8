@@ -1,12 +1,14 @@
 package droidsquad.voyage.activity;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.design.widget.TextInputLayout;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -14,7 +16,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -38,6 +39,7 @@ public class CreateTripActivity extends AppCompatActivity {
     private EditText mDateToView;
 
     private TextView mPrivateHelpView;
+    private TextView mTripNameErrorView;
 
     private AutoCompleteTextView mLeavingFromView;
     private AutoCompleteTextView mDestinationView;
@@ -70,6 +72,7 @@ public class CreateTripActivity extends AppCompatActivity {
         mDestinationView = (AutoCompleteTextView) findViewById(R.id.destination);
 
         mPrivateHelpView = (TextView) findViewById(R.id.trip_private_help);
+        mTripNameErrorView = (TextView) findViewById(R.id.trip_name_error);
 
         mMemberLimitWrapper = (TextInputLayout) findViewById(R.id.member_limit_wrapper);
         mLeavingFromWrapper = (TextInputLayout) findViewById(R.id.leaving_from_wrapper);
@@ -82,10 +85,10 @@ public class CreateTripActivity extends AppCompatActivity {
 
         // Set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.trip_toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_close);
+        toolbar.setTitle("");
+
         setSupportActionBar(toolbar);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         controller.setUpPlacesAutofill(mLeavingFromView, 0);
         controller.setUpPlacesAutofill(mDestinationView, 1);
@@ -94,13 +97,7 @@ public class CreateTripActivity extends AppCompatActivity {
         mPrivateView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mPrivateView.isChecked()) {
-                    mPrivateHelpView.setText(R.string.help_trip_private);
-                    mMemberLimitWrapper.setVisibility(View.GONE);
-                } else {
-                    mPrivateHelpView.setText(R.string.help_trip_public);
-                    mMemberLimitWrapper.setVisibility(View.VISIBLE);
-                }
+                togglePrivateCheckbox();
             }
         });
 
@@ -111,9 +108,7 @@ public class CreateTripActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case android.R.id.home:
-                // this takes the user 'back', as if they pressed the left-facing triangle icon on the main android toolbar.
-                // if this doesn't work as desired, another possibility is to call `finish()` here.
-                attemptClose();
+                controller.attemptClose();
                 return true;
             default:
                 return super.onOptionsItemSelected(menuItem);
@@ -133,38 +128,55 @@ public class CreateTripActivity extends AppCompatActivity {
         mDateFromView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                controller.showDateDialog(calendarFrom, mDateFromView);
+                controller.showDateDialog(calendarFrom);
             }
         });
 
         mDateToView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                controller.showDateDialog(calendarTo, mDateToView);
+                controller.showDateDialog(calendarTo);
             }
         });
     }
 
-
+    /**
+     * Hide the soft keyboard and clear focus
+     */
     public void hideKeyboard() {
         View view = this.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            view.clearFocus();
         }
     }
 
     /**
-     * Called when user presses the close toolbar button
+     * Change the help text and display/hide the members limit view
      */
-    public void attemptClose() {
-        controller.attemptClose();
+    public void togglePrivateCheckbox() {
+        if (mPrivateView.isChecked()) {
+            mPrivateHelpView.setText(R.string.help_trip_private);
+            mMemberLimitWrapper.setVisibility(View.GONE);
+        } else {
+            mPrivateHelpView.setText(R.string.help_trip_public);
+            mMemberLimitWrapper.setVisibility(View.VISIBLE);
+        }
     }
 
+    /**
+     * Show an alert dialog with cancel and ok options
+     * <p/>
+     * Triggered when the user tries to close the activity after making changes
+     *
+     * @param positiveListener Callback if user presses OK button
+     * @param negativeListener Callback if user presses Cancel button
+     */
     public void showAlertDialog(DialogInterface.OnClickListener positiveListener,
                                 DialogInterface.OnClickListener negativeListener) {
         new AlertDialog.Builder(this)
-                .setMessage("Are you sure you want to discard the changes?")
+                .setMessage(R.string.create_trip_alert_dialog_message)
                 .setPositiveButton(android.R.string.yes, positiveListener)
                 .setNegativeButton(android.R.string.no, negativeListener)
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -172,17 +184,26 @@ public class CreateTripActivity extends AppCompatActivity {
     }
 
     /**
-     * Called when the from date picker is pressed
+     * Show the date picker dialog and update the calendar with selected date
+     *
+     * @param listener Callback for when user picks a date
+     * @param calendar Calendar to save selected date to
      */
-    public void showFromDateDialog(View view) {
-        controller.showDateDialog(calendarFrom, mDateFromView);
+    public void showDatePickerDialog(DatePickerDialog.OnDateSetListener listener, Calendar calendar) {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, listener,
+                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+        datePickerDialog.getDatePicker().setMinDate(controller.getMinDateAllowed(calendar));
+        hideKeyboard();
+        datePickerDialog.show();
     }
 
     /**
-     * Called when the to date picker is pressed
+     * Update the dates views to display current state of calendars
      */
-    public void showToDateDialog(View view) {
-        controller.showDateDialog(calendarTo, mDateToView);
+    public void updateDateViews() {
+        mDateFromView.setText(dateFormat.format(calendarFrom.getTime()));
+        mDateToView.setText(dateFormat.format(calendarTo.getTime()));
     }
 
     /**
@@ -192,14 +213,34 @@ public class CreateTripActivity extends AppCompatActivity {
         controller.attemptCreateTrip();
     }
 
-    // TODO: show what field is missing, navigate to it perhaps. will need more input args
-    public void notifyTripInvalid() {
-
+    /**
+     * Displays the error on the given view
+     *
+     * @param view  View to display the error on
+     * @param error The error to be displayed
+     */
+    public void displayError(View view, String error) {
+        if (view instanceof TextInputLayout) {
+            ((TextInputLayout) view).setError(error);
+        } else if (view instanceof TextView) {
+            ((TextView) view).setError(error);
+        }
     }
 
+    /**
+     * @return true if user has made changes to the forms
+     */
+    public boolean hasChanges() {
+        return mTripNameView.getText().length() > 0 ||
+                mLeavingFromView.getText().length() > 0 ||
+                mDestinationView.getText().length() > 0;
+    }
+
+    /**
+     * Finish this acitivity and go back to previous activity on the stack
+     */
     public void exitActivity() {
-        Intent intent = new Intent(getApplicationContext(), TripListActivity.class);
-        startActivity(intent);
+        finish();
     }
 
     /* GETTERS */
@@ -224,7 +265,9 @@ public class CreateTripActivity extends AppCompatActivity {
         return mDestinationView;
     }
 
-    public Calendar getCalendarFrom() { return calendarFrom; }
+    public Calendar getCalendarFrom() {
+        return calendarFrom;
+    }
 
     public Calendar getCalendarTo() {
         return calendarTo;

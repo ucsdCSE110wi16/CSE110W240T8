@@ -1,112 +1,97 @@
 package droidsquad.voyage.model;
 
-import com.parse.ParseObject;
-
-import java.util.Calendar;
 import java.util.Date;
 
-/**
- * Created by Andrew on 1/23/16.
- */
 public class Trip {
-
     private static final int DEFAULT_LIMIT = 5;
-    private static final String DEFAULT_TRANSP = "Plane";
 
-    // General
-    private String tripName;
-    private String tripOrigin;
-    private String tripDestination;
-    private boolean tripPrivate;
-
-    // Details
-    private int tripLimit;
-    private Date dateFrom;
-    private Date dateTo;
+    private String name;
+    private String origin;
+    private String destination;
     private String transportation;
 
-    public Trip( String name, String orig, String dest, boolean priv,
-                 int limit, Date dateFrom, Date dateTo, String transp ){
+    private Date dateFrom;
+    private Date dateTo;
 
-        tripName = name;
-        tripOrigin = orig;
-        tripDestination = dest;
-        tripPrivate = priv;
+    private boolean isPrivate;
+    private int membersLimit;
 
-        tripLimit = limit;
+    public Trip(String name, String origin, String destination, boolean isPrivate,
+                int membersLimit, Date dateFrom, Date dateTo, String transportation) {
+        this.name = name;
+        this.origin = origin;
+        this.destination = destination;
+        this.transportation = transportation;
+
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;
-        transportation = transp;
 
+        this.isPrivate = isPrivate;
+        this.membersLimit = membersLimit;
     }
 
-    // TODO: Define minimum requirements to create a trip
-    public Trip( String name, String orig, String dest, boolean priv  ){
-        tripName = name;
-        tripOrigin = orig;
-        tripDestination = dest;
-        tripPrivate = priv;
+    /**
+     * TODO: Check if the Trip is valid for saving in Parse
+     *
+     * @return true if trip is valid, false otherwise
+     */
+    public boolean isValid() {
+        // Use googlePlacesModel.isSourceCityValid() and googlePlacesModel.isDestCityValid()
+        // to know if the user did select a valid Google Maps location or not.
 
-        // TODO: Define default values
-        tripLimit = DEFAULT_LIMIT;
-        Calendar calendar = Calendar.getInstance();
-        dateFrom = calendar.getTime();
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH));
-        dateTo = calendar.getTime();
-        transportation = DEFAULT_TRANSP;
+        return true;
     }
 
     @Override
-    public String toString(){
-        String toReturn = "Trip Name: " + tripName + "\n";
-        toReturn += "Leaving From: " + tripOrigin + "\n";
-        toReturn += "Destination: " + tripDestination + "\n";
-        toReturn += "Transportation: " + transportation + "\n";
-        toReturn += "Private: " + tripPrivate + "\n";
-        toReturn += "Limit: " + tripLimit + " persons\n";
-        toReturn += "Date From: " + dateFrom + "\n";
-        toReturn += "Date To: " + dateTo + "\n";
-        return toReturn;
+    public String toString() {
+        return "Trip Name: " + name + "\n" +
+                "Leaving From: " + origin + "\n" +
+                "Destination: " + destination + "\n" +
+                "Transportation: " + transportation + "\n" +
+                "Private: " + isPrivate + "\n" +
+                "Limit: " + membersLimit + " persons\n" +
+                "Date From: " + dateFrom + "\n" +
+                "Date To: " + dateTo + "\n";
     }
 
-    public String getTripName() {
-        return tripName;
+    public String getName() {
+        return name;
     }
 
-    public void setTripName(String tripName) {
-        this.tripName = tripName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getTripOrigin() {
-        return tripOrigin;
+    public String getOrigin() {
+        return origin;
     }
 
-    public void setTripOrigin(String tripOrigin) {
-        this.tripOrigin = tripOrigin;
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 
-    public String getTripDestination() {
-        return tripDestination;
+    public String getDestination() {
+        return destination;
     }
 
-    public void setTripDestination(String tripDestination) {
-        this.tripDestination = tripDestination;
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
-    public boolean isTripPrivate() {
-        return tripPrivate;
+    public boolean isPrivate() {
+        return isPrivate;
     }
 
-    public void setTripPrivate(boolean tripPrivate) {
-        this.tripPrivate = tripPrivate;
+    public void setPrivate(boolean aPrivate) {
+        this.isPrivate = aPrivate;
     }
 
     public int getTripLimit() {
-        return tripLimit;
+        return membersLimit;
     }
 
-    public void setTripLimit(int tripLimit) {
-        this.tripLimit = tripLimit;
+    public void setMembersLimit(int membersLimit) {
+        this.membersLimit = membersLimit;
     }
 
     public Date getDateFrom() {

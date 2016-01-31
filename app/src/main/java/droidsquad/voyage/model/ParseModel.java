@@ -2,7 +2,6 @@ package droidsquad.voyage.model;
 
 import android.content.Context;
 
-import com.parse.Parse;
 import com.parse.ParseObject;
 
 /**
@@ -22,10 +21,10 @@ public class ParseModel {
 
     public static void saveTrip(Trip trip) {
         ParseObject parseTrip  = new ParseObject("Trip");
-        parseTrip.put("name", trip.getTripName());
-        parseTrip.put("origin", trip.getTripOrigin());
-        parseTrip.put("destination", trip.getTripDestination());
-        parseTrip.put("private", trip.isTripPrivate());
+        parseTrip.put("name", trip.getName());
+        parseTrip.put("origin", trip.getOrigin());
+        parseTrip.put("destination", trip.getDestination());
+        parseTrip.put("private", trip.isPrivate());
         parseTrip.put("dateFrom", trip.getDateFrom());
         parseTrip.put("dateTo", trip.getDateTo());
         parseTrip.put("limit", trip.getTripLimit());
