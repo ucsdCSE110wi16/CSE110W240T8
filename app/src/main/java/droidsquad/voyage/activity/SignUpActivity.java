@@ -336,10 +336,9 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
                                     // Taking the user to the main activity and
                                     // killing all other activities in the BG
 
-                                    // TODO replace BlahActivity with the main activity
-//                                    Intent intent = new Intent(SignUpActivity.this, BlahActivity.class);
-//                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                    startActivity(intent);
+                                    Intent intent = new Intent(SignUpActivity.this, TripListActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
                                 } else {
                                     Log.d(TAG, "Unable to log user in." +
                                             ((e != null) ? (" ParseException occured. Code: " +

@@ -2,6 +2,7 @@ package droidsquad.voyage.model;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -24,6 +25,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.activity.CreateTripActivity;
+import droidsquad.voyage.activity.LoginActivity;
+import droidsquad.voyage.activity.TripListActivity;
 
 /**
  * Created by Raghav on 1/24/2016.
@@ -123,9 +127,15 @@ public class VoyageUser {
                 } else if (user.isNew()) {
                     Log.d(TAG, "Signing up new user.");
                     VoyageUser.refreshInfoFromFB();
+                    Intent intent = new Intent(activity, TripListActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    activity.startActivity(intent);
                 } else {
                     Log.d(TAG, "User logged in through Facebook!");
                     VoyageUser.refreshInfoFromFB();
+                    Intent intent = new Intent(activity, TripListActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    activity.startActivity(intent);
                 }
             }
         });

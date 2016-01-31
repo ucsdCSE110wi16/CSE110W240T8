@@ -170,7 +170,8 @@
                         android:text="4 Jul 2016"
                         style="@style/Widget.AppCompat.Spinner.Underlined"
                         android:id="@+id/choose_dob_textView"
-                        android:textStyle="bold" />
+                        android:textColor="#000000"
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 

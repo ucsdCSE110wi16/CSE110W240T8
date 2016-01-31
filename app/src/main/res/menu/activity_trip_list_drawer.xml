@@ -4,22 +4,22 @@
     <group android:id="@+id/group1">
         <item
             android:id="@+id/nav_feed"
-            android:icon="@drawable/ic_action_feed"
+            android:icon="@drawable/ic_web_black_48dp"
             android:title="Feed" />
         <item
             android:id="@+id/nav_trips"
-            android:icon="@drawable/ic_action_suitcase"
+            android:icon="@drawable/ic_card_travel_black_48dp"
             android:title="Trips" />
     </group>
 
     <group android:id="@+id/group2">
         <item
             android:id="@+id/nav_settings"
-            android:icon="@drawable/ic_action_gear"
+            android:icon="@drawable/ic_settings_black_48dp"
             android:title="Settings" />
         <item
             android:id="@+id/nav_logout"
-            android:icon="@drawable/ic_action_logout"
+            android:icon="@drawable/ic_logout_black_48dp"
             android:title="Logout" />
     </group>
 

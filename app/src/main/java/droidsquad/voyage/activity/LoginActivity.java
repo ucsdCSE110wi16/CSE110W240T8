@@ -232,6 +232,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     if (user != null) {
                         // Hooray! The user is logged in.
                         Log.d(TAG, "Successfully logged in " + email);
+                        Intent intent = new Intent(LoginActivity.this, TripListActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
                     } else {
                         // Login failed. Look at the ParseException to see what happened.
                         showProgress(false);
