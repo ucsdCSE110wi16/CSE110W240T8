@@ -10,6 +10,7 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.Date;
 
+import droidsquad.voyage.R;
 import droidsquad.voyage.activity.CreateTripActivity;
 import droidsquad.voyage.model.GooglePlacesAPI;
 import droidsquad.voyage.model.ParseModel;
@@ -100,18 +101,44 @@ public class CreateTripController {
         Date dateFrom = activity.getCalendarFrom().getTime();
         Date dateTo = activity.getCalendarTo().getTime();
         boolean privateTrip = activity.getPrivateView().isChecked();
+        boolean error = false;
 
-        int memberLimit = (!isEmpty(activity.getMemberLimitView()))
-                ? Integer.parseInt(activity.getMemberLimitView().getText().toString())
-                : 0;
+        int memberLimit;
+        try {
+            memberLimit = (!isEmpty(activity.getMemberLimitView()))
+                    ? Integer.parseInt(activity.getMemberLimitView().getText().toString())
+                    : 0;
+        }
+        catch(NumberFormatException e) {
+            memberLimit = 0;
+        }
 
         Trip newTrip = new Trip(tripName, leavingFrom, destination, privateTrip,
                 memberLimit, dateFrom, dateTo, transportation);
 
         if (tripName.length() < 3) {
-            activity.displayError(activity.getTripNameView(), "Name must be at least 3 character long");
-            return;
+            activity.displayError(activity.getTripNameView(), activity.getString(R.string.error_trip_name));
+            error = true;
         }
+
+        if(!privateTrip && memberLimit <= 0) {
+            activity.displayError(activity.getMemberLimitView(), activity.getString(R.string.error_member_limit));
+            error = true;
+        }
+
+        // TODO: update the valid location condition after linking up to a map API
+        if(leavingFrom.length() < 1) {
+            activity.displayError(activity.getLeavingFromView(), activity.getString(R.string.error_trip_location));
+            error = true;
+        }
+
+        if(destination.length() < 1) {
+            activity.displayError(activity.getDestinationView(), activity.getString(R.string.error_trip_location));
+            error = true;
+        }
+
+        if(error)
+            return;
 
         ParseModel.saveTrip(newTrip);
         activity.exitActivity();

@@ -62,6 +62,9 @@
     <string name="help_trip_private">Only members who you invite will see this trip.</string>
     <string name="help_trip_public">This trip will be visible to all your friends.</string>
     <string name="create_trip_alert_dialog_message">\"Are you sure you want to discard the changes?\"</string>
+    <string name="error_trip_name">"Name must be at least 3 character long"</string>
+    <string name="error_trip_location">"Please enter a valid location"</string>
+    <string name="error_member_limit">"Member limit must be a valid number"</string>
 
     <string-array name="array_transportation_modes">
         <item>Plane</item>
