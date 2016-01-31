@@ -12,6 +12,7 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.parse.LogInCallback;
+import com.parse.LogOutCallback;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
@@ -156,5 +157,23 @@ public class VoyageUser {
         Pattern p = Pattern.compile("^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$");
         Matcher m = p.matcher(mobileNum);
         return m.matches();
+    }
+
+    public static void logOut() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if(currentUser == null)
+            return;
+
+        currentUser.logOutInBackground(new LogOutCallback() {
+            @Override
+            public void done(com.parse.ParseException e) {
+                if(e == null) {
+                    // TODO: maybe add a loading animation
+                }
+                else {
+                    // TODO: handle if logout fails (error message)
+                }
+            }
+        });
     }
 }

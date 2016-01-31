@@ -114,6 +114,8 @@ public class GooglePlacesAPI implements
                             mDestCityFullAddress = place.getAddress().toString();
                         }
                         Log.d(TAG, "City name: " + place.getName() + "\nCity Address: " + place.getAddress());
+
+                        places.release();
                     }
                 });
                 Log.d(TAG, "Fetching details for ID: " + item.placeId);

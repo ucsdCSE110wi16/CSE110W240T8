@@ -18,6 +18,7 @@ import com.parse.ParseUser;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.TripListController;
+import droidsquad.voyage.model.VoyageUser;
 
 public class TripListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -107,7 +108,7 @@ public class TripListActivity extends AppCompatActivity
         } else if (id == R.id.nav_settings) {
 
         } else if (id == R.id.nav_logout) {
-
+            controller.logOutUser();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
