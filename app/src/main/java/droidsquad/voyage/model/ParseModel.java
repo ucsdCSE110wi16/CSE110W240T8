@@ -9,6 +9,10 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,17 +57,33 @@ public class ParseModel {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
-                if (e == null) {
-                    getAllMyTrips(objects);
-                } else {
-                    //TODO: if no trips for the user are found
-                }
+                getAllMyTrips(objects);
             }
         });
     }
 
-    public static void getAllMyTrips(List<ParseObject> trips) {
-        //TODO: return Trip java objects
+    public static ArrayList<Trip> getAllMyTrips(List<ParseObject> trips) {
+        ArrayList<Trip> allMyTrips = new ArrayList();
+        if(trips == null)
+            return allMyTrips;
+
+        for(ParseObject parseTrip: trips) {
+            String name = parseTrip.getString("name");
+            String creatorId = parseTrip.getString("creatorId");
+            JSONObject origin = parseTrip.getJSONObject("origin");
+            JSONObject destination = parseTrip.getJSONObject("destination");
+            boolean isPrivate = parseTrip.getBoolean("private");
+            Date dateFrom = parseTrip.getDate("dateFrom");
+            Date dateTo = parseTrip.getDate("dateTo");
+            int memberLimit = parseTrip.getInt("memberLimit");
+            String transportation = parseTrip.getString("transportation");
+
+            Trip trip = new Trip(name, origin, destination, isPrivate, memberLimit,
+                    dateFrom, dateTo, transportation, creatorId);
+
+            allMyTrips.add(trip);
+        }
+        return allMyTrips;
     }
 
     public static String getUser() {
