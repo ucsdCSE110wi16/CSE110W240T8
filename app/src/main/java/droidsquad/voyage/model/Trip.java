@@ -1,9 +1,14 @@
 package droidsquad.voyage.model;
 
+import com.parse.ParseUser;
+
 import java.util.Date;
 
 public class Trip {
     private static final int DEFAULT_LIMIT = 5;
+
+    /**TODO: ZEMEI*/
+    private ParseUser creator;
 
     private String name;
     private String origin;
@@ -17,7 +22,8 @@ public class Trip {
     private int membersLimit;
 
     public Trip(String name, String origin, String destination, boolean isPrivate,
-                int membersLimit, Date dateFrom, Date dateTo, String transportation) {
+                int membersLimit, Date dateFrom, Date dateTo, String transportation,
+                ParseUser creator) {
         this.name = name;
         this.origin = origin;
         this.destination = destination;
@@ -28,6 +34,9 @@ public class Trip {
 
         this.isPrivate = isPrivate;
         this.membersLimit = membersLimit;
+
+        /**TODO: ZEMEI*/
+        this.creator = creator;
     }
 
     /**
@@ -113,4 +122,7 @@ public class Trip {
     public void setTransportation(String transportation) {
         this.transportation = transportation;
     }
+
+    /**TODO: ZEMEI*/
+    public ParseUser getCreator() { return creator; }
 }

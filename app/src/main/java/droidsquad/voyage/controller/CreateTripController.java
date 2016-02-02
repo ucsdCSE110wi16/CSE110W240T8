@@ -7,6 +7,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.parse.ParseUser;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -100,6 +102,7 @@ public class CreateTripController {
         String transportation = activity.getTransportation().getSelectedItem().toString();
         Date dateFrom = activity.getCalendarFrom().getTime();
         Date dateTo = activity.getCalendarTo().getTime();
+        ParseUser creator = ParseModel.getUser();
         boolean privateTrip = activity.getPrivateView().isChecked();
         boolean error = false;
 
@@ -114,7 +117,7 @@ public class CreateTripController {
         }
 
         Trip newTrip = new Trip(tripName, leavingFrom, destination, privateTrip,
-                memberLimit, dateFrom, dateTo, transportation);
+                memberLimit, dateFrom, dateTo, transportation, creator);
 
         if (tripName.length() < 3) {
             activity.displayError(activity.getTripNameView(), activity.getString(R.string.error_trip_name));
