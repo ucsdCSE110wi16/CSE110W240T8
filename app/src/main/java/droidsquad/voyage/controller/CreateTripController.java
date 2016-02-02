@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import com.parse.ParseUser;
 
+import org.json.JSONObject;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -97,8 +99,8 @@ public class CreateTripController {
     public void attemptCreateTrip() {
         // Get all the information from the views
         String tripName = activity.getTripNameView().getText().toString();
-        String leavingFrom = activity.getLeavingFromView().getText().toString();
-        String destination = activity.getDestinationView().getText().toString();
+        JSONObject leavingFrom = googlePlacesModel.getSourceCityJSON();
+        JSONObject destination = googlePlacesModel.getDestCityJSON();
         String transportation = activity.getTransportation().getSelectedItem().toString();
         Date dateFrom = activity.getCalendarFrom().getTime();
         Date dateTo = activity.getCalendarTo().getTime();

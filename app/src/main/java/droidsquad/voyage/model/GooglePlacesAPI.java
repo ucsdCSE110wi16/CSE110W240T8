@@ -21,6 +21,9 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,6 +136,30 @@ public class GooglePlacesAPI implements
 
     public boolean isDestCityValid() {
         return mDestCityName != null;
+    }
+
+    public JSONObject getSourceCityJSON() {
+        JSONObject object = new JSONObject();
+        try {
+            object.put("city", mSourceCityName);
+            object.put("address", mSourceCityFullAddress);
+        } catch (JSONException e) {
+            Log.d(TAG, "JSON Exception Occurred. " + e.getMessage());
+        }
+
+        return object;
+    }
+
+    public JSONObject getDestCityJSON() {
+        JSONObject object = new JSONObject();
+        try {
+            object.put("city", mDestCityName);
+            object.put("address", mDestCityFullAddress);
+        } catch (JSONException e) {
+            Log.d(TAG, "JSON Exception Occurred. " + e.getMessage());
+        }
+
+        return object;
     }
 
     @Override

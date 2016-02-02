@@ -2,6 +2,8 @@ package droidsquad.voyage.model;
 
 import com.parse.ParseUser;
 
+import org.json.JSONObject;
+
 import java.util.Date;
 
 public class Trip {
@@ -11,8 +13,8 @@ public class Trip {
     private String creator;
 
     private String name;
-    private String origin;
-    private String destination;
+    private JSONObject origin;
+    private JSONObject destination;
     private String transportation;
 
     private Date dateFrom;
@@ -21,7 +23,7 @@ public class Trip {
     private boolean isPrivate;
     private int membersLimit;
 
-    public Trip(String name, String origin, String destination, boolean isPrivate,
+    public Trip(String name, JSONObject origin, JSONObject destination, boolean isPrivate,
                 int membersLimit, Date dateFrom, Date dateTo, String transportation,
                 String creator) {
         this.name = name;
@@ -71,19 +73,19 @@ public class Trip {
         this.name = name;
     }
 
-    public String getOrigin() {
+    public JSONObject getOrigin() {
         return origin;
     }
 
-    public void setOrigin(String origin) {
+    public void setOrigin(JSONObject origin) {
         this.origin = origin;
     }
 
-    public String getDestination() {
+    public JSONObject getDestination() {
         return destination;
     }
 
-    public void setDestination(String destination) {
+    public void setDestination(JSONObject destination) {
         this.destination = destination;
     }
 
