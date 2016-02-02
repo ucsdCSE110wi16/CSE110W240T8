@@ -102,7 +102,8 @@ public class CreateTripController {
         String transportation = activity.getTransportation().getSelectedItem().toString();
         Date dateFrom = activity.getCalendarFrom().getTime();
         Date dateTo = activity.getCalendarTo().getTime();
-        ParseUser creator = ParseModel.getUser();
+        /**TODO: ZEMEI*/
+        String creator = ParseModel.getUser();
         boolean privateTrip = activity.getPrivateView().isChecked();
         boolean error = false;
 

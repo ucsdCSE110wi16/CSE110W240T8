@@ -35,8 +35,8 @@ public class ParseModel {
         parseTrip.saveInBackground();
     }
 
-    public static ParseUser getUser() {
-        return ParseUser.getCurrentUser();
+    public static String getUser() {
+        return ParseUser.getCurrentUser().getObjectId();
     }
 
 }

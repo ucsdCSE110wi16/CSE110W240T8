@@ -8,7 +8,7 @@ public class Trip {
     private static final int DEFAULT_LIMIT = 5;
 
     /**TODO: ZEMEI*/
-    private ParseUser creator;
+    private String creator;
 
     private String name;
     private String origin;
@@ -23,7 +23,7 @@ public class Trip {
 
     public Trip(String name, String origin, String destination, boolean isPrivate,
                 int membersLimit, Date dateFrom, Date dateTo, String transportation,
-                ParseUser creator) {
+                String creator) {
         this.name = name;
         this.origin = origin;
         this.destination = destination;
@@ -124,5 +124,11 @@ public class Trip {
     }
 
     /**TODO: ZEMEI*/
-    public ParseUser getCreator() { return creator; }
+    public void setCreator( String creator ) {
+        this.creator = creator;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
 }
