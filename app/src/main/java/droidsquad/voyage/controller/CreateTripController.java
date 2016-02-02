@@ -104,8 +104,7 @@ public class CreateTripController {
         String transportation = activity.getTransportation().getSelectedItem().toString();
         Date dateFrom = activity.getCalendarFrom().getTime();
         Date dateTo = activity.getCalendarTo().getTime();
-        /**TODO: ZEMEI*/
-        String creator = ParseModel.getUser();
+        String creatorId = ParseModel.getUser();
         boolean privateTrip = activity.getPrivateView().isChecked();
         boolean error = false;
 
@@ -120,7 +119,7 @@ public class CreateTripController {
         }
 
         Trip newTrip = new Trip(tripName, leavingFrom, destination, privateTrip,
-                memberLimit, dateFrom, dateTo, transportation, creator);
+                memberLimit, dateFrom, dateTo, transportation, creatorId);
 
         if (tripName.length() < 3) {
             activity.displayError(activity.getTripNameView(), activity.getString(R.string.error_trip_name));

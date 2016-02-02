@@ -4,13 +4,14 @@ import com.parse.ParseUser;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Trip {
     private static final int DEFAULT_LIMIT = 5;
 
-    /**TODO: ZEMEI*/
-    private String creator;
+    private String creatorId;
+    String tripId;
 
     private String name;
     private JSONObject origin;
@@ -23,9 +24,11 @@ public class Trip {
     private boolean isPrivate;
     private int membersLimit;
 
+    ArrayList<String> allParticipants;
+
     public Trip(String name, JSONObject origin, JSONObject destination, boolean isPrivate,
                 int membersLimit, Date dateFrom, Date dateTo, String transportation,
-                String creator) {
+                String creatorId) {
         this.name = name;
         this.origin = origin;
         this.destination = destination;
@@ -37,8 +40,7 @@ public class Trip {
         this.isPrivate = isPrivate;
         this.membersLimit = membersLimit;
 
-        /**TODO: ZEMEI*/
-        this.creator = creator;
+        this.creatorId = creatorId;
     }
 
     /**
@@ -125,12 +127,19 @@ public class Trip {
         this.transportation = transportation;
     }
 
-    /**TODO: ZEMEI*/
-    public void setCreator( String creator ) {
-        this.creator = creator;
+    public void setCreatorId( String creatorId ) {
+        this.creatorId = creatorId;
     }
 
-    public String getCreator() {
-        return creator;
+    public String getCreatorId() {
+        return creatorId;
+    }
+
+    public void setTripId(String tripId) {
+        this.tripId = tripId;
+    }
+
+    public String getTripId() {
+        return tripId;
     }
 }
