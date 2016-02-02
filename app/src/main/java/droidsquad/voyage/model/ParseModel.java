@@ -1,6 +1,7 @@
 package droidsquad.voyage.model;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -22,6 +23,7 @@ public class ParseModel {
 
     public static final String USER_OBJECT = "User";
     public static final String TRIP_OBJECT = "Trip";
+    private static final String TAG = ParseUser.class.getSimpleName();
     // add more key/value final Strings
 
 
@@ -31,7 +33,8 @@ public class ParseModel {
     }
 
     public static void saveTrip(Trip trip) {
-        ParseObject parseTrip  = new ParseObject("Trip");
+        Log.d(TAG, "Attempting to save trip to parse.\nTrip: " + trip.toString());
+        ParseObject parseTrip = new ParseObject("Trip");
         parseTrip.put("name", trip.getName());
         parseTrip.put("creatorId", trip.getCreatorId());
         parseTrip.put("origin", trip.getOrigin());

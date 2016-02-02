@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Voyage</string>
     <string name="facebook_app_id">946525895432363</string>
+    <string name="google_app_id">433235175305</string>
     <string name="login_activity_title">Log into Voyage</string>
     <string name="sign_up_activity_title">Sign up for Voyage</string>
 
