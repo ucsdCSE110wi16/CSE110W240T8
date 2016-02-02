@@ -1,17 +1,21 @@
 package droidsquad.voyage.model;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 
 import droidsquad.voyage.R;
 
 public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHolder> {
+    private static final String TAG = TripCardAdapter.class.getSimpleName();
     private ArrayList<Trip> trips = new ArrayList<>();
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -26,7 +30,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             mName = (TextView) view.findViewById(R.id.trip_card_name);
             mCities = (TextView) view.findViewById(R.id.trip_card_cities);
             mDates = (TextView) view.findViewById(R.id.trip_card_date_range);
-            mPrivateIcon = (ImageView) view.findViewById(R.id.trip_card_is_private);
+            mPrivateIcon = (ImageView) view.findViewById(R.id.trip_card_private_icon);
         }
     }
 
@@ -53,7 +57,11 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         Trip trip = this.trips.get(position);
 
         holder.mName.setText(trip.getName());
-        holder.mCities.setText(trip.getOrigin() + " –> " + trip.getDestination());
+        try {
+            holder.mCities.setText(trip.getOrigin().get("name") + " –> " + trip.getDestination().get("name"));
+        } catch (JSONException e) {
+            Log.d(TAG, "JSONException occurred. " + e.getMessage());
+        }
         holder.mDates.setText(trip.getDateFrom() + " – " + trip.getDateTo());
         holder.mPrivateIcon.setVisibility(
                 (trip.isPrivate()) ? View.VISIBLE : View.GONE);

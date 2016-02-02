@@ -4,7 +4,12 @@ import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import droidsquad.voyage.activity.LoginActivity;
 import droidsquad.voyage.activity.TripListActivity;

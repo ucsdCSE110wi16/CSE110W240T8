@@ -73,10 +73,13 @@ public class GooglePlacesAPI implements
         TextWatcher watcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                mSourceCityName = null;
-                mSourceCityFullAddress = null;
-                mDestCityName = null;
-                mDestCityFullAddress = null;
+                if (cityType == 0) {
+                    mSourceCityName = null;
+                    mSourceCityFullAddress = null;
+                } else {
+                    mDestCityName = null;
+                    mDestCityFullAddress = null;
+                }
             }
 
             @Override
