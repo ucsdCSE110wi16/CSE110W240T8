@@ -23,6 +23,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         public TextView mCities;
         public TextView mDates;
         public ImageView mPrivateIcon;
+        public ImageView mTransportationIcon;
 
         public ViewHolder(View view) {
             super(view);
@@ -31,6 +32,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             mCities = (TextView) view.findViewById(R.id.trip_card_cities);
             mDates = (TextView) view.findViewById(R.id.trip_card_date_range);
             mPrivateIcon = (ImageView) view.findViewById(R.id.trip_card_private_icon);
+            mTransportationIcon = (ImageView) view.findViewById(R.id.trip_card_transportation_icon);
         }
     }
 
@@ -65,6 +67,20 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         holder.mDates.setText(trip.getDateFrom() + " – " + trip.getDateTo());
         holder.mPrivateIcon.setVisibility(
                 (trip.isPrivate()) ? View.VISIBLE : View.GONE);
+
+        switch (trip.getTransportation()) {
+            case "Car":
+                holder.mTransportationIcon.setImageResource(R.drawable.ic_car);
+                break;
+
+            case "Bus":
+                holder.mTransportationIcon.setImageResource(R.drawable.ic_bus);
+                break;
+
+            default :
+                holder.mTransportationIcon.setImageResource(R.drawable.ic_flight);
+                break;
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)

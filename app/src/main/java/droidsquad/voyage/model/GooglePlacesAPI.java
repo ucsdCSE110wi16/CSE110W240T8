@@ -123,7 +123,7 @@ public class GooglePlacesAPI implements
                             mDestCityFullAddress = place.getAddress().toString();
                             mDestID = place.getId();
                         }
-                        Log.d(TAG, "City name: " + place.getName() + "\nCity Address: " + place.getAddress());
+                        Log.d(TAG, "City name: " + place.getName() + "\nCity Address: " + place.getAddress() + "\nID: " + place.getId());
 
                         places.release();
                     }
@@ -146,6 +146,7 @@ public class GooglePlacesAPI implements
         try {
             object.put("city", mSourceCityName);
             object.put("address", mSourceCityFullAddress);
+            object.put("placeId", mSourceID);
         } catch (JSONException e) {
             Log.d(TAG, "JSON Exception Occurred. " + e.getMessage());
         }
@@ -158,6 +159,7 @@ public class GooglePlacesAPI implements
         try {
             object.put("city", mDestCityName);
             object.put("address", mDestCityFullAddress);
+            object.put("placeId", mDestID);
         } catch (JSONException e) {
             Log.d(TAG, "JSON Exception Occurred. " + e.getMessage());
         }
