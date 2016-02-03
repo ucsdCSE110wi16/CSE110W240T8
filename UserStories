@@ -1,29 +1,53 @@
 DROID SQUAD USER STORIES (1 = greatest priority, 5 = lowest priority)
 
 ********** Current Iteration **********
-Create New Trip
-As a travelers' group leader, I want to create a new trip with all its info so that I can begin the trip planning process.
-Estimation of Time for Completion: 3-4 days
-Customer Priority: 1
-
-View All Current Trips
 As a traveler client, I want to be able to view all the current trips I am currently signed up for so that the trip information is 
 accessible.
+Given I am signed in and on the trip list activity, when I open it for the first
+time, then I will be able to view all of the current trips I am participating
+in and is not past.
+Given I am signed in and on the trip list activity and I am not part of any
+trips, when I open it for the first time, then I will see that no trips have
+been added via text/graphic.
+Given I am signed in and the trip list activity has already been loaded, when I
+swipe down to refresh, then the activity will reload the data from the server
+and the list of trips will be updated.
 Estimation of Time for Completion: 1 wk
 Customer Priority: 1
-
-Polish Create Trip Flow
-As a group leader for a trip, I want to be able to create a trip with more
-fluid UX that displays descriptions for the trip options and software keyboard
-that hides itself in proper contexts.
-Estimation of Time for Completion: 1 day
-
-********** TODO **********
 
 Invite members to current trip
 As a group leader for a trip, I want to be able to add/delete friends from the trip so that I can form traveling group.
+Given I am a group leader and viewing the trip details, when I press an add
+friend/invite button, they will receive a notification/request to join the trip.
+Given I am an invitee for a trip, when I receive a notification to join a trip
+and I click on it, then I will be navigated to a pending invitations activity.
+Given I am an invitee for a trip, when I receive a notification to join a trip
+and I dismiss it, then I will still be able to see it when I go to the pending
+invitations activity, the invitation will still be there.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 1
+
+Popular Nearby Trips
+As a traveler interested in joining an existing trip, I want to be able to search for popular trips near my location so that I can 
+travel with others. 
+Given I am currently signed in and on the news feed activity, when I open it for
+the first time then it will be populated with public trips that my friends are
+involved in.
 Estimation of Time for Completion: 1 wk
 Customer Priority: 2
+
+View Trip Details
+As a trip participant, I want to be able to view details of the trip I am
+participating in.
+Given I am a group leader, when I view the trip details, then I should be able
+to have options to administrate the trip (edit, delete, etc).
+Given I am a trip participant, when I view the trip details, then I should be
+able to see the trip details (title, description, source, destination, friends,
+start and end date, transportation).
+
+
+********** TODO **********
+
 
 Member Request Notifications
 As a traveler who is not currently a member of the group that invited me, I want to receive notifications for invites to join that 
@@ -60,11 +84,6 @@ As a traveler client, I want to be able to view their own trip history so that I
 Estimation of Time for Completion: 1 day
 Customer Priority: 4
 
-Popular Nearby Trips
-As a traveler interested in joining an existing trip, I want to be able to search for popular trips near my location so that I can 
-travel with others. 
-Estimation of Time for Completion: 1 wk
-Customer Priority: 5
 
 Friend's Updates
 As a traveler client, I want to be able to see my friends' and/or public trips so that I can keep updated with what my friends are 
@@ -94,10 +113,13 @@ As a traveler client, I want to login via Facebook or email so that I can access
 Estimation of Time for Completion: 1 wk
 Customer Priority: 1
 
+Create New Trip
+As a travelers' group leader, I want to create a new trip with all its info so that I can begin the trip planning process.
+Estimation of Time for Completion: 3-4 days
+Customer Priority: 1
 
-
-
-
-
-
-
+Polish Create Trip Flow
+As a group leader for a trip, I want to be able to create a trip with more
+fluid UX that displays descriptions for the trip options and software keyboard
+that hides itself in proper contexts.
+Estimation of Time for Completion: 1 day
