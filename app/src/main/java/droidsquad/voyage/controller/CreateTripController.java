@@ -99,8 +99,8 @@ public class CreateTripController {
     public void attemptCreateTrip() {
         // Get all the information from the views
         String tripName = activity.getTripNameView().getText().toString();
-        JSONObject leavingFrom = googlePlacesModel.getSourceCityJSON();
-        JSONObject destination = googlePlacesModel.getDestCityJSON();
+        String leavingFrom = googlePlacesModel.getSourceCityJSON().toString();
+        String destination = googlePlacesModel.getDestCityJSON().toString();
         String transportation = activity.getTransportation().getSelectedItem().toString();
         Date dateFrom = activity.getCalendarFrom().getTime();
         Date dateTo = activity.getCalendarTo().getTime();

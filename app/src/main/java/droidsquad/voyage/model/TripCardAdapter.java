@@ -59,11 +59,8 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         Trip trip = this.trips.get(position);
 
         holder.mName.setText(trip.getName());
-        try {
-            holder.mCities.setText(trip.getOrigin().get("name") + " –> " + trip.getDestination().get("name"));
-        } catch (JSONException e) {
-            Log.d(TAG, "JSONException occurred. " + e.getMessage());
-        }
+        holder.mCities.setText(trip.getOrigin() + " –> " + trip.getDestination());
+
         holder.mDates.setText(trip.getDateFrom() + " – " + trip.getDateTo());
         holder.mPrivateIcon.setVisibility(
                 (trip.isPrivate()) ? View.VISIBLE : View.GONE);

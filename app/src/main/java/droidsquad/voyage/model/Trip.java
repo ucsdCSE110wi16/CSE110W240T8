@@ -14,8 +14,8 @@ public class Trip {
     String tripId;
 
     private String name;
-    private JSONObject origin;
-    private JSONObject destination;
+    private String origin;
+    private String destination;
     private String transportation;
 
     private Date dateFrom;
@@ -26,7 +26,7 @@ public class Trip {
 
     ArrayList<String> allParticipants;
 
-    public Trip(String name, JSONObject origin, JSONObject destination, boolean isPrivate,
+    public Trip(String name, String origin, String destination, boolean isPrivate,
                 int membersLimit, Date dateFrom, Date dateTo, String transportation,
                 String creatorId) {
         this.name = name;
@@ -75,19 +75,19 @@ public class Trip {
         this.name = name;
     }
 
-    public JSONObject getOrigin() {
+    public String getOrigin() {
         return origin;
     }
 
-    public void setOrigin(JSONObject origin) {
+    public void setOrigin(String origin) {
         this.origin = origin;
     }
 
-    public JSONObject getDestination() {
+    public String getDestination() {
         return destination;
     }
 
-    public void setDestination(JSONObject destination) {
+    public void setDestination(String destination) {
         this.destination = destination;
     }
 

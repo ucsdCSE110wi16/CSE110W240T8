@@ -73,8 +73,8 @@ public class ParseModel {
         for(ParseObject parseTrip: trips) {
             String name = parseTrip.getString("name");
             String creatorId = parseTrip.getString("creatorId");
-            JSONObject origin = parseTrip.getJSONObject("origin");
-            JSONObject destination = parseTrip.getJSONObject("destination");
+            String origin = parseTrip.getJSONObject("origin").toString();
+            String destination = parseTrip.getJSONObject("destination").toString();
             boolean isPrivate = parseTrip.getBoolean("private");
             Date dateFrom = parseTrip.getDate("dateFrom");
             Date dateTo = parseTrip.getDate("dateTo");
