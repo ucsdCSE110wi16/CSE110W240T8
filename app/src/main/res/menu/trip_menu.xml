@@ -4,15 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activity.TripActivity">
     <item
-        android:id="@+id/action_search"
-        android:icon="@drawable/ic_menu_share"
+        android:id="@+id/trip_action_share"
+        android:icon="@drawable/ic_share"
         android:orderInCategory="100"
         android:title="Share"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/trip_action_edit"
+        android:icon="@drawable/ic_edit"
         android:orderInCategory="200"
-        android:title="@string/action_settings"
+        android:title="Edit"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="300"
+        android:title="Report"
         app:showAsAction="never" />
 </menu>
