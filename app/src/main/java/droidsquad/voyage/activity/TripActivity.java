@@ -24,6 +24,8 @@ public class TripActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // TODO instantiate TripController and use the method setGooglePlacePhoto(imageView)
     }
 
     @Override
