@@ -40,7 +40,8 @@ public class GooglePlacesAPI implements
     private static final String TAG = GooglePlacesAPI.class.getSimpleName();
 
 
-    private String mSourceCityName, mDestCityName, mSourceCityFullAddress, mDestCityFullAddress;
+    private String mSourceCityName, mDestCityName,mSourceCityFullAddress,
+            mDestCityFullAddress, mSourceID, mDestID;
 
     public GooglePlacesAPI(Context context) {
         this.context = context;
@@ -109,9 +110,12 @@ public class GooglePlacesAPI implements
                         if (cityType == 0) {
                             mSourceCityName = place.getName().toString();
                             mSourceCityFullAddress = place.getAddress().toString();
+                            mSourceID = place.getId();
+
                         } else {
                             mDestCityName = place.getName().toString();
                             mDestCityFullAddress = place.getAddress().toString();
+                            mDestID = place.getId();
                         }
                         Log.d(TAG, "City name: " + place.getName() + "\nCity Address: " + place.getAddress());
 
