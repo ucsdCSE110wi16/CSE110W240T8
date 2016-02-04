@@ -160,18 +160,21 @@ public class VoyageUser {
     }
 
     public static void logOut() {
+        Log.d(TAG, "Logging user out.");
         ParseUser currentUser = ParseUser.getCurrentUser();
-        if(currentUser == null)
+        if (currentUser == null)
             return;
 
         currentUser.logOutInBackground(new LogOutCallback() {
             @Override
             public void done(com.parse.ParseException e) {
-                if(e == null) {
+                if (e == null) {
                     // TODO: maybe add a loading animation
-                }
-                else {
+                    Log.d(TAG, "User successfully logged out.");
+                } else {
                     // TODO: handle if logout fails (error message)
+                    Log.d(TAG, "ParseException occurred. Code: "
+                            + e.getCode() + "Message: " + e.getMessage());
                 }
             }
         });

@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import com.parse.ParseUser;
 
+import org.json.JSONObject;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -97,13 +99,12 @@ public class CreateTripController {
     public void attemptCreateTrip() {
         // Get all the information from the views
         String tripName = activity.getTripNameView().getText().toString();
-        String leavingFrom = activity.getLeavingFromView().getText().toString();
-        String destination = activity.getDestinationView().getText().toString();
+        String leavingFrom = googlePlacesModel.getSourceCityJSON().toString();
+        String destination = googlePlacesModel.getDestCityJSON().toString();
         String transportation = activity.getTransportation().getSelectedItem().toString();
         Date dateFrom = activity.getCalendarFrom().getTime();
         Date dateTo = activity.getCalendarTo().getTime();
-        /**TODO: ZEMEI*/
-        String creator = ParseModel.getUser();
+        String creatorId = ParseModel.getUser();
         boolean privateTrip = activity.getPrivateView().isChecked();
         boolean error = false;
 
@@ -118,7 +119,7 @@ public class CreateTripController {
         }
 
         Trip newTrip = new Trip(tripName, leavingFrom, destination, privateTrip,
-                memberLimit, dateFrom, dateTo, transportation, creator);
+                memberLimit, dateFrom, dateTo, transportation, creatorId);
 
         if (tripName.length() < 3) {
             activity.displayError(activity.getTripNameView(), activity.getString(R.string.error_trip_name));
@@ -130,13 +131,12 @@ public class CreateTripController {
             error = true;
         }
 
-        // TODO: update the valid location condition after linking up to a map API
-        if(leavingFrom.length() < 1) {
+        if(!googlePlacesModel.isSourceCityValid()) {
             activity.displayError(activity.getLeavingFromView(), activity.getString(R.string.error_trip_location));
             error = true;
         }
 
-        if(destination.length() < 1) {
+        if(!googlePlacesModel.isDestCityValid()) {
             activity.displayError(activity.getDestinationView(), activity.getString(R.string.error_trip_location));
             error = true;
         }
@@ -145,13 +145,20 @@ public class CreateTripController {
             return;
 
         ParseModel.saveTrip(newTrip);
-        activity.exitActivity();
 
+        // TODO show progress spinning thingy and wait till the trip has been saved to parse
+
+        // if success
+        activity.exitActivity();
         CharSequence text = "Trip Created";
         int duration = Toast.LENGTH_SHORT;
 
         Toast toast = Toast.makeText(activity.getApplicationContext(), text, duration);
         toast.show();
+
+        // TODO else : stay on the same page and show snackBar with error and button to retry.
+        // for reference for snackBar with button you can look at LoginActivity.java
+
     }
 
     private boolean isEmpty(EditText etText) {

@@ -25,6 +25,9 @@ import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,10 +77,13 @@ public class GooglePlacesAPI implements
         TextWatcher watcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                mSourceCityName = null;
-                mSourceCityFullAddress = null;
-                mDestCityName = null;
-                mDestCityFullAddress = null;
+                if (cityType == 0) {
+                    mSourceCityName = null;
+                    mSourceCityFullAddress = null;
+                } else {
+                    mDestCityName = null;
+                    mDestCityFullAddress = null;
+                }
             }
 
             @Override
@@ -121,7 +127,7 @@ public class GooglePlacesAPI implements
                             mDestCityFullAddress = place.getAddress().toString();
                             mDestID = place.getId();
                         }
-                        Log.d(TAG, "City name: " + place.getName() + "\nCity Address: " + place.getAddress());
+                        Log.d(TAG, "City name: " + place.getName() + "\nCity Address: " + place.getAddress() + "\nID: " + place.getId());
 
                         places.release();
                     }
@@ -182,6 +188,32 @@ public class GooglePlacesAPI implements
                     }
                 });
 
+    }
+
+    public JSONObject getSourceCityJSON() {
+        JSONObject object = new JSONObject();
+        try {
+            object.put("city", mSourceCityName);
+            object.put("address", mSourceCityFullAddress);
+            object.put("placeId", mSourceID);
+        } catch (JSONException e) {
+            Log.d(TAG, "JSON Exception Occurred. " + e.getMessage());
+        }
+
+        return object;
+    }
+
+    public JSONObject getDestCityJSON() {
+        JSONObject object = new JSONObject();
+        try {
+            object.put("city", mDestCityName);
+            object.put("address", mDestCityFullAddress);
+            object.put("placeId", mDestID);
+        } catch (JSONException e) {
+            Log.d(TAG, "JSON Exception Occurred. " + e.getMessage());
+        }
+
+        return object;
     }
 
     @Override
