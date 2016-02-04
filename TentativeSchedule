@@ -1,28 +1,35 @@
 DROID SQUAD (TENTATIVE) ITERATIONS SCHEDULE (refer to user stories for more detailed description of features)
 
+Details will become updated as we progress forward and get a better idea of what our goals are each week.
+
 Features Done by WEEK 4:
-Create New Trip (Activity set up)
-Register New User (error check fields & store data onto Parse)
-User Login (FB Login)
+Create New Trip 
+-Activity set up
+Register New User 
+-error check fields & store data onto Parse
+User Login 
+-FB Login
+Set up nav bar
 
 Features Done by WEEK 5:
 Continue create new Trip
--link to Google Maps api
+-link to Google Maps API
 View All Current Trips 
 -Make Trip object to store data
 -Grab trips associated w/ a user on Parse
-Implement logout (Can log out from nav bar)
+Implement logout (accessed from nav bar)
 
-Features Done by WEEK 6:
+Features Done by WEEK 6: 1ST MILESTONE (BASELINE)
 Continue View All Current Trips 
 -link trips to adapter so user can view all current trips
--finish implementing adapter
+-finish implementing adapter and cards
 Invite Members to Current Trip
--investigate & use parse user groups to do this
-
-Next up?
-Member Request Notifications
-Trip Notifications
+-use Parse user groups to do this
+Member Request, Trip Notifications
+-user can send trip invitations
+Start on feed activity
+-Use FB API
+Update login - app only uses Facebook login
 
 Features Done by WEEK 7:
 Popular Nearby Trips
@@ -38,6 +45,5 @@ Features Done by WEEK 9:
 Chat feature/New Features?
 Finalization Testing
 
-Features Done by WEEK 10
+Features Done by WEEK 10: FINAL MILESTONE
 Polishing up/last-min bug fixes
-MILESTONE/BASELINE
