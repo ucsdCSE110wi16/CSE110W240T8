@@ -51,9 +51,12 @@ public class TripListController {
         ptm.searchForAllTrips();
     }
 
-    // TODO: BACKEND, CALL THIS ONCE YOU HAVE THE ARRAYLIST OF TRIPS
     public void updateAdapter(ArrayList<Trip> trips) {
         adapter.updateData(trips);
+        refreshData();
+    }
+
+    public void refreshData() {
         adapter.notifyDataSetChanged();
     }
 
