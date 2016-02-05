@@ -18,6 +18,7 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.activity.CreateTripActivity;
 import droidsquad.voyage.model.GooglePlacesAPI;
 import droidsquad.voyage.model.ParseModel;
+import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.Trip;
 
 public class CreateTripController {
@@ -101,10 +102,12 @@ public class CreateTripController {
         String tripName = activity.getTripNameView().getText().toString();
         String leavingFrom = googlePlacesModel.getSourceCityJSON().toString();
         String destination = googlePlacesModel.getDestCityJSON().toString();
+        //JSONObject leavingFrom = googlePlacesModel.getSourceCityJSON();
+        //JSONObject destination = googlePlacesModel.getDestCityJSON();
         String transportation = activity.getTransportation().getSelectedItem().toString();
         Date dateFrom = activity.getCalendarFrom().getTime();
         Date dateTo = activity.getCalendarTo().getTime();
-        String creatorId = ParseModel.getUser();
+        String creatorId = ParseTripModel.getUser();
         boolean privateTrip = activity.getPrivateView().isChecked();
         boolean error = false;
 
@@ -144,7 +147,7 @@ public class CreateTripController {
         if(error)
             return;
 
-        ParseModel.saveTrip(newTrip);
+        ParseTripModel.saveTrip(newTrip);
 
         // TODO show progress spinning thingy and wait till the trip has been saved to parse
 

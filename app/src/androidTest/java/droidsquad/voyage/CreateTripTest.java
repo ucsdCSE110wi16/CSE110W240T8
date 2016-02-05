@@ -9,6 +9,7 @@ import java.util.Date;
 
 import droidsquad.voyage.activity.CreateTripActivity;
 import droidsquad.voyage.model.ParseModel;
+import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.Trip;
 
 /**
@@ -29,15 +30,15 @@ public class CreateTripTest {
         calendar.set(2015, 05, 17);
         Date to = calendar.getTime();
 
-        completeTrip = new Trip( "Complete", "La Jolla", "San Diego", false, 5,
-                                                                from, to, "Car" );
-        simpleTrip = new Trip( "Simple", "Curitiba", "La Jolla", true );
+       // completeTrip = new Trip( "Complete", "La Jolla", "San Diego", false, 5,
+         //                                                       from, to, "Car" );
+       // simpleTrip = new Trip( "Simple", "Curitiba", "La Jolla", true );
     }
 
     @Test
     public void save(){
-        ParseModel.saveTrip(completeTrip);
-        ParseModel.saveTrip(simpleTrip);
+        ParseTripModel.saveTrip(completeTrip);
+        ParseTripModel.saveTrip(simpleTrip);
     }
 
 }

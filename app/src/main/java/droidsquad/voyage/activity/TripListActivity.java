@@ -44,6 +44,7 @@ public class TripListActivity extends AppCompatActivity
 
         initUI();
 
+        controller.retrieveData();
     }
 
     private void initUI() {
@@ -66,6 +67,7 @@ public class TripListActivity extends AppCompatActivity
     public void createTrip(View v) {
         Intent intent = new Intent(getApplicationContext(), CreateTripActivity.class);
         startActivity(intent);
+
     }
 
     @Override
@@ -120,4 +122,6 @@ public class TripListActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 }

@@ -11,41 +11,34 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by Andrew on 1/20/16.
- */
-public class ParseModel {
+import droidsquad.voyage.controller.TripListController;
 
+/**
+ * Created by Vivian on 2/3/2016.
+ */
+public class ParseTripModel {
     public static final String USER_OBJECT = "User";
     public static final String TRIP_OBJECT = "Trip";
     private static final String TAG = ParseUser.class.getSimpleName();
     // add more key/value final Strings
 
+    private static TripListController c;
+
 
     private Context context;
 
-    public ParseModel() {
+    public ParseTripModel(TripListController controller) {
+        c = controller;
     }
 
-    public static void saveData() {
-
-    }
-
-    public static void searchData(){
-
-    }
-
-    public static void getData(){
-
-    }
-
-    /*public static void saveTrip(Trip trip) {
+    public static void saveTrip(Trip trip) {
         Log.d(TAG, "Attempting to save trip to parse.\nTrip: " + trip.toString());
         ParseObject parseTrip = new ParseObject("Trip");
         parseTrip.put("name", trip.getName());
@@ -87,16 +80,31 @@ public class ParseModel {
         });
     }
 
-    public static ArrayList<Trip> getAllMyTrips(List<ParseObject> trips) {
+    public static void getAllMyTrips(List<ParseObject> trips) {
         ArrayList<Trip> allMyTrips = new ArrayList();
         if(trips == null)
-            return allMyTrips;
+            return;
 
         for(ParseObject parseTrip: trips) {
             String name = parseTrip.getString("name");
             String creatorId = parseTrip.getString("creatorId");
-            String origin = parseTrip.getJSONObject("origin").toString();
-            String destination = parseTrip.getJSONObject("destination").toString();
+
+            //Getting String address from a JSONObject from a JSONString
+            String JSONStringorigin = parseTrip.getString("origin");
+            String JSONStringdestination = parseTrip.getString("destination");
+            String origin = null;
+            String destination = null;
+            try {
+                JSONObject JSONorigin = new JSONObject(JSONStringorigin);
+                JSONObject JSONdestination = new JSONObject(JSONStringdestination);
+
+                origin = JSONorigin.getString("address");
+                destination = JSONdestination.getString("address");
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
             boolean isPrivate = parseTrip.getBoolean("private");
             Date dateFrom = parseTrip.getDate("dateFrom");
             Date dateTo = parseTrip.getDate("dateTo");
@@ -108,11 +116,11 @@ public class ParseModel {
 
             allMyTrips.add(trip);
         }
-        return allMyTrips;
+
+        c.updateAdapter(allMyTrips);
     }
 
     public static String getUser() {
         return ParseUser.getCurrentUser().getObjectId();
-    }*/
-
+    }
 }
