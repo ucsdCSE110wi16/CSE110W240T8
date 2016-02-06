@@ -96,8 +96,6 @@ public class TripActivity extends AppCompatActivity {
             public void onGenerated(Palette palette) {
                 int colorPrimary = ContextCompat.getColor(
                         getApplicationContext(), R.color.colorPrimary);
-                int colorPrimaryDark = ContextCompat.getColor(
-                        getApplicationContext(), R.color.colorPrimaryDark);
                 int colorAccent = ContextCompat.getColor(
                         getApplicationContext(), R.color.colorAccent);
 
@@ -107,26 +105,14 @@ public class TripActivity extends AppCompatActivity {
                 // Status bar and toolbar color
                 mCollapsingToolbar.setContentScrimColor(
                         (mutedSwatch != null) ? mutedSwatch.getRgb() : colorPrimary);
-                setStatusBarColor(
-                        (mutedSwatch != null) ? darkenColor(mutedSwatch.getRgb()) : colorPrimaryDark);
+
+                mCollapsingToolbar.setStatusBarScrimColor(
+                        (mutedSwatch != null) ? mutedSwatch.getRgb() : colorPrimary);
 
                 // Floating Action Button color
                 mFAB.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));
             }
         });
-    }
-
-    /**
-     * Set the color of the status bar
-     *
-     * @param color Color to be set
-     */
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setStatusBarColor(int color) {
-        Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(color);
     }
 
     /**
@@ -159,8 +145,9 @@ public class TripActivity extends AppCompatActivity {
         mCollapsingToolbar.setTitle(name);
     }
 
-    public void setTripLocation(String location) {
+    public void setTripTransportationAndIcon(String location, int id) {
         mTripLocTextView.setText(location);
+        mTripLocTextView.setCompoundDrawablesWithIntrinsicBounds(id, 0, 0, 0);
     }
 
     public void setTripDates(String dates) {

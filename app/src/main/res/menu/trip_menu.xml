@@ -18,8 +18,14 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/trip_action_delete_trip"
         android:orderInCategory="300"
+        android:title="Delete Trip"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="400"
         android:title="Report"
         app:showAsAction="never" />
 </menu>
