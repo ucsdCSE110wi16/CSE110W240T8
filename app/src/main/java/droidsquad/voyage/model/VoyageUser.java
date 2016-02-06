@@ -3,10 +3,14 @@ package droidsquad.voyage.model;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -19,6 +23,11 @@ import com.parse.ParseUser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,6 +62,7 @@ public class VoyageUser {
                             currentUser.put("firstName", object.get("first_name").toString());
                             currentUser.put("lastName", object.get("last_name").toString());
                             currentUser.put("gender", object.get("gender").toString());
+                            currentUser.put("fbId", object.get(("id")).toString());
 
                             // Check if the user gave his/her email
                             if (object.has("email")) {
@@ -92,7 +102,7 @@ public class VoyageUser {
                     }
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "first_name,last_name,email,birthday,gender");
+        parameters.putString("fields", "first_name,last_name,email,birthday,gender,id");
         request.setParameters(parameters);
         request.executeAsync();
 
@@ -140,6 +150,46 @@ public class VoyageUser {
                 }
             }
         });
+    }
+
+    public static void setProfilePicAsync(final ImageView imageView) {
+        AsyncTask<Void, Void, Bitmap> task = new AsyncTask<Void, Void, Bitmap>() {
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                Bitmap bitmap=null;
+                String id = ParseUser.getCurrentUser().get("fbId").toString();
+                final String nomimg = "https://graph.facebook.com/"+id+"/picture?type=large";
+                URL imageURL = null;
+
+                try {
+                    imageURL = new URL(nomimg);
+                } catch (MalformedURLException e) {
+                    Log.d(TAG, "Malformed Exception occurred: " + e.getMessage());
+                }
+
+                try {
+                    HttpURLConnection connection = (HttpURLConnection) imageURL.openConnection();
+                    connection.setDoInput(true);
+                    connection.setInstanceFollowRedirects( true );
+                    connection.connect();
+                    InputStream inputStream = connection.getInputStream();
+                    //img_value.openConnection().setInstanceFollowRedirects(true).getInputStream()
+                    bitmap = BitmapFactory.decodeStream(inputStream);
+
+                } catch (IOException e) {
+                    Log.e(TAG, "IOException occurred: " + e.getMessage());
+                }
+                return bitmap;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                if (bitmap != null)
+                    imageView.setImageBitmap(bitmap);
+            }
+        };
+
+        task.execute();
     }
 
     public static boolean isEmailValid(String email) {
