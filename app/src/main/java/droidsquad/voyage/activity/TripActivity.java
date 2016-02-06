@@ -20,13 +20,22 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.controller.TripController;
+import droidsquad.voyage.model.Trip;
 
 public class TripActivity extends AppCompatActivity {
     private CollapsingToolbarLayout mCollapsingToolbar;
     private FloatingActionButton mFAB;
     private ImageView mHeaderImageView;
+    private TextView mTripLocTextView;
+    private TextView mTripDatesTextView;
+    private TripController mController;
 
 
     @Override
@@ -35,6 +44,10 @@ public class TripActivity extends AppCompatActivity {
         setContentView(R.layout.activity_trip);
 
         initUI();
+        mController = new TripController(this, (Trip) getIntent()
+                .getSerializableExtra(getString(R.string.intent_key_trip)));
+
+        mController.setGooglePlacePhoto(mHeaderImageView);
     }
 
     @Override
@@ -60,24 +73,22 @@ public class TripActivity extends AppCompatActivity {
         mCollapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mHeaderImageView = (ImageView) findViewById(R.id.header_image);
         mFAB = (FloatingActionButton) findViewById(R.id.fab);
+        mTripLocTextView = (TextView) findViewById(R.id.trip_locations);
+        mTripDatesTextView = (TextView) findViewById(R.id.trip_dates);
 
         // Set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        mCollapsingToolbar.setTitle("Backpacking in Arizona");
         mCollapsingToolbar.setExpandedTitleTypeface(Typeface.create("sans-serif", Typeface.BOLD));
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        setColors();
     }
 
     /**
      * Set the colors of the toolbar and FAB based on the header image
      */
-    private void setColors() {
+    public void setColors() {
         Bitmap bitmap = ((BitmapDrawable) mHeaderImageView.getDrawable()).getBitmap();
 
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
@@ -96,8 +107,6 @@ public class TripActivity extends AppCompatActivity {
                 // Status bar and toolbar color
                 mCollapsingToolbar.setContentScrimColor(
                         (mutedSwatch != null) ? mutedSwatch.getRgb() : colorPrimary);
-                mCollapsingToolbar.setExpandedTitleColor(
-                        (mutedSwatch != null) ? mutedSwatch.getBodyTextColor() : 0xffffff);
                 setStatusBarColor(
                         (mutedSwatch != null) ? darkenColor(mutedSwatch.getRgb()) : colorPrimaryDark);
 
@@ -144,5 +153,17 @@ public class TripActivity extends AppCompatActivity {
         sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Share"));
+    }
+
+    public void setTripName(String name) {
+        mCollapsingToolbar.setTitle(name);
+    }
+
+    public void setTripLocation(String location) {
+        mTripLocTextView.setText(location);
+    }
+
+    public void setTripDates(String dates) {
+        mTripDatesTextView.setText(dates);
     }
 }

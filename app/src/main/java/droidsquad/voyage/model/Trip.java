@@ -4,10 +4,11 @@ import com.parse.ParseUser;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Trip {
+public class Trip implements Serializable {
     private static final int DEFAULT_LIMIT = 5;
 
     private String creatorId;

@@ -1,5 +1,6 @@
 package droidsquad.voyage.model;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.activity.TripActivity;
 import droidsquad.voyage.controller.PlaceArrayAdapter;
 
 /**
@@ -146,18 +148,7 @@ public class GooglePlacesAPI implements
     }
 
 
-    public void loadPlaceImage(final ImageView imageView, String placeId) {
-
-        final ResultCallback<PlacePhotoResult> displayPhotoResultCallback
-                = new ResultCallback<PlacePhotoResult>() {
-            @Override
-            public void onResult(PlacePhotoResult placePhotoResult) {
-                if (!placePhotoResult.getStatus().isSuccess()) {
-                    return;
-                }
-                imageView.setImageBitmap(placePhotoResult.getBitmap());
-            }
-        };
+    public void loadPlaceImage(final ImageView imageView, String placeId, final TripActivity activity) {
 
         /**
          * Load a bitmap from the photos API asynchronously
@@ -171,10 +162,11 @@ public class GooglePlacesAPI implements
                     @Override
                     public void onResult(PlacePhotoMetadataResult photos) {
                         if (!photos.getStatus().isSuccess()) {
+                            Log.d(TAG, "Couldn\'t receive photos bundle successfully.");
                             return;
                         }
 
-                        Log.d(TAG, "Photo successfully received.");
+                        Log.d(TAG, "Photo bundle received successfully");
 
                         PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
                         if (photoMetadataBuffer.getCount() > 0) {
@@ -182,7 +174,23 @@ public class GooglePlacesAPI implements
                             photoMetadataBuffer.get(0)
                                     .getScaledPhoto(mGoogleApiClient, imageView.getWidth(),
                                             imageView.getHeight())
-                                    .setResultCallback(displayPhotoResultCallback);
+                                    .setResultCallback(new ResultCallback<PlacePhotoResult>() {
+                                        @Override
+                                        public void onResult(PlacePhotoResult placePhotoResult) {
+                                            if (!placePhotoResult.getStatus().isSuccess()) {
+                                                Log.d(TAG, "Couldn\'t retrieve the photo successfully.");
+                                                return;
+                                            }
+
+                                            Log.d(TAG, "Successfully retrieved photo from photo bundle.");
+
+                                            imageView.setImageBitmap(placePhotoResult.getBitmap());
+
+                                            activity.setColors();
+                                        }
+                                    });
+                        } else {
+                            Log.d(TAG, "0 images in the buffer.");
                         }
                         photoMetadataBuffer.release();
                     }

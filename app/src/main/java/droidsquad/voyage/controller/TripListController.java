@@ -40,7 +40,7 @@ public class TripListController {
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
 
         // specify an adapter (see also next example)
-        adapter = new TripCardAdapter();
+        adapter = new TripCardAdapter(activity);
         recyclerView.setAdapter(adapter);
     }
 

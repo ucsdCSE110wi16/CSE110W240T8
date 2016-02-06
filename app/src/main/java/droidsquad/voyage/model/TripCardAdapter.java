@@ -1,5 +1,8 @@
 package droidsquad.voyage.model;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,14 +12,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.activity.TripActivity;
 
 public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHolder> {
     private static final String TAG = TripCardAdapter.class.getSimpleName();
     private ArrayList<Trip> trips = new ArrayList<>();
+    private Activity mActivity;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mName;
@@ -24,6 +30,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         public TextView mDates;
         public ImageView mPrivateIcon;
         public ImageView mTransportationIcon;
+        public CardView mTripCard;
 
         public ViewHolder(View view) {
             super(view);
@@ -33,11 +40,14 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             mDates = (TextView) view.findViewById(R.id.trip_card_date_range);
             mPrivateIcon = (ImageView) view.findViewById(R.id.trip_card_private_icon);
             mTransportationIcon = (ImageView) view.findViewById(R.id.trip_card_transportation_icon);
+            mTripCard = (CardView) view.findViewById(R.id.trip_card_view);
         }
     }
 
-    public TripCardAdapter() {
+    public TripCardAdapter(Activity activity) {
         this.trips = new ArrayList<>();
+        this.mActivity = activity;
+
     }
 
     public void updateData(ArrayList<Trip> trips) {
@@ -56,10 +66,19 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Trip trip = this.trips.get(position);
+        final Trip trip = this.trips.get(position);
 
         holder.mName.setText(trip.getName());
-        holder.mCities.setText(trip.getOrigin() + " –> " + trip.getDestination());
+
+        try {
+            JSONObject origin = new JSONObject(trip.getOrigin());
+            JSONObject dest = new JSONObject(trip.getDestination());
+
+            holder.mCities.setText(origin.get("city") + " –> " + dest.get("city"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
         holder.mDates.setText(trip.getDateFrom() + " – " + trip.getDateTo());
         holder.mPrivateIcon.setVisibility(
@@ -78,6 +97,17 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                 holder.mTransportationIcon.setImageResource(R.drawable.ic_flight);
                 break;
         }
+
+        holder.mTripCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Card clicked for trip: " + trip.getName());
+
+                Intent intent = new Intent(mActivity, TripActivity.class);
+                intent.putExtra(mActivity.getString(R.string.intent_key_trip), trip);
+                mActivity.startActivity(intent);
+            }
+        });
     }
 
     // Return the size of your dataset (invoked by the layout manager)

@@ -75,7 +75,8 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".activity.TripActivity"
-            android:theme="@style/AppTheme.coloredStatusBarOnly" />
+            android:theme="@style/AppTheme.coloredStatusBarOnly"
+            android:parentActivityName=".activity.TripListActivity"/>
     </application>
 
 </manifest>
