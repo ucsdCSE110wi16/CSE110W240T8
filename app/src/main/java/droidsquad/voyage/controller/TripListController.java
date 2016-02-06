@@ -13,6 +13,7 @@ import java.util.List;
 
 import droidsquad.voyage.activity.LoginActivity;
 import droidsquad.voyage.activity.TripListActivity;
+import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.Trip;
 import droidsquad.voyage.model.TripCardAdapter;
 import droidsquad.voyage.model.VoyageUser;
@@ -46,12 +47,17 @@ public class TripListController {
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
         // TODO: create a method in ParseModel, or another model class if necessary to retrieve data and call updateAdapter() below
-
+        ParseTripModel ptm = new ParseTripModel(this);
+        ptm.searchForAllTrips();
     }
 
-    // TODO: BACKEND, CALL THIS ONCE YOU HAVE THE ARRAYLIST OF TRIPS
     public void updateAdapter(ArrayList<Trip> trips) {
         adapter.updateData(trips);
+        refreshData();
+    }
+
+    public void refreshData() {
+        adapter.notifyDataSetChanged();
     }
 
     public void logOutUser() {

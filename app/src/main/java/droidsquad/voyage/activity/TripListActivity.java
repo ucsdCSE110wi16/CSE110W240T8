@@ -17,12 +17,14 @@ import android.view.MenuItem;
 
 import com.parse.ParseUser;
 
+import java.io.Serializable;
+
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.TripListController;
 import droidsquad.voyage.model.VoyageUser;
 
 public class TripListActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, Serializable {
 
     private TripListController controller;
     private RecyclerView recyclerView;
@@ -43,7 +45,12 @@ public class TripListActivity extends AppCompatActivity
         controller = new TripListController(this);
 
         initUI();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        controller.retrieveData();
     }
 
     private void initUI() {
@@ -66,6 +73,7 @@ public class TripListActivity extends AppCompatActivity
     public void createTrip(View v) {
         Intent intent = new Intent(getApplicationContext(), CreateTripActivity.class);
         startActivity(intent);
+
     }
 
     @Override
@@ -119,5 +127,9 @@ public class TripListActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public TripListController getController() {
+        return controller;
     }
 }

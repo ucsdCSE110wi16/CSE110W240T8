@@ -241,6 +241,8 @@ public class CreateTripActivity extends AppCompatActivity {
      */
     public void exitActivity() {
         finish();
+        // tell the parent activity it has been updated
+
     }
 
     /* GETTERS */
