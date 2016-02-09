@@ -5,7 +5,6 @@ import com.parse.ParseUser;
 import java.util.Date;
 
 public class Trip {
-    private static final int DEFAULT_LIMIT = 5;
 
     /**TODO: ZEMEI*/
     private String creator;
@@ -19,10 +18,9 @@ public class Trip {
     private Date dateTo;
 
     private boolean isPrivate;
-    private int membersLimit;
 
     public Trip(String name, String origin, String destination, boolean isPrivate,
-                int membersLimit, Date dateFrom, Date dateTo, String transportation,
+                Date dateFrom, Date dateTo, String transportation,
                 String creator) {
         this.name = name;
         this.origin = origin;
@@ -33,7 +31,6 @@ public class Trip {
         this.dateTo = dateTo;
 
         this.isPrivate = isPrivate;
-        this.membersLimit = membersLimit;
 
         /**TODO: ZEMEI*/
         this.creator = creator;
@@ -58,7 +55,6 @@ public class Trip {
                 "Destination: " + destination + "\n" +
                 "Transportation: " + transportation + "\n" +
                 "Private: " + isPrivate + "\n" +
-                "Limit: " + membersLimit + " persons\n" +
                 "Date From: " + dateFrom + "\n" +
                 "Date To: " + dateTo + "\n";
     }
@@ -93,14 +89,6 @@ public class Trip {
 
     public void setPrivate(boolean aPrivate) {
         this.isPrivate = aPrivate;
-    }
-
-    public int getTripLimit() {
-        return membersLimit;
-    }
-
-    public void setMembersLimit(int membersLimit) {
-        this.membersLimit = membersLimit;
     }
 
     public Date getDateFrom() {

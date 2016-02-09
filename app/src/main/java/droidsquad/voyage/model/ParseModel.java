@@ -30,7 +30,6 @@ public class ParseModel {
         parseTrip.put("private", trip.isPrivate());
         parseTrip.put("dateFrom", trip.getDateFrom());
         parseTrip.put("dateTo", trip.getDateTo());
-        parseTrip.put("limit", trip.getTripLimit());
         parseTrip.put("transportation", trip.getTransportation());
         parseTrip.saveInBackground();
     }

@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -28,7 +30,6 @@ import droidsquad.voyage.controller.CreateTripController;
 public class CreateTripActivity extends AppCompatActivity {
     private CreateTripController controller;
 
-    private TextInputLayout mMemberLimitWrapper;
     private TextInputLayout mLeavingFromWrapper;
     private TextInputLayout mDestinationWrapper;
     private TextInputLayout mDateFromWrapper;
@@ -74,7 +75,6 @@ public class CreateTripActivity extends AppCompatActivity {
         mPrivateHelpView = (TextView) findViewById(R.id.trip_private_help);
         mTripNameErrorView = (TextView) findViewById(R.id.trip_name_error);
 
-        mMemberLimitWrapper = (TextInputLayout) findViewById(R.id.member_limit_wrapper);
         mLeavingFromWrapper = (TextInputLayout) findViewById(R.id.leaving_from_wrapper);
         mDestinationWrapper = (TextInputLayout) findViewById(R.id.destination_wrapper);
         mDateFromWrapper = (TextInputLayout) findViewById(R.id.date_from_wrapper);
@@ -153,15 +153,26 @@ public class CreateTripActivity extends AppCompatActivity {
     }
 
     /**
+     * In case user presses the Back button
+     */
+    @Override
+    public void onBackPressed() {
+        if (hasChanges()){
+            controller.attemptClose();
+        }
+        else {
+            exitActivity();
+        }
+    }
+
+    /**
      * Change the help text and display/hide the members limit view
      */
     public void togglePrivateCheckbox() {
         if (mPrivateView.isChecked()) {
             mPrivateHelpView.setText(R.string.help_trip_private);
-            mMemberLimitWrapper.setVisibility(View.GONE);
         } else {
             mPrivateHelpView.setText(R.string.help_trip_public);
-            mMemberLimitWrapper.setVisibility(View.VISIBLE);
         }
     }
 
@@ -247,10 +258,6 @@ public class CreateTripActivity extends AppCompatActivity {
 
     public EditText getTripNameView() {
         return mTripNameView;
-    }
-
-    public EditText getMemberLimitView() {
-        return mMemberLimitWrapper.getEditText();
     }
 
     public CheckBox getPrivateView() {

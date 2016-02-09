@@ -35,6 +35,7 @@ public class CreateTripController {
         if (!activity.hasChanges()) {
             activity.exitActivity();
         } else {
+            activity.hideKeyboard();
             activity.showAlertDialog(new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -107,26 +108,11 @@ public class CreateTripController {
         boolean privateTrip = activity.getPrivateView().isChecked();
         boolean error = false;
 
-        int memberLimit;
-        try {
-            memberLimit = (!isEmpty(activity.getMemberLimitView()))
-                    ? Integer.parseInt(activity.getMemberLimitView().getText().toString())
-                    : 0;
-        }
-        catch(NumberFormatException e) {
-            memberLimit = 0;
-        }
-
         Trip newTrip = new Trip(tripName, leavingFrom, destination, privateTrip,
-                memberLimit, dateFrom, dateTo, transportation, creator);
+                dateFrom, dateTo, transportation, creator);
 
         if (tripName.length() < 3) {
             activity.displayError(activity.getTripNameView(), activity.getString(R.string.error_trip_name));
-            error = true;
-        }
-
-        if(!privateTrip && memberLimit <= 0) {
-            activity.displayError(activity.getMemberLimitView(), activity.getString(R.string.error_member_limit));
             error = true;
         }
 
