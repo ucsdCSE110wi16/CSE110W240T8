@@ -17,11 +17,11 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
+        android:name="droidsquad.voyage.ParseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name="droidsquad.voyage.ParseApplication"
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.parse.APPLICATION_ID"
@@ -32,7 +32,7 @@
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
+            android:value="@string/facebook_app_id" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -40,9 +40,10 @@
 
         <activity
             android:name=".activity.LoginActivity"
-            android:label="@string/login_activity_title"/>
+            android:label="@string/login_activity_title" />
 
-        <activity android:name=".activity.CreateTripActivity"
+        <activity
+            android:name=".activity.CreateTripActivity"
             android:theme="@style/AppTheme.coloredStatusBarOnly" />
 
         <!--
@@ -64,13 +65,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SignUpActivity"
+        <activity
+            android:name=".activity.SignUpActivity"
             android:label="@string/sign_up_activity_title" />
-        <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:label="@string/app_name" />
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".activity.TripActivity"
+            android:theme="@style/CollapsingToolbarTheme"
+            android:parentActivityName=".activity.TripListActivity"/>
     </application>
 
 </manifest>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.TripActivity">
+    <item
+        android:id="@+id/trip_action_share"
+        android:icon="@drawable/ic_share"
+        android:orderInCategory="100"
+        android:title="Share"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/trip_action_edit"
+        android:icon="@drawable/ic_edit"
+        android:orderInCategory="200"
+        android:title="Edit"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/trip_action_delete_trip"
+        android:orderInCategory="300"
+        android:title="Delete Trip"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="400"
+        android:title="Report"
+        app:showAsAction="never" />
+</menu>

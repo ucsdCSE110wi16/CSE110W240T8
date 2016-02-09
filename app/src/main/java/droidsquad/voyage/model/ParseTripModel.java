@@ -90,20 +90,8 @@ public class ParseTripModel {
             String creatorId = parseTrip.getString("creatorId");
 
             //Getting String address from a JSONObject from a JSONString
-            String JSONStringorigin = parseTrip.getString("origin");
-            String JSONStringdestination = parseTrip.getString("destination");
-            String origin = null;
-            String destination = null;
-            try {
-                JSONObject JSONorigin = new JSONObject(JSONStringorigin);
-                JSONObject JSONdestination = new JSONObject(JSONStringdestination);
-
-                origin = JSONorigin.getString("address");
-                destination = JSONdestination.getString("address");
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            String origin = parseTrip.getString("origin");
+            String destination = parseTrip.getString("destination");
 
             boolean isPrivate = parseTrip.getBoolean("private");
             Date dateFrom = parseTrip.getDate("dateFrom");
