@@ -57,6 +57,10 @@ public class TripListController {
         adapter.notifyDataSetChanged();
     }
 
+    public void refreshViewContents() {
+        ParseTripModel.searchForAllTrips();
+    }
+
     public void logOutUser() {
         // TODO: update this method
         user.logOut();
