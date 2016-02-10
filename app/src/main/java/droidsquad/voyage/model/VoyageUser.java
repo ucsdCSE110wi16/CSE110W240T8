@@ -1,7 +1,6 @@
 package droidsquad.voyage.model;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,15 +27,12 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.activity.CreateTripActivity;
-import droidsquad.voyage.activity.LoginActivity;
 import droidsquad.voyage.activity.TripListActivity;
 
 /**
@@ -64,35 +60,6 @@ public class VoyageUser {
                             currentUser.put("gender", object.get("gender").toString());
                             currentUser.put("fbId", object.get(("id")).toString());
 
-                            // Check if the user gave his/her email
-                            if (object.has("email")) {
-                                // if the user signed up for facebook using his phone number then
-                                // this won't be a valid email. But it might be a valid phone number
-                                String emailOrMobile = object.get("email").toString();
-                                if (isEmailValid(emailOrMobile)) {
-                                    currentUser.put("email", emailOrMobile);
-                                } else if (isMobileNumValid(emailOrMobile)) {
-                                    currentUser.put("mobile", emailOrMobile);
-                                }
-                            }
-
-                            // Check if the user gave his birthday
-                            if (object.has("birthday")) {
-                                String birthday = object.get("birthday").toString();
-                                // The answer comes in the format "03\/28\/1996"
-
-                                int month = Integer.parseInt(birthday.substring(0, 2));
-                                int date = Integer.parseInt(birthday.substring(3, 5));
-                                int year = Integer.parseInt(birthday.substring(6));
-
-                                JSONObject dOB = new JSONObject();
-                                dOB.put("month", (month - 1));
-                                dOB.put("day", date);
-                                dOB.put("year", year);
-
-                                currentUser.put("dateOfBirth", dOB.toString());
-                            }
-
                             Log.d(TAG, "Info saved.");
                         } catch (JSONException e) {
                             Log.d(TAG, "JSONException occurred: " + e.getMessage());
@@ -102,18 +69,17 @@ public class VoyageUser {
                     }
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "first_name,last_name,email,birthday,gender,id");
+        parameters.putString("fields", "first_name,last_name,gender,id,friends");
         request.setParameters(parameters);
         request.executeAsync();
 
     }
 
-    public static void attempFBLogin(final Activity activity, final View view) {
+    public static void attemptFBLogin(final Activity activity, final View view) {
         Log.d(TAG, "Logging in user with Facebook.");
         Collection<String> permissions = new ArrayList<>();
         permissions.add("public_profile");
-        permissions.add("email");
-        permissions.add("user_birthday");
+        permissions.add("user_friends");
         ParseFacebookUtils.logInWithReadPermissionsInBackground(activity, permissions, new LogInCallback() {
             @Override
             public void done(ParseUser user, com.parse.ParseException err) {
@@ -130,7 +96,7 @@ public class VoyageUser {
                                 .setAction("RETRY", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        attempFBLogin(activity, view);
+                                        attemptFBLogin(activity, view);
                                     }
                                 });
                         snackbar.show();

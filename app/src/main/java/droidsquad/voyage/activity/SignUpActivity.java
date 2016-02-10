@@ -36,7 +36,6 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -175,7 +174,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             @Override
             public void onClick(final View v) {
                 hideKeyBoard();
-                VoyageUser.attempFBLogin(SignUpActivity.this, v);
+                VoyageUser.attemptFBLogin(SignUpActivity.this, v);
             }
         });
     }
