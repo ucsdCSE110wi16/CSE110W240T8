@@ -2,28 +2,28 @@ package droidsquad.voyage.model;
 
 import com.parse.ParseUser;
 
+import org.json.JSONObject;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 
-public class Trip {
-    private static final int DEFAULT_LIMIT = 5;
-
-    /**TODO: ZEMEI*/
-    private String creator;
+public class Trip implements Serializable {
+    private String creatorId;
+    private String tripId;
 
     private String name;
     private String origin;
     private String destination;
     private String transportation;
-
     private Date dateFrom;
     private Date dateTo;
-
     private boolean isPrivate;
-    private int membersLimit;
+
+    private ArrayList<String> allParticipants;
 
     public Trip(String name, String origin, String destination, boolean isPrivate,
-                int membersLimit, Date dateFrom, Date dateTo, String transportation,
-                String creator) {
+                Date dateFrom, Date dateTo, String transportation, String creatorId) {
         this.name = name;
         this.origin = origin;
         this.destination = destination;
@@ -33,22 +33,7 @@ public class Trip {
         this.dateTo = dateTo;
 
         this.isPrivate = isPrivate;
-        this.membersLimit = membersLimit;
-
-        /**TODO: ZEMEI*/
-        this.creator = creator;
-    }
-
-    /**
-     * TODO: Check if the Trip is valid for saving in Parse
-     *
-     * @return true if trip is valid, false otherwise
-     */
-    public boolean isValid() {
-        // Use googlePlacesModel.isSourceCityValid() and googlePlacesModel.isDestCityValid()
-        // to know if the user did select a valid Google Maps location or not.
-
-        return true;
+        this.creatorId = creatorId;
     }
 
     @Override
@@ -58,7 +43,6 @@ public class Trip {
                 "Destination: " + destination + "\n" +
                 "Transportation: " + transportation + "\n" +
                 "Private: " + isPrivate + "\n" +
-                "Limit: " + membersLimit + " persons\n" +
                 "Date From: " + dateFrom + "\n" +
                 "Date To: " + dateTo + "\n";
     }
@@ -95,14 +79,6 @@ public class Trip {
         this.isPrivate = aPrivate;
     }
 
-    public int getTripLimit() {
-        return membersLimit;
-    }
-
-    public void setMembersLimit(int membersLimit) {
-        this.membersLimit = membersLimit;
-    }
-
     public Date getDateFrom() {
         return dateFrom;
     }
@@ -123,12 +99,19 @@ public class Trip {
         this.transportation = transportation;
     }
 
-    /**TODO: ZEMEI*/
-    public void setCreator( String creator ) {
-        this.creator = creator;
+    public void setCreatorId( String creatorId ) {
+        this.creatorId = creatorId;
     }
 
-    public String getCreator() {
-        return creator;
+    public String getCreatorId() {
+        return creatorId;
+    }
+
+    public void setTripId(String tripId) {
+        this.tripId = tripId;
+    }
+
+    public String getTripId() {
+        return tripId;
     }
 }

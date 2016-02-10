@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Voyage</string>
     <string name="facebook_app_id">946525895432363</string>
+    <string name="google_app_id">433235175305</string>
     <string name="login_activity_title">Log into Voyage</string>
     <string name="sign_up_activity_title">Sign up for Voyage</string>
 
@@ -64,7 +65,6 @@
     <string name="create_trip_alert_dialog_message">\"Are you sure you want to discard the changes?\"</string>
     <string name="error_trip_name">"Name must be at least 3 character long"</string>
     <string name="error_trip_location">"Please enter a valid location"</string>
-    <string name="error_member_limit">"Member limit must be a valid number"</string>
 
     <string-array name="array_transportation_modes">
         <item>Plane</item>
@@ -79,4 +79,13 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+
+    <string name="intent_key_trip">TRIP_OBJ</string>
+
+    <string name="trip_dates">%1$s -> %2$s</string>
+    <string name="trip_locations">%1$s -> %2$s</string>
+    <string name="title_activity_add_friends">AddFriendsActivity</string>
+
+    <string name="fb_friend_search_hint">Add friends to trip</string>
 </resources>

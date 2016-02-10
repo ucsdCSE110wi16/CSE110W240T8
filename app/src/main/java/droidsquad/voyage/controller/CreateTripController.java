@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import com.parse.ParseUser;
 
+import org.json.JSONObject;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -16,6 +18,7 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.activity.CreateTripActivity;
 import droidsquad.voyage.model.GooglePlacesAPI;
 import droidsquad.voyage.model.ParseModel;
+import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.Trip;
 
 public class CreateTripController {
@@ -25,11 +28,10 @@ public class CreateTripController {
     public CreateTripController(CreateTripActivity activity) {
         this.activity = activity;
         googlePlacesModel = new GooglePlacesAPI(activity);
-
     }
 
     /**
-     * Display alert dialog if user has unsaved changes
+     * Display alert dialog if user has unsaved changes, exit activity otherwise
      */
     public void attemptClose() {
         if (!activity.hasChanges()) {
@@ -50,7 +52,7 @@ public class CreateTripController {
     }
 
     /**
-     * Shows the date picker dialog and updates the calendar upon date selected
+     * Shows the date picker dialog and updates the calendar with date selected
      *
      * @param calendar Calendar to be contain date selected
      */
@@ -92,73 +94,70 @@ public class CreateTripController {
     }
 
     /**
+     * TODO: Add documentation
+     *
+     * @param textView
+     * @param i
+     */
+    public void setUpPlacesAutofill(AutoCompleteTextView textView, int i) {
+        googlePlacesModel.setUpPlacesAutofill(textView, i);
+    }
+
+    /**
      * Attempts to create a Trip with the information in the views
      */
     public void attemptCreateTrip() {
         // Get all the information from the views
         String tripName = activity.getTripNameView().getText().toString();
-        String leavingFrom = activity.getLeavingFromView().getText().toString();
-        String destination = activity.getDestinationView().getText().toString();
+        String leavingFrom = googlePlacesModel.getSourceCityJSON().toString();
+        String destination = googlePlacesModel.getDestCityJSON().toString();
         String transportation = activity.getTransportation().getSelectedItem().toString();
+        String creatorId = ParseTripModel.getUser();
+
+        //JSONObject leavingFrom = googlePlacesModel.getSourceCityJSON();
+        //JSONObject destination = googlePlacesModel.getDestCityJSON();
+
         Date dateFrom = activity.getCalendarFrom().getTime();
         Date dateTo = activity.getCalendarTo().getTime();
-        /**TODO: ZEMEI*/
-        String creator = ParseModel.getUser();
-        boolean privateTrip = activity.getPrivateView().isChecked();
-        boolean error = false;
 
-        int memberLimit;
-        try {
-            memberLimit = (!isEmpty(activity.getMemberLimitView()))
-                    ? Integer.parseInt(activity.getMemberLimitView().getText().toString())
-                    : 0;
-        }
-        catch(NumberFormatException e) {
-            memberLimit = 0;
-        }
+        boolean isPrivate = activity.getPrivateView().isChecked();
+        boolean hasError = false;
 
-        Trip newTrip = new Trip(tripName, leavingFrom, destination, privateTrip,
-                memberLimit, dateFrom, dateTo, transportation, creator);
-
+        // TODO: Scroll to and set the focus on the first View that has error
+        /* Check for errors */
         if (tripName.length() < 3) {
             activity.displayError(activity.getTripNameView(), activity.getString(R.string.error_trip_name));
-            error = true;
+            hasError = true;
         }
 
-        if(!privateTrip && memberLimit <= 0) {
-            activity.displayError(activity.getMemberLimitView(), activity.getString(R.string.error_member_limit));
-            error = true;
+        if(!googlePlacesModel.isSourceCityValid()) {
+            activity.displayError(activity.getLeavingFromWrapper(), activity.getString(R.string.error_trip_location));
+            hasError = true;
         }
 
-        // TODO: update the valid location condition after linking up to a map API
-        if(leavingFrom.length() < 1) {
-            activity.displayError(activity.getLeavingFromView(), activity.getString(R.string.error_trip_location));
-            error = true;
+        if(!googlePlacesModel.isDestCityValid()) {
+            activity.displayError(activity.getDestinationWrapper(), activity.getString(R.string.error_trip_location));
+            hasError = true;
         }
 
-        if(destination.length() < 1) {
-            activity.displayError(activity.getDestinationView(), activity.getString(R.string.error_trip_location));
-            error = true;
-        }
+        if(hasError) return;
 
-        if(error)
-            return;
+        Trip newTrip = new Trip(tripName, leavingFrom, destination, isPrivate,
+                dateFrom, dateTo, transportation, creatorId);
 
-        ParseModel.saveTrip(newTrip);
+        ParseTripModel.saveTrip(newTrip);
+
+        // TODO show progress spinning thingy and wait till the trip has been saved to parse
+
+        // if success
         activity.exitActivity();
-
         CharSequence text = "Trip Created";
         int duration = Toast.LENGTH_SHORT;
 
         Toast toast = Toast.makeText(activity.getApplicationContext(), text, duration);
         toast.show();
-    }
 
-    private boolean isEmpty(EditText etText) {
-        return etText.getText().toString().trim().length() <= 0;
-    }
-
-    public void setUpPlacesAutofill(AutoCompleteTextView textView, int i) {
-        googlePlacesModel.setUpPlacesAutofill(textView, i);
+        // TODO else : stay on the same page and show snackBar with error and button to retry.
+        // for reference for snackBar with button you can look at LoginActivity.java
     }
 }
