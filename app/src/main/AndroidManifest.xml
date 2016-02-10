@@ -40,7 +40,14 @@
 
         <activity
             android:name=".activity.LoginActivity"
-            android:label="@string/login_activity_title" />
+            android:label="@string/login_activity_title" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".activity.CreateTripActivity"
@@ -57,14 +64,7 @@
         <activity
             android:name=".activity.TripListActivity"
             android:label="@string/title_activity_trip_list"
-            android:theme="@style/AppTheme.NoActionBar">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.SignUpActivity"
             android:label="@string/sign_up_activity_title" />

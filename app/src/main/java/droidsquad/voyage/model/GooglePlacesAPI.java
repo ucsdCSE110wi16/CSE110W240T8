@@ -185,7 +185,6 @@ public class GooglePlacesAPI implements
                                             Log.d(TAG, "Successfully retrieved photo from photo bundle.");
 
                                             imageView.setImageBitmap(placePhotoResult.getBitmap());
-
                                             activity.setColors();
                                         }
                                     });

@@ -1,13 +1,10 @@
 package droidsquad.voyage.activity;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -17,17 +14,15 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
-import android.view.WindowManager;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.TripController;
-import droidsquad.voyage.model.Trip;
 
 public class TripActivity extends AppCompatActivity {
     private CollapsingToolbarLayout mCollapsingToolbar;
@@ -37,15 +32,16 @@ public class TripActivity extends AppCompatActivity {
     private TextView mTripDatesTextView;
     private TripController mController;
 
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip);
 
+        mController = new TripController(this);
+
         initUI();
-        mController = new TripController(this, (Trip) getIntent()
-                .getSerializableExtra(getString(R.string.intent_key_trip)));
 
         mController.setGooglePlacePhoto(mHeaderImageView);
     }
@@ -76,13 +72,30 @@ public class TripActivity extends AppCompatActivity {
         mTripLocTextView = (TextView) findViewById(R.id.trip_locations);
         mTripDatesTextView = (TextView) findViewById(R.id.trip_dates);
 
-        // Set up toolbar
+        // Set the dates
+        String dates = getString(R.string.trip_dates,
+                dateFormat.format(mController.getDateFrom()),
+                dateFormat.format(mController.getDateTo()));
+        mTripDatesTextView.setText(dates);
+
+        // Set the locations
+        String transportation = getString(R.string.trip_locations,
+                mController.getOrigin(), mController.getDestination());
+        mTripLocTextView.setText(transportation);
+        mTripLocTextView.setCompoundDrawablesWithIntrinsicBounds(mController.getDrawableId(), 0, 0, 0);
+
+        // Set up toolbar and action bar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+
         setSupportActionBar(toolbar);
         mCollapsingToolbar.setExpandedTitleTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+        mCollapsingToolbar.setTitle(mController.getTitle());
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
     }
 
     /**
@@ -103,29 +116,14 @@ public class TripActivity extends AppCompatActivity {
                 int vibrantColor = palette.getVibrantColor(colorAccent);
 
                 // Status bar and toolbar color
-                mCollapsingToolbar.setContentScrimColor(
-                        (mutedSwatch != null) ? mutedSwatch.getRgb() : colorPrimary);
-
-                mCollapsingToolbar.setStatusBarScrimColor(
-                        (mutedSwatch != null) ? mutedSwatch.getRgb() : colorPrimary);
+                int toolbarColor = (mutedSwatch != null) ? mutedSwatch.getRgb() : colorPrimary;
+                mCollapsingToolbar.setContentScrimColor(toolbarColor);
+                mCollapsingToolbar.setStatusBarScrimColor(toolbarColor);
 
                 // Floating Action Button color
                 mFAB.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));
             }
         });
-    }
-
-    /**
-     * Get a darker version of a color
-     *
-     * @param color Color to be darkened
-     * @return Darkened color
-     */
-    private int darkenColor(int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[2] *= 0.8f;
-        return Color.HSVToColor(hsv);
     }
 
     /**
@@ -139,18 +137,5 @@ public class TripActivity extends AppCompatActivity {
         sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Share"));
-    }
-
-    public void setTripName(String name) {
-        mCollapsingToolbar.setTitle(name);
-    }
-
-    public void setTripTransportationAndIcon(String location, int id) {
-        mTripLocTextView.setText(location);
-        mTripLocTextView.setCompoundDrawablesWithIntrinsicBounds(id, 0, 0, 0);
-    }
-
-    public void setTripDates(String dates) {
-        mTripDatesTextView.setText(dates);
     }
 }

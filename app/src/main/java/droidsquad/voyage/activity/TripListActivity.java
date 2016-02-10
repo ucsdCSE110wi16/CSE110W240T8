@@ -115,7 +115,7 @@ public class TripListActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_feed) {
-            // Handle the feed action
+            // TODO: Handle the feed action
         } else if (id == R.id.nav_trips) {
 
         } else if (id == R.id.nav_settings) {

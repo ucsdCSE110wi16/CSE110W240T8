@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.method.KeyListener;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -28,16 +31,13 @@ import droidsquad.voyage.controller.CreateTripController;
 public class CreateTripActivity extends AppCompatActivity {
     private CreateTripController controller;
 
-    private TextInputLayout mMemberLimitWrapper;
     private TextInputLayout mLeavingFromWrapper;
     private TextInputLayout mDestinationWrapper;
-    private TextInputLayout mDateFromWrapper;
-    private TextInputLayout mDateToWrapper;
 
     private EditText mTripNameView;
-    private EditText mDateFromView;
-    private EditText mDateToView;
 
+    private TextView mDateFromView;
+    private TextView mDateToView;
     private TextView mPrivateHelpView;
     private TextView mTripNameErrorView;
 
@@ -64,6 +64,9 @@ public class CreateTripActivity extends AppCompatActivity {
         initUI();
     }
 
+    /**
+     * Initialize all the UI elements of this activity
+     */
     private void initUI() {
         mTripNameView = (EditText) findViewById(R.id.trip_name);
         mPrivateView = (CheckBox) findViewById(R.id.private_check);
@@ -71,17 +74,14 @@ public class CreateTripActivity extends AppCompatActivity {
         mLeavingFromView = (AutoCompleteTextView) findViewById(R.id.leaving_from);
         mDestinationView = (AutoCompleteTextView) findViewById(R.id.destination);
 
+        mDateFromView = (TextView) findViewById(R.id.date_from);
+        mDateToView = (TextView) findViewById(R.id.date_to);
+
         mPrivateHelpView = (TextView) findViewById(R.id.trip_private_help);
         mTripNameErrorView = (TextView) findViewById(R.id.trip_name_error);
 
-        mMemberLimitWrapper = (TextInputLayout) findViewById(R.id.member_limit_wrapper);
         mLeavingFromWrapper = (TextInputLayout) findViewById(R.id.leaving_from_wrapper);
         mDestinationWrapper = (TextInputLayout) findViewById(R.id.destination_wrapper);
-        mDateFromWrapper = (TextInputLayout) findViewById(R.id.date_from_wrapper);
-        mDateToWrapper = (TextInputLayout) findViewById(R.id.date_to_wrapper);
-
-        mDateFromView = mDateFromWrapper.getEditText();
-        mDateToView = mDateToWrapper.getEditText();
 
         // Set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.trip_toolbar);
@@ -101,6 +101,9 @@ public class CreateTripActivity extends AppCompatActivity {
             }
         });
 
+        // TODO: Listen for text changes on mTripNameView and clear the error when it changes
+        // Clear error by calling mTripNameErrorView.setVisibility(View.GONE);
+
         initDatePickers();
     }
 
@@ -115,8 +118,13 @@ public class CreateTripActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        controller.attemptClose();
+    }
+
     /**
-     * Set up default dates
+     * Set up default dates on the date pickers
      */
     private void initDatePickers() {
         calendarFrom = Calendar.getInstance();
@@ -141,33 +149,28 @@ public class CreateTripActivity extends AppCompatActivity {
     }
 
     /**
-     * Hide the soft keyboard and clear focus
+     * Hide the soft keyboard
      */
     public void hideKeyboard() {
         View view = this.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-            view.clearFocus();
         }
     }
 
     /**
-     * Change the help text and display/hide the members limit view
+     * Change the help text according to checkbox check state
      */
     public void togglePrivateCheckbox() {
-        if (mPrivateView.isChecked()) {
-            mPrivateHelpView.setText(R.string.help_trip_private);
-            mMemberLimitWrapper.setVisibility(View.GONE);
-        } else {
-            mPrivateHelpView.setText(R.string.help_trip_public);
-            mMemberLimitWrapper.setVisibility(View.VISIBLE);
-        }
+        mPrivateHelpView.setText(mPrivateView.isChecked()
+                ? R.string.help_trip_private
+                : R.string.help_trip_public);
     }
 
     /**
      * Show an alert dialog with cancel and ok options
-     * <p/>
+     *
      * Triggered when the user tries to close the activity after making changes
      *
      * @param positiveListener Callback if user presses OK button
@@ -175,6 +178,8 @@ public class CreateTripActivity extends AppCompatActivity {
      */
     public void showAlertDialog(DialogInterface.OnClickListener positiveListener,
                                 DialogInterface.OnClickListener negativeListener) {
+        hideKeyboard();
+
         new AlertDialog.Builder(this)
                 .setMessage(R.string.create_trip_alert_dialog_message)
                 .setPositiveButton(android.R.string.yes, positiveListener)
@@ -220,10 +225,11 @@ public class CreateTripActivity extends AppCompatActivity {
      * @param error The error to be displayed
      */
     public void displayError(View view, String error) {
-        if (view instanceof TextInputLayout) {
+        if (view == mTripNameView) {
+            mTripNameErrorView.setText(error);
+            mTripNameErrorView.setVisibility(View.VISIBLE);
+        } else {
             ((TextInputLayout) view).setError(error);
-        } else if (view instanceof TextView) {
-            ((TextView) view).setError(error);
         }
     }
 
@@ -237,7 +243,7 @@ public class CreateTripActivity extends AppCompatActivity {
     }
 
     /**
-     * Finish this acitivity and go back to previous activity on the stack
+     * Finish this activity and go back to previous activity on the stack
      */
     public void exitActivity() {
         finish();
@@ -249,10 +255,6 @@ public class CreateTripActivity extends AppCompatActivity {
 
     public EditText getTripNameView() {
         return mTripNameView;
-    }
-
-    public EditText getMemberLimitView() {
-        return mMemberLimitWrapper.getEditText();
     }
 
     public CheckBox getPrivateView() {
@@ -279,11 +281,19 @@ public class CreateTripActivity extends AppCompatActivity {
         return mTransportation;
     }
 
-    public EditText getDateToView() {
+    public TextView getDateToView() {
         return mDateToView;
     }
 
-    public EditText getDateFromView() {
+    public TextView getDateFromView() {
         return mDateFromView;
+    }
+
+    public TextInputLayout getLeavingFromWrapper() {
+        return mLeavingFromWrapper;
+    }
+
+    public TextInputLayout getDestinationWrapper() {
+        return mDestinationWrapper;
     }
 }

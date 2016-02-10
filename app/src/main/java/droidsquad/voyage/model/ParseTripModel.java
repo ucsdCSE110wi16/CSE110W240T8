@@ -48,7 +48,6 @@ public class ParseTripModel {
         parseTrip.put("private", trip.isPrivate());
         parseTrip.put("dateFrom", trip.getDateFrom());
         parseTrip.put("dateTo", trip.getDateTo());
-        parseTrip.put("limit", trip.getTripLimit());
         parseTrip.put("transportation", trip.getTransportation());
 
         //TODO: Initialize UserGroup stuff for new trips?
@@ -99,7 +98,7 @@ public class ParseTripModel {
             int memberLimit = parseTrip.getInt("memberLimit");
             String transportation = parseTrip.getString("transportation");
 
-            Trip trip = new Trip(name, origin, destination, isPrivate, memberLimit,
+            Trip trip = new Trip(name, origin, destination, isPrivate,
                     dateFrom, dateTo, transportation, creatorId);
 
             allMyTrips.add(trip);

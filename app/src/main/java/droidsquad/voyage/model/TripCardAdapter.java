@@ -14,7 +14,9 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.activity.TripActivity;
@@ -47,7 +49,6 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     public TripCardAdapter(Activity activity) {
         this.trips = new ArrayList<>();
         this.mActivity = activity;
-
     }
 
     public void updateData(ArrayList<Trip> trips) {
@@ -79,8 +80,12 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             e.printStackTrace();
         }
 
+        // Set the dates
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
+        String dates = mActivity.getString(R.string.trip_dates,
+                dateFormat.format(trip.getDateFrom()), dateFormat.format(trip.getDateTo()));
+        holder.mDates.setText(dates);
 
-        holder.mDates.setText(trip.getDateFrom() + " – " + trip.getDateTo());
         holder.mPrivateIcon.setVisibility(
                 (trip.isPrivate()) ? View.VISIBLE : View.GONE);
 
