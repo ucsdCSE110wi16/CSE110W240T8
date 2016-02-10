@@ -2,13 +2,6 @@ package droidsquad.voyage.controller;
 
 import android.util.Log;
 
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -24,7 +17,6 @@ public class AddFriendsController {
     private FacebookUser[] friends;
     private String query;
     private FBFriendsAdapter mAdapter;
-
 
     public static final String TAG = AddFriendsController.class.getSimpleName();
 
@@ -42,49 +34,32 @@ public class AddFriendsController {
      * Fields retrieved are ID, Name and Picture
      */
     private void getFBFriends() {
-        FacebookAPI.requestFBFriends(new GraphRequest.GraphJSONArrayCallback() {
-
+        FacebookAPI.requestFBFriends(new FacebookAPI.FBFriendsArrayCallback() {
             @Override
-            public void onCompleted(JSONArray objects, GraphResponse response) {
-                // TODO: Parse the JSONArray into a List<FriendsAutoComplete>
-                friends = new FacebookUser[objects.length()];
-
-                try {
-                    Log.d(TAG, "Objects received: " + objects.toString());
-
-                    for (int i = 0; i < objects.length(); i++) {
-                        JSONObject friend = objects.getJSONObject(i);
-                        String pictureURL = friend
-                                .getJSONObject("picture")
-                                .getJSONObject("data")
-                                .getString("url");
-
-                        friends[i] = new FacebookUser(
-                                (String) friend.get("id"),
-                                (String) friend.get("name"),
-                                pictureURL);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            public void onCompleted(FacebookUser[] queriedFriends) {
+                Log.d(TAG, "Friends Arrays received with size: " + queriedFriends.length);
 
                 // Sort the entries alphabetically by name and store in a member variable
-                Arrays.sort(friends, new Comparator<FacebookUser>() {
+                Arrays.sort(queriedFriends, new Comparator<FacebookUser>() {
                     @Override
                     public int compare(FacebookUser lhs, FacebookUser rhs) {
                         return lhs.name.compareTo(rhs.name);
                     }
                 });
 
+                friends = queriedFriends;
                 isFriendsPopulated = true;
-                if (query != null) {
-                    updateAdapter(query);
-                }
+                if (query != null) updateAdapter(query);
             }
         });
     }
 
-    public void setQueryChange(String queryString) {
+    /**
+     * If friends haven't yet been loaded save the query for later, else display the results
+     *
+     * @param queryString The string the user typed in the search box
+     */
+    public void onQueryTextChange(String queryString) {
         if (!isFriendsPopulated) {
             query = queryString;
         } else {
@@ -92,13 +67,17 @@ public class AddFriendsController {
         }
     }
 
-
+    /**
+     * TODO: Optimize the search indexing algorithm
+     *
+     * @param queryString The query string to search for friends
+     */
     private void updateAdapter(String queryString) {
-        // Get the friends that match the constraint
+        // Get the friends according to the query
         ArrayList<FacebookUser> queriedFriends = new ArrayList<>();
         if (!queryString.isEmpty()) {
             for (FacebookUser friend : friends) {
-                if (friend.name.toLowerCase().startsWith(queryString.toLowerCase())) {
+                if (friend.name.toLowerCase().contains(queryString.toLowerCase())) {
                     queriedFriends.add(friend);
                 }
             }

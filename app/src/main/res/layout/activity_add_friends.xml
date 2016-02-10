@@ -7,34 +7,37 @@
     android:fitsSystemWindows="true"
     tools:context="droidsquad.voyage.activity.AddFriendsActivity">
 
-    <android.support.v7.widget.CardView
-        android:layout_margin="8dp"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardElevation="4dp">
+        android:orientation="vertical"
+        android:padding="8dp">
 
-        <LinearLayout
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="4dp">
+            app:cardElevation="4dp">
 
             <android.support.v7.widget.SearchView
                 android:id="@+id/friends_search_view"
+                style="@style/Base.Widget.AppCompat.SearchView.ActionBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                style="@style/Base.Widget.AppCompat.SearchView.ActionBar"
-                app:queryHint="@string/fb_friend_search_hint"
-                app:iconifiedByDefault="false" />
+                app:iconifiedByDefault="false"
+                app:queryHint="@string/fb_friend_search_hint" />
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="4dp">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/friends_results_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
-
-    </android.support.v7.widget.CardView>
+                android:layout_height="wrap_content"/>
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

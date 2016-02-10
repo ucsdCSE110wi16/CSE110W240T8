@@ -5,6 +5,10 @@ import android.graphics.BitmapFactory;
 
 import java.net.URL;
 
+/**
+ * This class represents a Facebook User. It contains member variables for storing
+ * information retrieved from Facebook Graph API
+ */
 public class FacebookUser {
     public String name;
     public String id;
@@ -19,10 +23,11 @@ public class FacebookUser {
     /**
      * Get the profile facebook profile picture of this user
      *
-     * @return A Bitmap of this friend's profile picture
+     * @param callback Called with Bitmap once picture has finished downloading
+     * @deprecated Use the FacebookAPI.getProfilePicAsync method instead
      */
     @Deprecated
-    public Bitmap getPicture() {
+    public void getPictureAsync(FBUserPictureCallback callback) {
         Bitmap bitmap = null;
         try {
             URL url = new URL(pictureURL);
@@ -31,6 +36,13 @@ public class FacebookUser {
             e.printStackTrace();
         }
 
-        return bitmap;
+        callback.onCompleted(bitmap);
+    }
+
+    /**
+     * Callback ot be used with getPictureAsync method
+     */
+    public interface FBUserPictureCallback {
+        void onCompleted(Bitmap picture);
     }
 }

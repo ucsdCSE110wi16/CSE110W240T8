@@ -139,17 +139,13 @@ public class GooglePlacesAPI implements
     }
 
 
+    /**
+     * Load a bitmap from the photos API asynchronously
+     * by using buffers and result callbacks.
+     */
     public void loadPlaceImage(final ImageView imageView, String placeId, final TripActivity activity) {
-
-        /**
-         * Load a bitmap from the photos API asynchronously
-         * by using buffers and result callbacks.
-         */
-
         Places.GeoDataApi.getPlacePhotos(mGoogleApiClient, placeId)
                 .setResultCallback(new ResultCallback<PlacePhotoMetadataResult>() {
-
-
                     @Override
                     public void onResult(PlacePhotoMetadataResult photos) {
                         if (!photos.getStatus().isSuccess()) {
