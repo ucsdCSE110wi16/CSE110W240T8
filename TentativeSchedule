@@ -19,26 +19,26 @@ View All Current Trips
 -Grab trips associated w/ a user on Parse
 Implement logout (accessed from nav bar)
 
-Features Done by WEEK 6: 1ST MILESTONE (BASELINE)
+Features Done by WEEK 6
 Continue View All Current Trips 
 -link trips to adapter so user can view all current trips
 -finish implementing adapter and cards
-Invite Members to Current Trip
--use Parse user groups to do this
-Member Request, Trip Notifications
--user can send trip invitations
-Start on feed activity
--Use FB API
 Update login - app only uses Facebook login
+Start linking up with FB friends mechanisms
 
 Features Done by WEEK 7:
-Popular Nearby Trips
-Friends’ Update
+Delete trip
+Invite Members to Current Trip
+-use Parse user groups to do this
+Member Request Notifications & Trip Notifications
+-user can send trip invitations
+(Maybe) Start on feed activity 
+-Use FB API
 
-Features Done by WEEK 8:
+Features Done by WEEK 8: 1ST MILESTONE: BASELINE
 View Own Trip History
 User Ranking
-Create Profile 
+FB Feed activity
 View Profile
 
 Features Done by WEEK 9:
