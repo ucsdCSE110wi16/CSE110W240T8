@@ -37,6 +37,7 @@ public class CreateTripController {
         if (!activity.hasChanges()) {
             activity.exitActivity();
         } else {
+            activity.hideKeyboard();
             activity.showAlertDialog(new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

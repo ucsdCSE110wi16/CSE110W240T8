@@ -1,9 +1,5 @@
 package droidsquad.voyage.model;
 
-import com.parse.ParseUser;
-
-import org.json.JSONObject;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +20,7 @@ public class Trip implements Serializable {
 
     public Trip(String name, String origin, String destination, boolean isPrivate,
                 Date dateFrom, Date dateTo, String transportation, String creatorId) {
+
         this.name = name;
         this.origin = origin;
         this.destination = destination;
@@ -99,7 +96,7 @@ public class Trip implements Serializable {
         this.transportation = transportation;
     }
 
-    public void setCreatorId( String creatorId ) {
+    public void setCreatorId(String creatorId) {
         this.creatorId = creatorId;
     }
 

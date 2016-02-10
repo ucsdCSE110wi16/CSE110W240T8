@@ -42,7 +42,7 @@
     <string name="title_activity_blah">BlahActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="error_no_internet_connection">No connection.</string>
-    <string name="label_login_facebook">Login with Facebook</string>
+    <string name="label_login_facebook">Continue with Facebook</string>
     <string name="label_sign_up_facebook">Sign Up with Facebook</string>
 
     <!-- Strings related to trip creation -->
