@@ -26,13 +26,6 @@ public class ParseTripModel {
     private static final String TAG = ParseUser.class.getSimpleName();
     // add more key/value final Strings
 
-    private static TripListController c;
-    private Context context;
-
-    public ParseTripModel(TripListController controller) {
-        c = controller;
-    }
-
     public static void saveTrip(Trip trip) {
         Log.d(TAG, "Attempting to save trip to parse.\nTrip: " + trip.toString());
         ParseObject parseTrip = new ParseObject("Trip");
@@ -62,19 +55,19 @@ public class ParseTripModel {
         trip.setTripId(parseTrip.getObjectId());
     }
 
-    public void searchForAllTrips() {
+    public static void searchForAllTrips(final ParseTripCallback callback) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
         query.whereEqualTo("creatorId", ParseUser.getCurrentUser().getObjectId());
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
-                getAllMyTrips(objects);
+                getAllMyTrips(objects, callback);
             }
         });
     }
 
-    public void getAllMyTrips(List<ParseObject> trips) {
+    private static void getAllMyTrips(List<ParseObject> trips, ParseTripCallback callback) {
         ArrayList<Trip> allMyTrips = new ArrayList<>();
         if(trips == null)
             return;
@@ -98,10 +91,14 @@ public class ParseTripModel {
             allMyTrips.add(trip);
         }
 
-        c.updateAdapter(allMyTrips);
+        callback.onCompleted(allMyTrips);
     }
 
     public static String getUser() {
         return ParseUser.getCurrentUser().getObjectId();
+    }
+
+    public interface ParseTripCallback {
+        void onCompleted(ArrayList<Trip> trip);
     }
 }

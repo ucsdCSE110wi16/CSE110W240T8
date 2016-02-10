@@ -81,7 +81,7 @@ public class TripListActivity extends AppCompatActivity
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        controller.refreshViewContents();
+                        controller.retrieveData();
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
                 }, 2000);

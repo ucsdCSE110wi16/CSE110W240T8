@@ -4,12 +4,7 @@ import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import droidsquad.voyage.activity.LoginActivity;
 import droidsquad.voyage.activity.TripListActivity;
@@ -44,21 +39,29 @@ public class TripListController {
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
         // TODO: create a method in ParseModel, or another model class if necessary to retrieve data and call updateAdapter() below
-        ParseTripModel ptm = new ParseTripModel(this);
-        ptm.searchForAllTrips();
+        ParseTripModel.searchForAllTrips(new ParseTripModel.ParseTripCallback() {
+            @Override
+            public void onCompleted(ArrayList<Trip> trip) {
+                updateAdapter(trip);
+            }
+        });
     }
 
+    /**
+     * Update the content of the adapter
+     *
+     * @param trips New trips to update the adapter with
+     */
     public void updateAdapter(ArrayList<Trip> trips) {
         adapter.updateData(trips);
         refreshData();
     }
 
-    public void refreshData() {
+    /**
+     * Refreshes the data within the adapter
+     */
+    private void refreshData() {
         adapter.notifyDataSetChanged();
-    }
-
-    public void refreshViewContents() {
-        ParseTripModel.searchForAllTrips();
     }
 
     public void logOutUser() {
