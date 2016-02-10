@@ -1,14 +1,10 @@
 package droidsquad.voyage.model;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.method.KeyListener;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
@@ -32,13 +28,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import droidsquad.voyage.R;
 import droidsquad.voyage.activity.TripActivity;
 import droidsquad.voyage.controller.PlaceArrayAdapter;
 
-/**
- * Created by Andrew on 1/29/16.
- */
 public class GooglePlacesAPI implements
         GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks {
@@ -57,7 +49,6 @@ public class GooglePlacesAPI implements
 
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(Places.GEO_DATA_API)
-                .enableAutoManage((FragmentActivity) context, 0, this)
                 .addConnectionCallbacks(this)
                 .build();
 

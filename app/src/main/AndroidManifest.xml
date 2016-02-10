@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name="droidsquad.voyage.ParseApplication"
+        android:name=".ParseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -29,25 +29,16 @@
         <meta-data
             android:name="com.parse.CLIENT_KEY"
             android:value="mElQZrcXoLhEJYxptd9GFBvc1qGs9OBVYjHseOgt" />
-
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCQxOiiXC6SIYv1IsQiebWPrDfmchL3U70" />
 
         <activity
             android:name=".activity.LoginActivity"
-            android:label="@string/login_activity_title" >
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:label="@string/login_activity_title" />
 
         <activity
             android:name=".activity.CreateTripActivity"
@@ -64,7 +55,14 @@
         <activity
             android:name=".activity.TripListActivity"
             android:label="@string/title_activity_trip_list"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".activity.SignUpActivity"
             android:label="@string/sign_up_activity_title" />
@@ -75,8 +73,12 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".activity.TripActivity"
-            android:theme="@style/CollapsingToolbarTheme"
-            android:parentActivityName=".activity.TripListActivity"/>
+            android:parentActivityName=".activity.TripListActivity"
+            android:theme="@style/CollapsingToolbarTheme" />
+        <activity
+            android:name=".activity.AddFriendsActivity"
+            android:label="@string/title_activity_add_friends"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 
 </manifest>

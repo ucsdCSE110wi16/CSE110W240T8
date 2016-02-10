@@ -15,6 +15,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AutoCompleteTextView;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +26,7 @@ import java.util.Locale;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.TripController;
+import droidsquad.voyage.model.Trip;
 
 public class TripActivity extends AppCompatActivity {
     private CollapsingToolbarLayout mCollapsingToolbar;
@@ -42,6 +46,15 @@ public class TripActivity extends AppCompatActivity {
         mController = new TripController(this);
 
         initUI();
+        mFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TripActivity.this, AddFriendsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        mController = new TripController(this);
 
         mController.setGooglePlacePhoto(mHeaderImageView);
     }

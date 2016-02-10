@@ -118,46 +118,6 @@ public class VoyageUser {
         });
     }
 
-    public static void setProfilePicAsync(final ImageView imageView) {
-        AsyncTask<Void, Void, Bitmap> task = new AsyncTask<Void, Void, Bitmap>() {
-            @Override
-            protected Bitmap doInBackground(Void... params) {
-                Bitmap bitmap=null;
-                String id = ParseUser.getCurrentUser().get("fbId").toString();
-                final String nomimg = "https://graph.facebook.com/"+id+"/picture?type=large";
-                URL imageURL = null;
-
-                try {
-                    imageURL = new URL(nomimg);
-                } catch (MalformedURLException e) {
-                    Log.d(TAG, "Malformed Exception occurred: " + e.getMessage());
-                }
-
-                try {
-                    HttpURLConnection connection = (HttpURLConnection) imageURL.openConnection();
-                    connection.setDoInput(true);
-                    connection.setInstanceFollowRedirects( true );
-                    connection.connect();
-                    InputStream inputStream = connection.getInputStream();
-                    //img_value.openConnection().setInstanceFollowRedirects(true).getInputStream()
-                    bitmap = BitmapFactory.decodeStream(inputStream);
-
-                } catch (IOException e) {
-                    Log.e(TAG, "IOException occurred: " + e.getMessage());
-                }
-                return bitmap;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                if (bitmap != null)
-                    imageView.setImageBitmap(bitmap);
-            }
-        };
-
-        task.execute();
-    }
-
     public static boolean isEmailValid(String email) {
         Pattern p = Pattern.compile(".+@.+\\.[a-z]+"); // matching email with regex
         Matcher m = p.matcher(email);

@@ -6,18 +6,22 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/list_item_padding_vertical"
     android:paddingBottom="@dimen/list_item_padding_vertical"
+    android:clickable="true"
+    android:foreground="?android:selectableItemBackground"
     android:gravity="center">
 
     <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/friend_profile_pic"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:src="@drawable/yosemite"/>
+        android:src="@drawable/ic_account_circle"/>
 
     <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/friend_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Heitor Schueroff"
-        android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Title" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle" />
 
 </LinearLayout>
