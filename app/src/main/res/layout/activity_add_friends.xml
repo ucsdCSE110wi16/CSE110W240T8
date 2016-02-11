@@ -28,13 +28,31 @@
                 card_view:cardCornerRadius="0dp"
                 card_view:cardElevation="4dp">
 
-                <android.support.v7.widget.SearchView
-                    android:id="@+id/friends_search_view"
-                    style="@style/Base.Widget.AppCompat.SearchView.ActionBar"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:iconifiedByDefault="false"
-                    app:queryHint="@string/fb_friend_search_hint" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <android.support.v7.widget.AppCompatImageView
+                        android:id="@+id/exit_back_image_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_arrow_back"
+                        android:layout_marginLeft="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true" />
+
+                    <android.support.v7.widget.SearchView
+                        android:id="@+id/friends_search_view"
+                        style="@style/Base.Widget.AppCompat.SearchView.ActionBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:iconifiedByDefault="false"
+                        app:queryHint="@string/fb_friend_search_hint" />
+
+                </LinearLayout>
+
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
@@ -46,10 +64,17 @@
                 card_view:cardCornerRadius="0dp"
                 card_view:cardElevation="4dp">
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/friends_results_recycler_view"
+                <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/friends_results_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </ScrollView>
+
 
             </android.support.v7.widget.CardView>
         </LinearLayout>
@@ -79,13 +104,13 @@
 
                 <android.support.v7.widget.AppCompatImageButton
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/activity_horizontal_margin"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_done" />
 
             </LinearLayout>
         </android.support.v7.widget.CardView>
-
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

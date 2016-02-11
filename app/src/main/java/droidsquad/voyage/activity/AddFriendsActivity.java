@@ -1,9 +1,14 @@
 package droidsquad.voyage.activity;
 
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ImageView;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.AddFriendsController;
@@ -16,6 +21,8 @@ public class AddFriendsActivity extends AppCompatActivity {
     private android.support.v7.widget.SearchView mSearchView;
     private RecyclerView mRecyclerView;
     private FBFriendsAdapter mAdapter;
+    private SearchManager mSearchManager;
+    private ImageView mExitBackImage;
 
     private static final String TAG = AddFriendsActivity.class.getSimpleName();
 
@@ -45,6 +52,13 @@ public class AddFriendsActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        mExitBackImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     /**
@@ -53,5 +67,16 @@ public class AddFriendsActivity extends AppCompatActivity {
     private void initUI() {
         mSearchView = (android.support.v7.widget.SearchView) findViewById(R.id.friends_search_view);
         mRecyclerView = (RecyclerView) findViewById(R.id.friends_results_recycler_view);
+        mSearchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        mSearchView.setSearchableInfo(mSearchManager.getSearchableInfo(getComponentName()));
+        mExitBackImage = (ImageView) findViewById(R.id.exit_back_image_view);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            mSearchView.setQuery(query, false);
+        }
     }
 }
