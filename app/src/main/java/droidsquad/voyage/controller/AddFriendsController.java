@@ -10,29 +10,37 @@ import droidsquad.voyage.activity.AddFriendsActivity;
 import droidsquad.voyage.model.FBFriendsAdapter;
 import droidsquad.voyage.model.FacebookAPI;
 import droidsquad.voyage.model.FacebookUser;
+import droidsquad.voyage.model.SelectedFBFriendsAdapter;
 
 public class AddFriendsController {
     private AddFriendsActivity mActivity;
     private boolean isFriendsPopulated;
     private FacebookUser[] friends;
     private String query;
-    private FBFriendsAdapter mAdapter;
-    private ArrayList<FacebookUser> mSelectedFriends;
+    private FBFriendsAdapter mResultsAdapter;
+    private SelectedFBFriendsAdapter mSelectedFriendsAdapter;
 
     public static final String TAG = AddFriendsController.class.getSimpleName();
 
-    public AddFriendsController(AddFriendsActivity activity, FBFriendsAdapter adapter) {
+    public AddFriendsController(AddFriendsActivity activity, FBFriendsAdapter resultsAdapter,
+                                SelectedFBFriendsAdapter selectedFriendsAdapter) {
         mActivity = activity;
-        mAdapter = adapter;
-        mAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
+        mResultsAdapter = resultsAdapter;
+        mResultsAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
             @Override
             public void onClick(FacebookUser user) {
-                mSelectedFriends.add(user);
+                mSelectedFriendsAdapter.addFriend(user);
                 updateAdapter(query);
             }
         });
 
-        mSelectedFriends = new ArrayList<>();
+        mSelectedFriendsAdapter = selectedFriendsAdapter;
+        mSelectedFriendsAdapter.setOnItemRemovedListener(new SelectedFBFriendsAdapter.OnItemRemovedListener() {
+            @Override
+            public void onRemoved() {
+                updateAdapter(query);
+            }
+        });
 
         isFriendsPopulated = false;
         getFBFriends();
@@ -89,13 +97,13 @@ public class AddFriendsController {
         if (!queryString.isEmpty()) {
             for (FacebookUser friend : friends) {
                 if (friend.name.toLowerCase().contains(queryString.toLowerCase())
-                        && !mSelectedFriends.contains(friend)) {
+                        && !mSelectedFriendsAdapter.mSelectedUsers.contains(friend)) {
                     queriedFriends.add(friend);
                 }
             }
         }
 
-        mAdapter.updateResults(queriedFriends);
+        mResultsAdapter.updateResults(queriedFriends);
     }
 
     private void addFriendsToTrip() {

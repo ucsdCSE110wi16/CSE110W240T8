@@ -39,7 +39,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:src="@drawable/ic_arrow_back"
-                        android:layout_marginLeft="8dp"
+                        android:padding="8dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true" />
 
@@ -48,6 +48,7 @@
                         style="@style/Base.Widget.AppCompat.SearchView.ActionBar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingLeft="-8dp"
                         app:iconifiedByDefault="false"
                         app:queryHint="@string/fb_friend_search_hint" />
 

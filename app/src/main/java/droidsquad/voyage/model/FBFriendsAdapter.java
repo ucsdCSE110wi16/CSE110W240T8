@@ -41,7 +41,7 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
         holder.mNameTextView.setText(friend.name);
         Picasso.with(mActivity)
                 .load(friend.pictureURL)
-                .placeholder(R.drawable.ic_account_circle)
+                .placeholder(R.drawable.ic_account_circle_gray)
                 .into(holder.mProfilePicImageView);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
