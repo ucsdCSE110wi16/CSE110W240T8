@@ -1,28 +1,30 @@
 package droidsquad.voyage.controller;
 
-import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import droidsquad.voyage.activity.AddFriendsActivity;
+
 public class AutoWrappingLinearLayoutManager extends LinearLayoutManager {
-
-    public AutoWrappingLinearLayoutManager(Context context, int orientation, boolean reverseLayout)    {
-        super(context, orientation, reverseLayout);
-    }
-
     private int[] mMeasuredDimension = new int[2];
 
+    public AutoWrappingLinearLayoutManager(AddFriendsActivity activity, int orientation, boolean reverseLayout)    {
+        super(activity, orientation, reverseLayout);
+    }
+
     @Override
-    public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state,
+    public void onMeasure(final RecyclerView.Recycler recycler, RecyclerView.State state,
                           int widthSpec, int heightSpec) {
         final int widthMode = View.MeasureSpec.getMode(widthSpec);
         final int heightMode = View.MeasureSpec.getMode(heightSpec);
         final int widthSize = View.MeasureSpec.getSize(widthSpec);
         final int heightSize = View.MeasureSpec.getSize(heightSpec);
+
         int width = 0;
         int height = 0;
+
         for (int i = 0; i < getItemCount(); i++) {
             measureScrapChild(recycler, i,
                     View.MeasureSpec.makeMeasureSpec(i, View.MeasureSpec.UNSPECIFIED),
@@ -41,6 +43,7 @@ public class AutoWrappingLinearLayoutManager extends LinearLayoutManager {
                 }
             }
         }
+
         switch (widthMode) {
             case View.MeasureSpec.EXACTLY:
                 width = widthSize;
