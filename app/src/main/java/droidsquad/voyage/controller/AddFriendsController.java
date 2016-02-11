@@ -1,5 +1,6 @@
 package droidsquad.voyage.controller;
 
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -10,20 +11,37 @@ import droidsquad.voyage.activity.AddFriendsActivity;
 import droidsquad.voyage.model.FBFriendsAdapter;
 import droidsquad.voyage.model.FacebookAPI;
 import droidsquad.voyage.model.FacebookUser;
+import droidsquad.voyage.model.SelectedFBFriendsAdapter;
 
 public class AddFriendsController {
     private AddFriendsActivity mActivity;
-    private boolean isFriendsPopulated;
+    private FBFriendsAdapter mResultsAdapter;
+    private SelectedFBFriendsAdapter mSelectedFriendsAdapter;
     private FacebookUser[] friends;
-    private String query;
-    private FBFriendsAdapter mAdapter;
 
     public static final String TAG = AddFriendsController.class.getSimpleName();
 
-    public AddFriendsController(AddFriendsActivity activity, FBFriendsAdapter adapter) {
+    public AddFriendsController(AddFriendsActivity activity) {
         mActivity = activity;
-        mAdapter = adapter;
-        isFriendsPopulated = false;
+
+        mResultsAdapter = new FBFriendsAdapter(activity);
+        mSelectedFriendsAdapter = new SelectedFBFriendsAdapter(activity);
+
+        mResultsAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
+            @Override
+            public void onClick(FacebookUser user) {
+                mSelectedFriendsAdapter.addFriend(user);
+                updateAdapter(mActivity.getQuery());
+            }
+        });
+
+        mSelectedFriendsAdapter.setOnItemRemovedListener(new SelectedFBFriendsAdapter.OnItemRemovedListener() {
+            @Override
+            public void onRemoved() {
+                updateAdapter(mActivity.getQuery());
+            }
+        });
+
         getFBFriends();
     }
 
@@ -48,8 +66,7 @@ public class AddFriendsController {
                 });
 
                 friends = queriedFriends;
-                isFriendsPopulated = true;
-                if (query != null) updateAdapter(query);
+                updateAdapter(mActivity.getQuery());
             }
         });
     }
@@ -57,32 +74,42 @@ public class AddFriendsController {
     /**
      * If friends haven't yet been loaded save the query for later, else display the results
      *
-     * @param queryString The string the user typed in the search box
+     * @param query The string the user typed in the search box
      */
-    public void onQueryTextChange(String queryString) {
-        if (!isFriendsPopulated) {
-            query = queryString;
-        } else {
-            updateAdapter(queryString);
-        }
+    public void onQueryTextChange(String query) {
+        updateAdapter(query);
     }
 
     /**
      * TODO: Optimize the search indexing algorithm
      *
-     * @param queryString The query string to search for friends
+     * @param query The query string to search for friends
      */
-    private void updateAdapter(String queryString) {
+    private void updateAdapter(String query) {
         // Get the friends according to the query
         ArrayList<FacebookUser> queriedFriends = new ArrayList<>();
-        if (!queryString.isEmpty()) {
+
+        if (!query.isEmpty()) {
             for (FacebookUser friend : friends) {
-                if (friend.name.toLowerCase().contains(queryString.toLowerCase())) {
+                if (friend.name.toLowerCase().contains(query.toLowerCase())
+                        && !mSelectedFriendsAdapter.mSelectedUsers.contains(friend)) {
                     queriedFriends.add(friend);
                 }
             }
         }
 
-        mAdapter.updateResults(queriedFriends);
+        mResultsAdapter.updateResults(queriedFriends);
+    }
+
+    private void addFriendsToTrip() {
+        // TODO: Add user in the pending array of the trip and send notification
+    }
+
+    public RecyclerView.Adapter getResultsAdapter() {
+        return mResultsAdapter;
+    }
+
+    public RecyclerView.Adapter getSelectedFriendsAdapter() {
+        return mSelectedFriendsAdapter;
     }
 }

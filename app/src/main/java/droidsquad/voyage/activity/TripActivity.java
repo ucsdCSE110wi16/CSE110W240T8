@@ -68,8 +68,12 @@ public class TripActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
             case R.id.trip_action_share:
                 startShareIntent();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -99,16 +103,13 @@ public class TripActivity extends AppCompatActivity {
 
         // Set up toolbar and action bar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-
         setSupportActionBar(toolbar);
+
         mCollapsingToolbar.setExpandedTitleTypeface(Typeface.create("sans-serif", Typeface.BOLD));
         mCollapsingToolbar.setTitle(mController.getTitle());
 
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     /**

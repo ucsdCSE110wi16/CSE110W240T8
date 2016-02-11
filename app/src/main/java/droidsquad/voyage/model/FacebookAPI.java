@@ -41,7 +41,6 @@ public class FacebookAPI {
                 new GraphRequest.GraphJSONArrayCallback() {
                     @Override
                     public void onCompleted(JSONArray objects, GraphResponse response) {
-                        Log.d(TAG, "Objects received: " + objects.toString());
                         FacebookUser friends[] = new FacebookUser[objects.length()];
 
                         // Parse the JSONObjects into FacebookUser objects
