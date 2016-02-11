@@ -1,12 +1,14 @@
 package droidsquad.voyage.model;
 
 import android.app.Activity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -17,6 +19,7 @@ import droidsquad.voyage.R;
 public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.ViewHolder> {
     private Activity mActivity;
     private ArrayList<FacebookUser> results;
+    private OnClickListener mListener;
 
     private static final String TAG = FBFriendsAdapter.class.getSimpleName();
 
@@ -35,7 +38,7 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        FacebookUser friend = results.get(position);
+        final FacebookUser friend = results.get(position);
 
         holder.mNameTextView.setText(friend.name);
         Picasso.with(mActivity)
@@ -43,12 +46,32 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
                 .placeholder(R.drawable.ic_account_circle)
                 .into(holder.mProfilePicImageView);
 
-        //FacebookAPI.getProfilePicAsync(holder.mProfilePicImageView, friend.id, "square");
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onClick(friend);
+                }
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return results.size();
+    }
+
+    public void updateResults(ArrayList<FacebookUser> friends) {
+        results = friends;
+        notifyDataSetChanged();
+    }
+
+    public void setOnClickListener(OnClickListener listener) {
+        this.mListener = listener;
+    }
+
+    public interface OnClickListener {
+        void onClick(FacebookUser user);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -61,10 +84,5 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
             mNameTextView = (TextView) view.findViewById(R.id.friend_name);
             mProfilePicImageView = (ImageView) view.findViewById(R.id.friend_profile_pic);
         }
-    }
-
-    public void updateResults(ArrayList<FacebookUser> friends) {
-        results = friends;
-        notifyDataSetChanged();
     }
 }

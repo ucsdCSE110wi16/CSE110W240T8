@@ -17,12 +17,23 @@ public class AddFriendsController {
     private FacebookUser[] friends;
     private String query;
     private FBFriendsAdapter mAdapter;
+    private ArrayList<FacebookUser> mSelectedFriends;
 
     public static final String TAG = AddFriendsController.class.getSimpleName();
 
     public AddFriendsController(AddFriendsActivity activity, FBFriendsAdapter adapter) {
         mActivity = activity;
         mAdapter = adapter;
+        mAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
+            @Override
+            public void onClick(FacebookUser user) {
+                mSelectedFriends.add(user);
+                updateAdapter(query);
+            }
+        });
+
+        mSelectedFriends = new ArrayList<>();
+
         isFriendsPopulated = false;
         getFBFriends();
     }
@@ -60,9 +71,9 @@ public class AddFriendsController {
      * @param queryString The string the user typed in the search box
      */
     public void onQueryTextChange(String queryString) {
-        if (!isFriendsPopulated) {
-            query = queryString;
-        } else {
+        query = queryString;
+
+        if (isFriendsPopulated) {
             updateAdapter(queryString);
         }
     }
@@ -77,7 +88,8 @@ public class AddFriendsController {
         ArrayList<FacebookUser> queriedFriends = new ArrayList<>();
         if (!queryString.isEmpty()) {
             for (FacebookUser friend : friends) {
-                if (friend.name.toLowerCase().contains(queryString.toLowerCase())) {
+                if (friend.name.toLowerCase().contains(queryString.toLowerCase())
+                        && !mSelectedFriends.contains(friend)) {
                     queriedFriends.add(friend);
                 }
             }
@@ -85,4 +97,9 @@ public class AddFriendsController {
 
         mAdapter.updateResults(queriedFriends);
     }
+
+    private void addFriendsToTrip() {
+        // TODO: Add user in the pending array of the trip and send notification
+    }
+
 }

@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.AddFriendsController;
+import droidsquad.voyage.controller.AutoWrappingLinearLayoutManager;
 import droidsquad.voyage.model.FBFriendsAdapter;
 
 public class AddFriendsActivity extends AppCompatActivity {
@@ -26,7 +27,7 @@ public class AddFriendsActivity extends AppCompatActivity {
         initUI();
 
         mAdapter = new FBFriendsAdapter(this);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new AutoWrappingLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setAdapter(mAdapter);
 
         controller = new AddFriendsController(this, mAdapter);
