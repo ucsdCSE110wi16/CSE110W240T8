@@ -16,7 +16,7 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.controller.TripListController;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment for displaying list of trips. Controller is instantiated in onCreateView
  */
 public class TripListFragment extends Fragment {
 
@@ -28,18 +28,21 @@ public class TripListFragment extends Fragment {
         return new TripListFragment();
     }
 
+    /**
+     * onResume overriden so that upon returning to this fragment when another activity closes
+     * (like CreateTripActivity), data is re-polled to reflect newest changes on the Parse server.
+     */
     @Override
     public void onResume() {
         super.onResume();
         controller.retrieveData();
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // set the controller
+        // the controller must be set here!
         this.controller = new TripListController(this);
 
         // Inflate the layout for this fragment
@@ -77,6 +80,9 @@ public class TripListFragment extends Fragment {
         return v;
     }
 
+    /**
+     * Navigates to the CreateTripActivity
+     */
     public void createTrip() {
         Intent intent = new Intent(getContext(), CreateTripActivity.class);
         getContext().startActivity(intent);

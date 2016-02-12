@@ -11,7 +11,8 @@ import droidsquad.voyage.activity.TripListFragment;
 import droidsquad.voyage.model.VoyageUser;
 
 /**
- * Created by Andrew on 2/12/16.
+ * Controls the MainNavDrawerActivity. Basically just handles user interaction with the nav drawer,
+ * most notably selecting options within the navigation drawer
  */
 public class MainNavDrawerController {
 
@@ -29,6 +30,9 @@ public class MainNavDrawerController {
 
     }
 
+    /**
+     * Called when the Trips option is selected from the navigation drawer
+     */
     public void tripsPressed() {
         Fragment fragment = TripListFragment.newInstance();
         changeFragment(fragment, "TripList");
@@ -36,6 +40,9 @@ public class MainNavDrawerController {
 
 
 
+    /**
+     * Called when the Feed option is selected from the navigation drawer
+     */
     public void feedPressed() {
         Toast.makeText(activity, "Feed Fragment", Toast.LENGTH_SHORT).show();
         // TODO: create feed fragment
@@ -43,6 +50,9 @@ public class MainNavDrawerController {
         // changeFragment(fragment, "Feed");
     }
 
+    /**
+     * Called when the Settings option is selected from the navigation drawer
+     */
     public void settingsPressed() {
         Toast.makeText(activity, "Settings Fragment", Toast.LENGTH_SHORT).show();
         // TODO: create settings fragment
@@ -50,6 +60,9 @@ public class MainNavDrawerController {
         // changeFragment(fragment, "Feed");
     }
 
+    /**
+     * Called when the Logout option is selected from the navigation drawer
+     */
     public void logOutUser() {
         user.logOut();
         Intent intent = new Intent(activity, LoginActivity.class);
@@ -57,6 +70,11 @@ public class MainNavDrawerController {
         activity.startActivity(intent);
     }
 
+    /**
+     * Logic used to do the actual fragment changing
+     * @param fragment  created from newInstance()
+     * @param fragmentLabel     string label describing the fragment
+     */
     private void changeFragment(Fragment fragment, String fragmentLabel) {
         Fragment currentFragment = activity.getSupportFragmentManager().
                 findFragmentByTag(fragmentLabel);

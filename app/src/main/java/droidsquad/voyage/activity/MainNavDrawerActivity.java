@@ -40,6 +40,8 @@ public class MainNavDrawerActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         controller = new MainNavDrawerController(this);
+
+        // default start with TripList fragment
         controller.tripsPressed();
         initUI();
     }
@@ -58,6 +60,28 @@ public class MainNavDrawerActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_feed) {
+            controller.feedPressed();
+
+        } else if (id == R.id.nav_trips) {
+            controller.tripsPressed();
+        } else if (id == R.id.nav_settings) {
+            controller.settingsPressed();
+
+        } else if (id == R.id.nav_logout) {
+            controller.logOutUser();
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @Override
@@ -92,28 +116,6 @@ public class MainNavDrawerActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_feed) {
-            controller.feedPressed();
-
-        } else if (id == R.id.nav_trips) {
-            controller.tripsPressed();
-        } else if (id == R.id.nav_settings) {
-            controller.settingsPressed();
-
-        } else if (id == R.id.nav_logout) {
-            controller.logOutUser();
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 
     public MainNavDrawerController getController() {
         return controller;
