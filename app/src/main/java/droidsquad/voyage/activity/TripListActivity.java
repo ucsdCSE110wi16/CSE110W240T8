@@ -137,9 +137,6 @@ public class TripListActivity extends AppCompatActivity
             // TODO: Handle the feed action
         } else if (id == R.id.nav_trips) {
 
-        } else if(id == R.id.nav_invites){
-            Intent intent = new Intent(this, PendingInvitationsActivity.class);
-            this.startActivity(intent);
         } else if (id == R.id.nav_settings) {
 
         } else if (id == R.id.nav_logout) {
