@@ -1,6 +1,7 @@
 package droidsquad.voyage.model;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -24,7 +25,7 @@ import droidsquad.voyage.activity.TripActivity;
 public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHolder> {
     private static final String TAG = TripCardAdapter.class.getSimpleName();
     private ArrayList<Trip> trips = new ArrayList<>();
-    private Activity mActivity;
+    private Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mName;
@@ -46,9 +47,9 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         }
     }
 
-    public TripCardAdapter(Activity activity) {
+    public TripCardAdapter(Context context) {
         this.trips = new ArrayList<>();
-        this.mActivity = activity;
+        this.context = context;
     }
 
     public void updateData(ArrayList<Trip> trips) {
@@ -82,7 +83,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
 
         // Set the dates
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
-        String dates = mActivity.getString(R.string.trip_dates,
+        String dates = context.getString(R.string.trip_dates,
                 dateFormat.format(trip.getDateFrom()), dateFormat.format(trip.getDateTo()));
         holder.mDates.setText(dates);
 
@@ -108,9 +109,9 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             public void onClick(View v) {
                 Log.d(TAG, "Card clicked for trip: " + trip.getName());
 
-                Intent intent = new Intent(mActivity, TripActivity.class);
-                intent.putExtra(mActivity.getString(R.string.intent_key_trip), trip);
-                mActivity.startActivity(intent);
+                Intent intent = new Intent(context, TripActivity.class);
+                intent.putExtra(context.getString(R.string.intent_key_trip), trip);
+                context.startActivity(intent);
             }
         });
     }

@@ -2,14 +2,10 @@ package droidsquad.voyage.model;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -22,18 +18,13 @@ import com.parse.ParseUser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.activity.TripListActivity;
+import droidsquad.voyage.activity.MainNavDrawerActivity;
 
 public class VoyageUser {
     private static final String TAG = VoyageUser.class.getSimpleName();
@@ -101,13 +92,13 @@ public class VoyageUser {
                 } else if (user.isNew()) {
                     Log.d(TAG, "Signing up new user.");
                     VoyageUser.refreshInfoFromFB();
-                    Intent intent = new Intent(activity, TripListActivity.class);
+                    Intent intent = new Intent(activity, MainNavDrawerActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     activity.startActivity(intent);
                 } else {
                     Log.d(TAG, "User logged in through Facebook!");
                     VoyageUser.refreshInfoFromFB();
-                    Intent intent = new Intent(activity, TripListActivity.class);
+                    Intent intent = new Intent(activity, MainNavDrawerActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     activity.startActivity(intent);
                 }

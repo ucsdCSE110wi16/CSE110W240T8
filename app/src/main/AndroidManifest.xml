@@ -53,7 +53,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".activity.TripListActivity"
+            android:name=".activity.MainNavDrawerActivity"
             android:label="@string/title_activity_trip_list"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -70,7 +70,7 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".activity.TripActivity"
-            android:parentActivityName=".activity.TripListActivity"
+            android:parentActivityName=".activity.MainNavDrawerActivity"
             android:theme="@style/CollapsingToolbarTheme" />
         <activity
             android:name=".activity.AddFriendsActivity"

@@ -2,12 +2,6 @@ package droidsquad.voyage.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,15 +16,15 @@ import com.parse.ParseUser;
 import java.io.Serializable;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.TripListController;
-import droidsquad.voyage.model.VoyageUser;
+import droidsquad.voyage.controller.MainNavDrawerController;
 
-public class TripListActivity extends AppCompatActivity
+/**
+ * Main nav bar activity, displays fragments (triplist, feed, etc)
+ */
+public class MainNavDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Serializable {
 
-    private TripListController controller;
-    private RecyclerView recyclerView;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private MainNavDrawerController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,19 +37,13 @@ public class TripListActivity extends AppCompatActivity
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trip_list);
+        setContentView(R.layout.activity_main);
 
-        controller = new TripListController(this);
-
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+        controller = new MainNavDrawerController(this);
+        controller.tripsPressed();
         initUI();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        controller.retrieveData();
-    }
 
     private void initUI() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -69,29 +57,6 @@ public class TripListActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        recyclerView = (RecyclerView) findViewById(R.id.trip_recycler_view);
-        controller.setAdapter(recyclerView);
-
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mSwipeRefreshLayout.setRefreshing(true);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        controller.retrieveData();
-                        mSwipeRefreshLayout.setRefreshing(false);
-                    }
-                }, 2000);
-            }
-        });
-    }
-
-    public void createTrip(View v) {
-        Intent intent = new Intent(getApplicationContext(), CreateTripActivity.class);
-        startActivity(intent);
 
     }
 
@@ -134,10 +99,12 @@ public class TripListActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_feed) {
-            // TODO: Handle the feed action
-        } else if (id == R.id.nav_trips) {
+            controller.feedPressed();
 
+        } else if (id == R.id.nav_trips) {
+            controller.tripsPressed();
         } else if (id == R.id.nav_settings) {
+            controller.settingsPressed();
 
         } else if (id == R.id.nav_logout) {
             controller.logOutUser();
@@ -148,7 +115,7 @@ public class TripListActivity extends AppCompatActivity
         return true;
     }
 
-    public TripListController getController() {
+    public MainNavDrawerController getController() {
         return controller;
     }
 }
