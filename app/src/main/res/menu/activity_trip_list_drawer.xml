@@ -7,6 +7,10 @@
             android:icon="@drawable/ic_web_black_48dp"
             android:title="Feed" />
         <item
+            android:id="@+id/nav_invites"
+            android:icon="@drawable/ic_action_invite"
+            android:title="Pending Invites" />
+        <item
             android:id="@+id/nav_trips"
             android:icon="@drawable/ic_card_travel_black_48dp"
             android:title="Trips" />
