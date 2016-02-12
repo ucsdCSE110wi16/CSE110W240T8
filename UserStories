@@ -1,8 +1,12 @@
 DROID SQUAD USER STORIES (1 = greatest priority, 5 = lowest priority)
 
 ********** Current Iteration **********
+
+USER STORY: 
 As a traveler client, I want to be able to view all the current trips I am currently signed up for so that the trip information is 
 accessible.
+
+SCENARIOS:
 Given I am signed in and on the trip list activity, when I open it for the first
 time, then I will be able to view all of the current trips I am participating
 in and is not past.
@@ -15,30 +19,45 @@ and the list of trips will be updated.
 Estimation of Time for Completion: 1 wk
 Customer Priority: 1
 
-Invite members to current trip
-As a group leader for a trip, I want to be able to add/delete friends from the trip so that I can form traveling group.
-Given I am a group leader and viewing the trip details, when I press an add
-friend/invite button, they will receive a notification/request to join the trip.
-Given I am an invitee for a trip, when I receive a notification to join a trip
-and I click on it, then I will be navigated to a pending invitations activity.
-Given I am an invitee for a trip, when I receive a notification to join a trip
-and I dismiss it, then I will still be able to see it when I go to the pending
-invitations activity, the invitation will still be there.
-Estimation of Time for Completion: 1 wk
-Customer Priority: 1
 
-Popular Nearby Trips
-As a traveler interested in joining an existing trip, I want to be able to search for popular trips near my location so that I can 
-travel with others. 
-Given I am currently signed in and on the news feed activity, when I open it for
-the first time then it will be populated with public trips that my friends are
-involved in.
+
+USER STORY: Member Request Notifications
+As a traveler who is not currently a member of the group that invited me, I want to receive notifications for invites to join that 
+existing trip group, so that I can know that I have the opportunity to join in.
 Estimation of Time for Completion: 1 wk
 Customer Priority: 2
 
-View Trip Details
+SCENARIOS:
+Given that I have a valid account with the app, when my friend sends an invitation to me 
+to join their trip group, then I will be sent a notification about that invitation.
+When I receive a notification, then I will be able to view the invitation and accept or
+reject the invitation.
+When I accept the invitation, then I will become a member of the trip.
+When I become a member of the trip, then I will be able to view it in my list of trips.
+Given I am an invitee for a trip, when I receive a notification to join a trip
+and I click on it, then I will be able to see all the invitations I have not responded to yet.
+Given I am an invitee for a trip, when I receive a notification to join a trip
+and I dismiss it, then I will still be able to see it when I view all my pending
+invitations.
+
+
+
+USER STORY: Invite members to current trip
+As a group leader for a trip, I want to be able to add/delete friends from the trip so that I can form traveling group.
+
+SCENARIOS:
+Given I am a group leader and viewing the trip details, when I press an add
+friend/invite button, then they will receive a notification/request to join the trip.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 1
+
+
+
+USER STORY: View Trip Details
 As a trip participant, I want to be able to view details of the trip I am
-participating in.
+participating in so that I can remind myself and be aware about important details.
+
+SCENARIOS:
 Given I am a group leader, when I view the trip details, then I should be able
 to have options to administrate the trip (edit, delete, etc).
 Given I am a trip participant, when I view the trip details, then I should be
@@ -49,76 +68,79 @@ start and end date, transportation).
 ********** TODO **********
 
 
-Member Request Notifications
-As a traveler who is not currently a member of the group that invited me, I want to receive notifications for invites to join that 
-existing trip group, so that I can know that I have the opportunity to join in.
+USER STORY: Popular Nearby Trips
+As a traveler interested in joining an existing trip, I want to be able to search for popular trips near my location so that I can 
+travel with others. 
+SCENARIOS:
+Given I am currently signed in and on the news feed activity, when I open it for
+the first time then it will be populated with public trips that my friends are
+involved in.
 Estimation of Time for Completion: 1 wk
 Customer Priority: 2
 
-Create Profile
+USER STORY: Create Profile
 As a traveler client, I want to create a user profile with my information (Full Name, Age, Location, Picture, and Bio) so that other 
 travelers can get a quick overview of who I am.
 Estimation of Time for Completion: 2-3 days
 Customer Priority: 3
 
-Trip Notifications
+USER STORY: Trip Notifications
 As a member of a planned trip, I want to receive notifications about updates for their current trip so that I'll be up-to-date with 
 any changes or upcoming dates.
 Estimation of Time for Completion: 1 wk
 Customer Priority: 3
 
-View Profile 
+USER STORY: View Profile 
 As a traveler client, I want to be able to view others' profiles, which contains name, age, location, picture, trip history, and bio, 
 so that I can get a quick overview of who they are.
 Estimation of Time for Completion: 1 day
 Customer Priority: 3
 
-User Ranking
+USER STORY: User Ranking
 As a traveler client, I want to see another user's ratings based on cleanliness and friendliness, shown on their profile, so that I 
 can figure out whether I would like to travel with them.
 Estimation of Time for Completion: 1 wk
 Customer Priority: 4
 
-View Own Trip History
+USER STORY: View Own Trip History
 As a traveler client, I want to be able to view their own trip history so that I can keep track of where I've been in the past.
 Estimation of Time for Completion: 1 day
 Customer Priority: 4
 
-
-Friend's Updates
+USER STORY: Friend's Updates
 As a traveler client, I want to be able to see my friends' and/or public trips so that I can keep updated with what my friends are 
 doing.
 Estimation of Time for Completion: 1 wk
 Customer Priority: 5
 
-Delete Account
+USER STORY: Delete Account
 As a traveler client, I want to be able to delete my account so that I will not be affiliated with this app's services anymore.
 Estimation of Time for Completion: 1 day
 Customer Priority: 5
 
 ********** Done **********
 
-Create New Trip
+USER STORY: Create New Trip
 As a travelers' group leader, I want to create a new trip with all its info so that I can begin the trip planning process.
 Estimation of Time for Completion: 3-4 days
 Customer Priority: 1
 
-Register New User
+USER STORY: Register New User
 As a traveler client, I want to register an account via Facebook or email so that I can be able to access my saved trips later.
 Estimation of Time for Completion: 1 wk
 Customer Priority: 1
 
-User Login
+USER STORY: User Login
 As a traveler client, I want to login via Facebook or email so that I can access my saved trips.
 Estimation of Time for Completion: 1 wk
 Customer Priority: 1
 
-Create New Trip
+USER STORY: Create New Trip
 As a travelers' group leader, I want to create a new trip with all its info so that I can begin the trip planning process.
 Estimation of Time for Completion: 3-4 days
 Customer Priority: 1
 
-Polish Create Trip Flow
+USER STORY: Polish Create Trip Flow
 As a group leader for a trip, I want to be able to create a trip with more
 fluid UX that displays descriptions for the trip options and software keyboard
 that hides itself in proper contexts.
