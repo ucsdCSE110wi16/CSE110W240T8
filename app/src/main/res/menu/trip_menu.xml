@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activity.TripActivity">
+    tools:context=".view.activity.TripActivity">
     <item
         android:id="@+id/trip_action_share"
         android:icon="@drawable/ic_share"

@@ -1,4 +1,4 @@
-package droidsquad.voyage.model;
+package droidsquad.voyage.model.api;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -28,8 +28,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import droidsquad.voyage.activity.TripActivity;
-import droidsquad.voyage.controller.PlaceArrayAdapter;
+import droidsquad.voyage.view.activity.TripActivity;
+import droidsquad.voyage.model.adapters.PlaceArrayAdapter;
 
 public class GooglePlacesAPI implements
         GoogleApiClient.OnConnectionFailedListener,

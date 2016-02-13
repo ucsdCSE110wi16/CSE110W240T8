@@ -1,4 +1,4 @@
-package droidsquad.voyage.model;
+package droidsquad.voyage.model.api;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,17 +10,16 @@ import android.widget.ImageView;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import droidsquad.voyage.model.objects.FacebookUser;
 
 /**
  * This class contains static methods for retrieving data asynchronously from Facebook

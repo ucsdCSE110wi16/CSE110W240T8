@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".ParseApplication"
+        android:name=".util.ParseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -37,11 +37,11 @@
             android:value="AIzaSyCQxOiiXC6SIYv1IsQiebWPrDfmchL3U70" />
 
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".view.activity.LoginActivity"
             android:label="@string/login_activity_title" />
 
         <activity
-            android:name=".activity.CreateTripActivity"
+            android:name=".view.activity.CreateTripActivity"
             android:theme="@style/AppTheme.coloredStatusBarOnly" />
 
         <!--
@@ -53,7 +53,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".activity.MainNavDrawerActivity"
+            android:name=".view.activity.MainNavDrawerActivity"
             android:label="@string/title_activity_trip_list"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -69,11 +69,11 @@
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
-            android:name=".activity.TripActivity"
-            android:parentActivityName=".activity.MainNavDrawerActivity"
+            android:name=".view.activity.TripActivity"
+            android:parentActivityName=".view.activity.MainNavDrawerActivity"
             android:theme="@style/CollapsingToolbarTheme" />
         <activity
-            android:name=".activity.AddFriendsActivity"
+            android:name=".view.activity.AddFriendsActivity"
             android:label="@string/title_activity_add_friends"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:launchMode="singleTop">

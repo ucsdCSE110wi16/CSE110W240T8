@@ -1,4 +1,4 @@
-package droidsquad.voyage.activity;
+package droidsquad.voyage.view.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -16,8 +16,8 @@ import android.widget.Button;
 import com.parse.ParseFacebookUtils;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.LoginController;
-import droidsquad.voyage.model.VoyageUser;
+import droidsquad.voyage.controller.activityController.LoginController;
+import droidsquad.voyage.model.objects.VoyageUser;
 
 public class LoginActivity extends AppCompatActivity {
 

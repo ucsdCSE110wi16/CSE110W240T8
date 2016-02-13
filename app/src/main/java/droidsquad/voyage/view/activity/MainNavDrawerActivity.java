@@ -1,4 +1,4 @@
-package droidsquad.voyage.activity;
+package droidsquad.voyage.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +16,7 @@ import com.parse.ParseUser;
 import java.io.Serializable;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.MainNavDrawerController;
+import droidsquad.voyage.controller.activityController.MainNavDrawerController;
 
 /**
  * Main nav bar activity, displays fragments (triplist, feed, etc)

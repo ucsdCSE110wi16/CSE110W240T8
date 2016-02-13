@@ -1,4 +1,4 @@
-package droidsquad.voyage.model;
+package droidsquad.voyage.model.objects;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.activity.MainNavDrawerActivity;
+import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 
 public class VoyageUser {
     private static final String TAG = VoyageUser.class.getSimpleName();

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import droidsquad.voyage.model.objects.Trip;
+
 public class ParseTripModel {
     public static final String USER_OBJECT = "User";
     public static final String TRIP_OBJECT = "Trip";

@@ -1,4 +1,4 @@
-package droidsquad.voyage.activity;
+package droidsquad.voyage.view.activity;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -14,10 +14,7 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AutoCompleteTextView;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,8 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.TripController;
-import droidsquad.voyage.model.Trip;
+import droidsquad.voyage.controller.activityController.TripController;
 
 public class TripActivity extends AppCompatActivity {
     private CollapsingToolbarLayout mCollapsingToolbar;

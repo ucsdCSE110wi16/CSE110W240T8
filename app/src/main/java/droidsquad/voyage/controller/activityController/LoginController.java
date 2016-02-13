@@ -1,6 +1,6 @@
-package droidsquad.voyage.controller;
+package droidsquad.voyage.controller.activityController;
 
-import droidsquad.voyage.activity.LoginActivity;
+import droidsquad.voyage.view.activity.LoginActivity;
 
 /**
  * Created by Andrew on 1/20/16.

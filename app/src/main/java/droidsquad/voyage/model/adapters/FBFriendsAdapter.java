@@ -1,4 +1,4 @@
-package droidsquad.voyage.model;
+package droidsquad.voyage.model.adapters;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +13,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.model.objects.FacebookUser;
 
 public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.ViewHolder> {
     private Activity mActivity;

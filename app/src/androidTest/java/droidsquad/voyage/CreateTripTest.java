@@ -7,10 +7,9 @@ import org.junit.Test;
 import java.util.Calendar;
 import java.util.Date;
 
-import droidsquad.voyage.activity.CreateTripActivity;
-import droidsquad.voyage.model.ParseModel;
+import droidsquad.voyage.view.activity.CreateTripActivity;
 import droidsquad.voyage.model.ParseTripModel;
-import droidsquad.voyage.model.Trip;
+import droidsquad.voyage.model.objects.Trip;
 
 /**
  * Created by gumbe on 1/23/2016.

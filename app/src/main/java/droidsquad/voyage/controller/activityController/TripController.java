@@ -1,4 +1,4 @@
-package droidsquad.voyage.controller;
+package droidsquad.voyage.controller.activityController;
 
 import android.util.Log;
 import android.widget.ImageView;
@@ -9,9 +9,9 @@ import org.json.JSONObject;
 import java.util.Date;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.activity.TripActivity;
-import droidsquad.voyage.model.GooglePlacesAPI;
-import droidsquad.voyage.model.Trip;
+import droidsquad.voyage.view.activity.TripActivity;
+import droidsquad.voyage.model.api.GooglePlacesAPI;
+import droidsquad.voyage.model.objects.Trip;
 
 public class TripController {
     private static final String TAG = TripController.class.getSimpleName();
