@@ -178,11 +178,10 @@ public class CreateTripActivity extends AppCompatActivity {
      * @param negativeListener Callback if user presses Cancel button
      */
     public void showAlertDialog(DialogInterface.OnClickListener positiveListener,
-                                DialogInterface.OnClickListener negativeListener) {
-        hideKeyboard();
-
+                                DialogInterface.OnClickListener negativeListener,
+                                String message) {
         new AlertDialog.Builder(this)
-                .setMessage(R.string.create_trip_alert_dialog_message)
+                .setMessage(message)
                 .setPositiveButton(android.R.string.yes, positiveListener)
                 .setNegativeButton(android.R.string.no, negativeListener)
                 .setIcon(android.R.drawable.ic_dialog_alert)
