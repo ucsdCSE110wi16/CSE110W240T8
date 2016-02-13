@@ -62,7 +62,7 @@
     <!-- Error and Help messages for create trip activity -->
     <string name="help_trip_private">Only members who you invite will see this trip.</string>
     <string name="help_trip_public">This trip will be visible to all your friends.</string>
-    <string name="create_trip_alert_dialog_message">\"Are you sure you want to discard the changes?\"</string>
+    <string name="create_trip_alert_dialog_message">Are you sure you want to discard the changes?</string>
     <string name="error_trip_name">"Name must be at least 3 character long"</string>
     <string name="error_trip_location">"Please enter a valid location"</string>
 
@@ -90,4 +90,7 @@
 
     <string name="fb_friend_search_hint">Add friends to trip</string>
 
+    <!-- Overlap dialog error -->
+    <string name="error_overlap">You have an overlap with another existing trip:&#160;</string>
+    <string name="error_overlap_continue">. Do you want to continue?</string>
 </resources>

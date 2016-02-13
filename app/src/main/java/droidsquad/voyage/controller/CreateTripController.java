@@ -4,20 +4,15 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import com.parse.ParseUser;
-
-import org.json.JSONObject;
-
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.activity.CreateTripActivity;
 import droidsquad.voyage.model.GooglePlacesAPI;
-import droidsquad.voyage.model.ParseModel;
 import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.Trip;
 
@@ -48,7 +43,7 @@ public class CreateTripController {
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                 }
-            });
+            }, activity.getString(R.string.create_trip_alert_dialog_message));
         }
     }
 
@@ -146,6 +141,57 @@ public class CreateTripController {
         Trip newTrip = new Trip(tripName, leavingFrom, destination, isPrivate,
                 dateFrom, dateTo, transportation, creatorId);
 
+        finalizeTripCheck(newTrip);
+    }
+
+    /**
+     * Finalization: Before saving the trip to parse, first check if the trip overlaps with
+     * any other trips the user is already enrolled in
+     */
+    public void finalizeTripCheck(final Trip newTrip) {
+        ParseTripModel.searchForAllTrips(new ParseTripModel.ParseTripCallback() {
+            @Override
+            public void onCompleted(ArrayList<Trip> trip) {
+                if (!compareForOverlaps(newTrip, trip)) {
+                    completeSave(newTrip);
+                }
+            }
+        });
+    }
+
+    /**
+     * Check for trip overlaps between existing trips for a user, and a newly created one
+     * @param newTrip
+     * @param trip
+     * @return
+     */
+    public boolean compareForOverlaps(Trip newTrip, ArrayList<Trip> trip) {
+        for(Trip t: trip) {
+            if(newTrip.overlaps(t)) {
+                String message = activity.getString(R.string.error_overlap) + t.getName() +
+                        activity.getString(R.string.error_overlap_continue);
+                activity.showAlertDialog(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        activity.exitActivity();
+                    }
+                }, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }, message);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Completes the save process after we know adding a new trip is a valid action
+     * @param newTrip
+     */
+    public void completeSave(Trip newTrip) {
         ParseTripModel.saveTrip(newTrip);
 
         // TODO show progress spinning thingy and wait till the trip has been saved to parse

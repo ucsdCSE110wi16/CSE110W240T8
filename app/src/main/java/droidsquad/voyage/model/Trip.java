@@ -44,6 +44,19 @@ public class Trip implements Serializable {
                 "Date To: " + dateTo + "\n";
     }
 
+    /**
+     * Checks if the current trip overlaps with the other, in terms of departure and arrival
+     * @param other
+     * @return
+     */
+    public boolean overlaps(Trip other) {
+        if((other.getDateFrom().before(this.dateTo) && other.getDateFrom().after(this.dateFrom))
+                || (other.getDateTo().before(this.dateTo) && other.getDateTo().after(this.dateFrom))
+                || (other.getDateTo().equals(this.dateTo) && other.getDateFrom().equals(this.dateFrom)))
+            return true;
+        return false;
+    }
+
     public String getName() {
         return name;
     }
