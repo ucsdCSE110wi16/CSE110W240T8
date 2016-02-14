@@ -45,8 +45,7 @@ public class TripActivity extends AppCompatActivity {
         mFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(TripActivity.this, AddFriendsActivity.class);
-                startActivity(intent);
+                mController.launchAddFriends();
             }
         });
 

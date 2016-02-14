@@ -3,6 +3,7 @@ package droidsquad.voyage.model;
 import android.util.Log;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.util.Constants;
 
 public class ParseTripModel {
     public static final String USER_OBJECT = "User";
@@ -40,7 +42,7 @@ public class ParseTripModel {
         parseTrip.put("transportation", trip.getTransportation());
 
         //TODO: Initialize UserGroup stuff for new trips?
-        ParseRelation<ParseObject> relation = parseTrip.getRelation("members");
+        ParseRelation<ParseUser> relation = parseTrip.getRelation("members");
         relation.add(ParseUser.getCurrentUser());
         parseTrip.saveInBackground(new SaveCallback() {
             @Override
@@ -110,10 +112,77 @@ public class ParseTripModel {
         return ParseUser.getCurrentUser().getObjectId();
     }
 
+    public static void saveInvitees(String tripObjId, final ArrayList<String> fbIDs, final TripASyncTaskCallback callback) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
+        query.getInBackground(tripObjId, new GetCallback<ParseObject>() {
+            @Override
+            public void done(final ParseObject parseTrip, ParseException e) {
+                if (e == null) {
+                    getFBUsers(parseTrip, fbIDs, callback);
+                } else {
+                    Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                            + " Message: " + e.getMessage());
+
+                    callback.onFaliure(getParseErrorString(e.getCode()));
+                }
+            }
+        });
+    }
+
+    private static void getFBUsers(final ParseObject parseTrip, ArrayList<String> fbIDs, final TripASyncTaskCallback callback) {
+        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+        userQuery.whereContainedIn("fbId", fbIDs);
+        userQuery.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (e == null) {
+                    setUpInviteeRelations(objects, parseTrip, callback);
+                } else {
+                    Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                            + " Message: " + e.getMessage());
+                    callback.onFaliure(getParseErrorString(e.getCode()));
+                }
+            }
+        });
+    }
+
+    private static void setUpInviteeRelations(List<ParseUser> objects, ParseObject parseTrip, final TripASyncTaskCallback callback) {
+        ParseRelation<ParseUser> relation = parseTrip.getRelation("invitees");
+        for (ParseUser user: objects) {
+            relation.add(user);
+        }
+        parseTrip.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    callback.onSuccess();
+                } else {
+                    Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                            + " Message: " + e.getMessage());
+                    callback.onFaliure(getParseErrorString(e.getCode()));
+                }
+            }
+        });
+    }
+
+    private static String getParseErrorString(int code) {
+        switch (code) {
+            case 100:
+                return Constants.ERROR_NO_INTERNET_CONNECTION;
+            default:
+                return Constants.ERROR_UNKNOWN;
+        }
+    }
+
     /**
      * Interface to implement a callback that is accepted in methods of this class
      */
     public interface ParseTripCallback {
         void onCompleted(ArrayList<Trip> trip);
+    }
+
+    public interface TripASyncTaskCallback {
+        void onSuccess ();
+        void onFaliure(String error);
     }
 }

@@ -88,15 +88,6 @@ public class FacebookAPI {
                 try {
                     URL imageURL = new URL(GRAPH_URL + id + "/picture?type=" + type);
                     bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
-
-//                    HttpURLConnection connection = (HttpURLConnection) imageURL.openConnection();
-//                    connection.setDoInput(true);
-//                    connection.setInstanceFollowRedirects(true);
-//                    connection.connect();
-//                    InputStream inputStream = connection.getInputStream();
-//                    //img_value.openConnection().setInstanceFollowRedirects(true).getInputStream()
-//                    bitmap = BitmapFactory.decodeStream(inputStream);
-
                 } catch (MalformedURLException e) {
                     Log.d(TAG, "Malformed Exception occurred: " + e.getMessage());
                 } catch (IOException e) {
