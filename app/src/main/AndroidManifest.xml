@@ -32,8 +32,10 @@
       IMPORTANT: Change "com.parse.starter.permission.C2D_MESSAGE" in the lines below
       to match your app's package name + ".permission.C2D_MESSAGE".
     -->
-    <permission android:protectionLevel="signature" android:name="droidsquad.voyage" />
-    <uses-permission android:name="droidsquad.voyage" />
+    <permission
+        android:name="droidsquad.voyage.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="droidsquad.voyage.permission.C2D_MESSAGE" />
 
     <application
         android:name=".util.ParseApplication"
@@ -94,8 +96,8 @@
         <activity
             android:name=".view.activity.AddFriendsActivity"
             android:label="@string/title_activity_add_friends"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />

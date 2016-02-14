@@ -9,14 +9,9 @@ import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
 
-/**
- * Created by Andrew on 1/20/16.
- */
 public class ParseApplication extends Application {
-
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
 
         // Initialize the singletons so their instances
