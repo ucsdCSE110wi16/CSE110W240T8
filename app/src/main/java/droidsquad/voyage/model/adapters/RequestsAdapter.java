@@ -1,6 +1,7 @@
 package droidsquad.voyage.model.adapters;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,11 +20,14 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.Request;
 
 public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHolder> {
+    private static final String TAG = RequestsAdapter.class.getSimpleName();
     private Context context;
     private List<Request> mRequests;
+    private OnButtonClickedCallback mCallback;
 
     public RequestsAdapter(Context context) {
         mRequests = new ArrayList<>();
+        this.context = context;
     }
 
     @Override
@@ -35,8 +39,8 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Request request = mRequests.get(position);
+    public void onBindViewHolder(ViewHolder holder, final int position) {
+        final Request request = mRequests.get(position);
 
         Picasso.with(context)
                 .load(request.hostPicURL)
@@ -47,20 +51,29 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         holder.invitationMsgView.setText(context.getString(R.string.request_message_template,
                 request.tripName));
         holder.elapsedTimeView.setText("");
+        holder.declineButton.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.cardview_light_background));
 
         holder.acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (mCallback != null) {
+                    mCallback.onAcceptClicked(request);
+                }
             }
         });
 
         holder.declineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (mCallback != null) {
+                    mCallback.onDeclineClicked(request);
+                }
             }
         });
+    }
+
+    public void setOnButtonClickedCallback(OnButtonClickedCallback callback) {
+        this.mCallback = callback;
     }
 
     @Override
@@ -71,6 +84,13 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
     public void updateAdapter(List<Request> requests) {
         mRequests = requests;
         notifyDataSetChanged();
+    }
+
+    public void removeRequest(Request request) {
+        int position = mRequests.indexOf(request);
+        mRequests.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, mRequests.size());
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -91,5 +111,10 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
             acceptButton = (Button) view.findViewById(R.id.accept_button);
             declineButton = (AppCompatButton) view.findViewById(R.id.decline_button);
         }
+    }
+
+    public interface OnButtonClickedCallback {
+        void onAcceptClicked(Request request);
+        void onDeclineClicked(Request request);
     }
 }

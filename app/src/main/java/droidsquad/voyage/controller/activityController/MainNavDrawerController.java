@@ -36,7 +36,7 @@ public class MainNavDrawerController {
      */
     public void tripsPressed() {
         Fragment fragment = TripListFragment.newInstance();
-        changeFragment(fragment, "TripList");
+        changeFragment(fragment, activity.getString(R.string.label_trip_list_fragment));
     }
 
 
@@ -87,6 +87,7 @@ public class MainNavDrawerController {
             fragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, fragment, fragmentLabel)
                     .commit();
+            activity.setTitle(fragmentLabel);
         }
     }
 }

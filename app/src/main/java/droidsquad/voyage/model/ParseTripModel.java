@@ -42,7 +42,7 @@ public class ParseTripModel {
         parseTrip.put("transportation", trip.getTransportation());
 
         //TODO: Initialize UserGroup stuff for new trips?
-        ParseRelation<ParseObject> relation = parseTrip.getRelation("members");
+        ParseRelation<ParseUser> relation = parseTrip.getRelation("members");
         relation.add(ParseUser.getCurrentUser());
         parseTrip.saveInBackground(new SaveCallback() {
             @Override
