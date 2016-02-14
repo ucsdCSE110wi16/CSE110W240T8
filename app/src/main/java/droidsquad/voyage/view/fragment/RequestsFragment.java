@@ -9,9 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.controller.fragmentController.RequestsController;
 
 public class RequestsFragment extends Fragment {
-
+    private RequestsController mController;
     private RecyclerView mRequestsRecyclerView;
 
     @Override
@@ -27,7 +28,10 @@ public class RequestsFragment extends Fragment {
 
         initUI(view);
 
+        mController = new RequestsController(this);
+
         mRequestsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRequestsRecyclerView.setAdapter(mController.getAdapter());
 
         return view;
     }

@@ -41,7 +41,7 @@
             android:layout_toEndOf="@+id/profile_pic"
             android:layout_toRightOf="@+id/profile_pic"
             android:paddingTop="4dp"
-            android:text="invited you to join Backpacking in Arizona" />
+            android:text="@string/request_message_template" />
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/elapsed_time"
@@ -62,6 +62,7 @@
             android:layout_marginTop="8dp"
             android:layout_toEndOf="@+id/profile_pic"
             android:layout_toRightOf="@+id/profile_pic"
+            android:foreground="?android:selectableItemBackground"
             android:hint="@string/accept"
             android:textColorHint="#fff" />
 
@@ -74,6 +75,7 @@
             android:layout_toEndOf="@id/accept_button"
             android:layout_toRightOf="@id/accept_button"
             android:backgroundTint="@color/cardview_light_background"
+            android:foreground="?android:selectableItemBackground"
             android:hint="@string/decline" />
 
     </RelativeLayout>
