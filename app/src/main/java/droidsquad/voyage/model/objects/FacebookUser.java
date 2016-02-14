@@ -1,4 +1,4 @@
-package droidsquad.voyage.model;
+package droidsquad.voyage.model.objects;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

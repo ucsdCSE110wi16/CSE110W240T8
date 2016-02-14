@@ -1,4 +1,4 @@
-package droidsquad.voyage.controller;
+package droidsquad.voyage.controller.activityController;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
@@ -11,10 +11,10 @@ import java.util.Calendar;
 import java.util.Date;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.activity.CreateTripActivity;
-import droidsquad.voyage.model.GooglePlacesAPI;
+import droidsquad.voyage.view.activity.CreateTripActivity;
+import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.ParseTripModel;
-import droidsquad.voyage.model.Trip;
+import droidsquad.voyage.model.objects.Trip;
 
 public class CreateTripController {
     private CreateTripActivity activity;
@@ -165,7 +165,7 @@ public class CreateTripController {
      * @param trip
      * @return
      */
-    public boolean compareForOverlaps(Trip newTrip, ArrayList<Trip> trip) {
+    public boolean compareForOverlaps(final Trip newTrip, ArrayList<Trip> trip) {
         for(Trip t: trip) {
             if(newTrip.overlaps(t)) {
                 String message = activity.getString(R.string.error_overlap) + t.getName() +
@@ -173,7 +173,7 @@ public class CreateTripController {
                 activity.showAlertDialog(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        activity.exitActivity();
+                        completeSave(newTrip);
                     }
                 }, new DialogInterface.OnClickListener() {
                     @Override

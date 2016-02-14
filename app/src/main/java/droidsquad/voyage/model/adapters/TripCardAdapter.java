@@ -1,6 +1,5 @@
-package droidsquad.voyage.model;
+package droidsquad.voyage.model.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
@@ -20,7 +19,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.activity.TripActivity;
+import droidsquad.voyage.view.activity.TripActivity;
+import droidsquad.voyage.model.objects.Trip;
 
 public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHolder> {
     private static final String TAG = TripCardAdapter.class.getSimpleName();

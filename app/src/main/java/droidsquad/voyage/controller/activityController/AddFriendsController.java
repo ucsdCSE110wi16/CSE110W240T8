@@ -1,4 +1,4 @@
-package droidsquad.voyage.controller;
+package droidsquad.voyage.controller.activityController;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import droidsquad.voyage.activity.AddFriendsActivity;
-import droidsquad.voyage.model.FBFriendsAdapter;
-import droidsquad.voyage.model.FacebookAPI;
-import droidsquad.voyage.model.FacebookUser;
-import droidsquad.voyage.model.SelectedFBFriendsAdapter;
+import droidsquad.voyage.view.activity.AddFriendsActivity;
+import droidsquad.voyage.model.adapters.FBFriendsAdapter;
+import droidsquad.voyage.model.api.FacebookAPI;
+import droidsquad.voyage.model.objects.FacebookUser;
+import droidsquad.voyage.model.adapters.SelectedFBFriendsAdapter;
 
 public class AddFriendsController {
     private AddFriendsActivity mActivity;

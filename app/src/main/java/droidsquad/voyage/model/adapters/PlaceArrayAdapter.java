@@ -1,4 +1,4 @@
-package droidsquad.voyage.controller;
+package droidsquad.voyage.model.adapters;
 
 import android.content.Context;
 import android.util.Log;

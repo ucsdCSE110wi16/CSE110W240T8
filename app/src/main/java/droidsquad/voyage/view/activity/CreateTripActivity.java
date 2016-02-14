@@ -1,19 +1,13 @@
-package droidsquad.voyage.activity;
+package droidsquad.voyage.view.activity;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.text.method.KeyListener;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -28,7 +22,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.CreateTripController;
+import droidsquad.voyage.controller.activityController.CreateTripController;
 
 public class CreateTripActivity extends AppCompatActivity {
     private CreateTripController controller;

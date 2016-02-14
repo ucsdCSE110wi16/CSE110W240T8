@@ -1,4 +1,4 @@
-package droidsquad.voyage.model;
+package droidsquad.voyage.model.objects;
 
 import java.io.Serializable;
 import java.util.ArrayList;

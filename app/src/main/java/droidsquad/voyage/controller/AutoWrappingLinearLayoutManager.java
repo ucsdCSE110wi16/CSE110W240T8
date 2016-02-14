@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import droidsquad.voyage.activity.AddFriendsActivity;
+import droidsquad.voyage.view.activity.AddFriendsActivity;
 
 public class AutoWrappingLinearLayoutManager extends LinearLayoutManager {
     private int[] mMeasuredDimension = new int[2];

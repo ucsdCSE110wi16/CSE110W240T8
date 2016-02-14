@@ -1,4 +1,4 @@
-package droidsquad.voyage;
+package droidsquad.voyage.util;
 
 import android.app.Application;
 

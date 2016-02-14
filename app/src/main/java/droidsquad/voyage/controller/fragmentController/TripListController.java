@@ -1,4 +1,4 @@
-package droidsquad.voyage.controller;
+package droidsquad.voyage.controller.fragmentController;
 
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
@@ -6,10 +6,10 @@ import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import droidsquad.voyage.activity.TripListFragment;
+import droidsquad.voyage.view.fragment.TripListFragment;
 import droidsquad.voyage.model.ParseTripModel;
-import droidsquad.voyage.model.Trip;
-import droidsquad.voyage.model.TripCardAdapter;
+import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.model.adapters.TripCardAdapter;
 
 public class TripListController {
     private TripListFragment fragment;

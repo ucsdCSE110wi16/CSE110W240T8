@@ -1,4 +1,4 @@
-package droidsquad.voyage.activity;
+package droidsquad.voyage.view.activity;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.AddFriendsController;
+import droidsquad.voyage.controller.activityController.AddFriendsController;
 import droidsquad.voyage.controller.AutoWrappingLinearLayoutManager;
 
 public class AddFriendsActivity extends AppCompatActivity {

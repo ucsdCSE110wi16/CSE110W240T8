@@ -1,4 +1,4 @@
-package droidsquad.voyage.activity;
+package droidsquad.voyage.view.fragment;
 
 
 import android.content.Intent;
@@ -13,7 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.TripListController;
+import droidsquad.voyage.controller.fragmentController.TripListController;
+import droidsquad.voyage.view.activity.CreateTripActivity;
 
 /**
  * Fragment for displaying list of trips. Controller is instantiated in onCreateView
