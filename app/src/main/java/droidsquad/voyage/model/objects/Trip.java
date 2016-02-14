@@ -59,6 +59,14 @@ public class Trip implements Serializable {
         return false;
     }
 
+    public ArrayList<String> getAllParticipants() {
+        return allParticipants;
+    }
+
+    public void setAllParticipants(ArrayList<String> members) {
+        allParticipants = members;
+    }
+
     public String getName() {
         return name;
     }
