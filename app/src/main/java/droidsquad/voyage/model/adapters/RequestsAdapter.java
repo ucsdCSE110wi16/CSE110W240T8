@@ -1,6 +1,7 @@
 package droidsquad.voyage.model.adapters;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,7 +79,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         public TextView invitationMsgView;
         public TextView elapsedTimeView;
         public Button acceptButton;
-        public Button declineButton;
+        public AppCompatButton declineButton;
 
         public ViewHolder(View view) {
             super(view);
@@ -88,7 +89,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
             invitationMsgView = (TextView) view.findViewById(R.id.trip_name);
             elapsedTimeView = (TextView) view.findViewById(R.id.elapsed_time);
             acceptButton = (Button) view.findViewById(R.id.accept_button);
-            declineButton = (Button) view.findViewById(R.id.decline_button);
+            declineButton = (AppCompatButton) view.findViewById(R.id.decline_button);
         }
     }
 }
