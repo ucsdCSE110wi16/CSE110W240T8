@@ -31,17 +31,8 @@
         <item>Female</item>
         <item>Other</item>
     </string-array>
-    <string name="error_empty_mobile_num">Please enter a mobile number</string>
-    <string name="error_invalid_mobile_num">Please enter a valid mobile number</string>
-    <string name="error_short_password">Password should be at least 8 characters</string>
-    <string name="error_password_lowercase">Password must contain at least 1 lowercase character</string>
-    <string name="error_password_uppercase">Password must contain at least 1 uppercase character</string>
-    <string name="error_password_number">Password must contain at least 1 number</string>
-    <string name="error_email_already_taken">That email is already taken</string>
-    <string name="error_unkown">Something went wrong. Please try again in a while.</string>
     <string name="title_activity_blah">BlahActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
-    <string name="error_no_internet_connection">No connection.</string>
     <string name="label_login_facebook">Continue with Facebook</string>
     <string name="label_sign_up_facebook">Sign Up with Facebook</string>
 
@@ -93,4 +84,8 @@
     <!-- Overlap dialog error -->
     <string name="error_overlap">You have an overlap with another existing trip:&#160;</string>
     <string name="error_overlap_continue">. Do you want to continue?</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="label_requests_fragment">Requests</string>
 </resources>
