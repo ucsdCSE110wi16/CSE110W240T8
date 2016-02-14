@@ -74,7 +74,6 @@
 
     - See more at: http://www.ahotbrew.com/android-dropdown-spinner-example/#sthash.TShO44xy.dpuf
     <string name="title_activity_trip_list">TripListActivity</string>
-    <string name="title_activity_pending_invitations">Pending Invitations</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -93,4 +92,8 @@
     <!-- Overlap dialog error -->
     <string name="error_overlap">You have an overlap with another existing trip:&#160;</string>
     <string name="error_overlap_continue">. Do you want to continue?</string>
+
+    <!-- Deletion alert dialog-->
+    <string name="delete_alert">Are you sure you want to delete this trip?</string>
+
 </resources>

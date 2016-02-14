@@ -1,6 +1,7 @@
 package droidsquad.voyage.model;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -130,34 +131,44 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             public boolean onLongClick(View v) {
                 Log.d(TAG, "Card long clicked for delete: " + trip.getName());
 
-                //Alert dialog for delete
+                AlertDialog.Builder deleteAlert = new AlertDialog.Builder(context);
+                deleteAlert.setMessage(R.string.delete_alert);
 
-
-                ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
-                query.getInBackground(trip.getTripId(), new GetCallback<ParseObject>() {
-                    public void done(ParseObject object, ParseException e) {
-                        if (e == null) {
-                            Log.d(TAG, "Query success!");
-                            object.deleteInBackground(new DeleteCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    if (e == null) {
-                                        Log.d(TAG, "deletion successful");
-                                    } else {
-                                        Log.d(TAG, "deletion unsuccessful");
-                                    }
+                deleteAlert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
+                        query.getInBackground(trip.getTripId(), new GetCallback<ParseObject>() {
+                            public void done(ParseObject object, ParseException e) {
+                                if (e == null) {
+                                    Log.d(TAG, "Query success!");
+                                    object.deleteInBackground(new DeleteCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null) {
+                                                Log.d(TAG, "deletion successful");
+                                            } else {
+                                                Log.d(TAG, "deletion unsuccessful");
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    Log.d(TAG, "Query unsuccessful");
                                 }
-                            });
-                        } else {
-                            Log.d(TAG, "Query unsuccessful");
-                        }
+                            }
+                        });
+
+                        //refresh triplist after deletion
+                        trips.remove(trip);
+                        updateData(trips);
+                        notifyDataSetChanged();
                     }
                 });
-
-                //refresh triplist after deletion
-                trips.remove(trip);
-                updateData(trips);
-                notifyDataSetChanged();
+                deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+                deleteAlert.show();
 
                 return true;
             }
