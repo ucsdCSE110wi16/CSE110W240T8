@@ -11,5 +11,6 @@ public class Request {
     public String hostId;
     public String hostPicURL;
     public String tripName;
+    public String tripId;
     public Time elapsedTime;
 }
