@@ -7,6 +7,7 @@ import android.widget.Toast;
 import droidsquad.voyage.R;
 import droidsquad.voyage.view.activity.LoginActivity;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
+import droidsquad.voyage.view.fragment.RequestsFragment;
 import droidsquad.voyage.view.fragment.TripListFragment;
 import droidsquad.voyage.model.objects.VoyageUser;
 
@@ -58,6 +59,10 @@ public class MainNavDrawerController {
         // TODO: create settings fragment
         // Fragment fragment = SettingsFragment.newInstance();
         // changeFragment(fragment, "Feed");
+    }
+
+    public void requestsPressed() {
+        changeFragment(new RequestsFragment(), activity.getString(R.string.label_requests_fragment));
     }
 
     /**

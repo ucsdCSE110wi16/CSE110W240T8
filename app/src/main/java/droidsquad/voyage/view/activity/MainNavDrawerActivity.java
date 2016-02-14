@@ -77,6 +77,8 @@ public class MainNavDrawerActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
             controller.logOutUser();
+        } else if (id == R.id.nav_requests) {
+            controller.requestsPressed();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

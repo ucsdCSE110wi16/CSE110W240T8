@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 
 public class VoyageUser {
@@ -80,7 +81,7 @@ public class VoyageUser {
                     }
 
                     if (err != null && err.getCode() == -1) {
-                        Snackbar snackbar = Snackbar.make(view, R.string.error_no_internet_connection, Snackbar.LENGTH_LONG)
+                        Snackbar snackbar = Snackbar.make(view, Constants.ERROR_NO_INTERNET_CONNECTION, Snackbar.LENGTH_LONG)
                                 .setAction("RETRY", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {

@@ -1,5 +1,6 @@
 package droidsquad.voyage.controller.activityController;
 
+import android.content.Intent;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -9,6 +10,7 @@ import org.json.JSONObject;
 import java.util.Date;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.view.activity.AddFriendsActivity;
 import droidsquad.voyage.view.activity.TripActivity;
 import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.objects.Trip;
@@ -90,6 +92,12 @@ public class TripController {
         }
 
         return destination;
+    }
+
+    public void launchAddFriends() {
+        Intent intent = new Intent(activity, AddFriendsActivity.class);
+        intent.putExtra(activity.getString(R.string.intent_key_trip), trip);
+        activity.startActivity(intent);
     }
 
     public CharSequence getTitle() {
