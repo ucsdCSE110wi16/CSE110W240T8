@@ -27,9 +27,9 @@ public class ParseTripModel {
      *
      * @param trip Trip to be saved
      */
-    public static void saveTrip(Trip trip) {
+    public static void saveTrip(final Trip trip) {
         Log.d(TAG, "Attempting to save trip to parse.\nTrip: " + trip.toString());
-        ParseObject parseTrip = new ParseObject("Trip");
+        final ParseObject parseTrip = new ParseObject("Trip");
         parseTrip.put("name", trip.getName());
         parseTrip.put("creatorId", trip.getCreatorId());
         parseTrip.put("origin", trip.getOrigin());
@@ -47,13 +47,12 @@ public class ParseTripModel {
             public void done(ParseException e) {
                 if (e == null) {
                     Log.d(TAG, "SUCCESS");
+                    trip.setTripId(parseTrip.getObjectId());
                 } else {
                     Log.d(TAG, "FAILED");
                 }
             }
         });
-
-        trip.setTripId(parseTrip.getObjectId());
     }
 
     /**
@@ -100,6 +99,7 @@ public class ParseTripModel {
             Trip trip = new Trip(name, origin, destination, isPrivate,
                     dateFrom, dateTo, transportation, creatorId);
 
+            trip.setTripId(parseTrip.getObjectId());
             allMyTrips.add(trip);
         }
 

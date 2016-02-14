@@ -1,6 +1,10 @@
 package droidsquad.voyage.model.adapters;
 
+
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -10,12 +14,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.parse.DeleteCallback;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
@@ -114,6 +127,55 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                 context.startActivity(intent);
             }
         });
+
+        holder.mTripCard.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Log.d(TAG, "Card long clicked for delete: " + trip.getName());
+
+                AlertDialog.Builder deleteAlert = new AlertDialog.Builder(context);
+                deleteAlert.setMessage(R.string.delete_alert);
+
+                deleteAlert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
+                        query.getInBackground(trip.getTripId(), new GetCallback<ParseObject>() {
+                            public void done(ParseObject object, ParseException e) {
+                                if (e == null) {
+                                    Log.d(TAG, "Query success!");
+                                    object.deleteInBackground(new DeleteCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null) {
+                                                Log.d(TAG, "deletion successful");
+                                            } else {
+                                                Log.d(TAG, "deletion unsuccessful");
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    Log.d(TAG, "Query unsuccessful");
+                                }
+                            }
+                        });
+
+                        //refresh triplist after deletion
+                        trips.remove(trip);
+                        updateData(trips);
+                        notifyDataSetChanged();
+                    }
+                });
+                deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+                deleteAlert.show();
+
+                return true;
+            }
+        });
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -121,4 +183,5 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     public int getItemCount() {
         return trips.size();
     }
+
 }

@@ -1,5 +1,6 @@
 package droidsquad.voyage.controller.activityController;
 
+import android.content.DialogInterface;
 import android.util.Log;
 import android.widget.ImageView;
 
