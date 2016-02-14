@@ -11,12 +11,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.parse.DeleteCallback;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
@@ -114,6 +123,38 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                 context.startActivity(intent);
             }
         });
+
+        holder.mTripCard.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Log.d(TAG, "Card long clicked for delete: " + trip.getName());
+
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
+                Log.d(TAG, "Trip ID: " + trip.getTripId());
+                query.getInBackground(trip.getTripId(), new GetCallback<ParseObject>() {
+                    public void done(ParseObject object, ParseException e) {
+                        if (e == null) {
+                            Log.d(TAG, "Query success!");
+                            object.deleteInBackground(new DeleteCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if(e == null) {
+                                        Log.d(TAG, "deletion successful");
+                                    } else {
+                                        Log.d(TAG, "deletion unsuccessful");
+                                    }
+                                }
+                            });
+                        } else {
+                            Log.d(TAG, "Query unsuccessful");
+                        }
+                    }
+                });
+
+                return true;
+            }
+        });
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)

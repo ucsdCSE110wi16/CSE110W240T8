@@ -2,6 +2,7 @@ package droidsquad.voyage.controller;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.util.Log;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.Toast;
@@ -193,6 +194,7 @@ public class CreateTripController {
      */
     public void completeSave(Trip newTrip) {
         ParseTripModel.saveTrip(newTrip);
+        Log.d("565656","SAVE trip ID: " + newTrip.getTripId());
 
         // TODO show progress spinning thingy and wait till the trip has been saved to parse
 

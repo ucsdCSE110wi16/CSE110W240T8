@@ -1,5 +1,7 @@
 package droidsquad.voyage.model;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -119,9 +121,12 @@ public class Trip implements Serializable {
 
     public void setTripId(String tripId) {
         this.tripId = tripId;
+
+        System.out.println("setTripID: " + this.tripId);
     }
 
     public String getTripId() {
+        System.out.println("getTripID: " + tripId);
         return tripId;
     }
 }
