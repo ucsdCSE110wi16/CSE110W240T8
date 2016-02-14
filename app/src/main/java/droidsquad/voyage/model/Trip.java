@@ -119,14 +119,7 @@ public class Trip implements Serializable {
         return creatorId;
     }
 
-    public void setTripId(String tripId) {
-        this.tripId = tripId;
+    public void setTripId(String tripId) { this.tripId = tripId; }
 
-        System.out.println("setTripID: " + this.tripId);
-    }
-
-    public String getTripId() {
-        System.out.println("getTripID: " + tripId);
-        return tripId;
-    }
+    public String getTripId() { return tripId; }
 }

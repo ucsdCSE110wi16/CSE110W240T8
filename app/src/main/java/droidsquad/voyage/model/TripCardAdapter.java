@@ -2,6 +2,7 @@ package droidsquad.voyage.model;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -129,8 +130,10 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             public boolean onLongClick(View v) {
                 Log.d(TAG, "Card long clicked for delete: " + trip.getName());
 
+                //Alert dialog for delete
+
+
                 ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
-                Log.d(TAG, "Trip ID: " + trip.getTripId());
                 query.getInBackground(trip.getTripId(), new GetCallback<ParseObject>() {
                     public void done(ParseObject object, ParseException e) {
                         if (e == null) {
@@ -138,7 +141,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                             object.deleteInBackground(new DeleteCallback() {
                                 @Override
                                 public void done(ParseException e) {
-                                    if(e == null) {
+                                    if (e == null) {
                                         Log.d(TAG, "deletion successful");
                                     } else {
                                         Log.d(TAG, "deletion unsuccessful");
@@ -151,6 +154,11 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                     }
                 });
 
+                //refresh triplist after deletion
+                trips.remove(trip);
+                updateData(trips);
+                notifyDataSetChanged();
+
                 return true;
             }
         });
@@ -162,4 +170,5 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     public int getItemCount() {
         return trips.size();
     }
+
 }

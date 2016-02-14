@@ -194,8 +194,6 @@ public class CreateTripController {
      */
     public void completeSave(Trip newTrip) {
         ParseTripModel.saveTrip(newTrip);
-        Log.d("565656","SAVE trip ID: " + newTrip.getTripId());
-
         // TODO show progress spinning thingy and wait till the trip has been saved to parse
 
         // if success
