@@ -24,6 +24,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
     private Context context;
     private List<Request> mRequests;
     private OnButtonClickedCallback mCallback;
+    private OnDataEmptyListener mEmptyListener;
 
     public RequestsAdapter(Context context) {
         mRequests = new ArrayList<>();
@@ -84,6 +85,10 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
     public void updateAdapter(List<Request> requests) {
         mRequests = requests;
         notifyDataSetChanged();
+
+        if (mEmptyListener != null && mRequests.size() == 0) {
+            mEmptyListener.onEmpty();
+        }
     }
 
     public void removeRequest(Request request) {
@@ -91,6 +96,14 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         mRequests.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, mRequests.size());
+
+        if (mEmptyListener != null && mRequests.size() == 0) {
+            mEmptyListener.onEmpty();
+        }
+    }
+
+    public void setOnDataEmptyListener(OnDataEmptyListener listener) {
+        this.mEmptyListener = listener;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -116,5 +129,9 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
     public interface OnButtonClickedCallback {
         void onAcceptClicked(Request request);
         void onDeclineClicked(Request request);
+    }
+
+    public interface OnDataEmptyListener {
+        void onEmpty();
     }
 }

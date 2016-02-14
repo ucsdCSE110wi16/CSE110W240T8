@@ -22,8 +22,19 @@ public class RequestsController {
 
         setRequestButtonClicks();
 
+        setOnAdapterEmptyListener();
+
         mFragment.showProgress(true);
         fetchData();
+    }
+
+    private void setOnAdapterEmptyListener() {
+        mAdapter.setOnDataEmptyListener(new RequestsAdapter.OnDataEmptyListener() {
+            @Override
+            public void onEmpty() {
+                mFragment.showNoRequestsView(true);
+            }
+        });
     }
 
     private void setRequestButtonClicks() {
@@ -89,6 +100,7 @@ public class RequestsController {
             @Override
             public void onSuccess(List<Request> requests) {
                 mFragment.showProgress(false);
+                mFragment.showNoRequestsView(false);
                 mAdapter.updateAdapter(requests);
             }
 

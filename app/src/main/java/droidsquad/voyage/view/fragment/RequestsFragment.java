@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import droidsquad.voyage.R;
@@ -16,6 +17,7 @@ public class RequestsFragment extends Fragment {
     private RequestsController mController;
     private RecyclerView mRequestsRecyclerView;
     private ProgressBar mProgressBar;
+    private LinearLayout mNoRequestsView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,7 @@ public class RequestsFragment extends Fragment {
     private void initUI(View view) {
         mRequestsRecyclerView = (RecyclerView) view.findViewById(R.id.requests_recycler_view);
         mProgressBar = (ProgressBar) view.findViewById(R.id.requests_progress_bar);
+        mNoRequestsView = (LinearLayout) view.findViewById(R.id.no_requests_view);
     }
 
     public void showProgress(boolean show) {
@@ -50,6 +53,16 @@ public class RequestsFragment extends Fragment {
         } else {
             mRequestsRecyclerView.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(View.GONE);
+        }
+    }
+
+    public void showNoRequestsView(boolean show) {
+        if (show) {
+            mNoRequestsView.setVisibility(View.VISIBLE);
+            mRequestsRecyclerView.setVisibility(View.GONE);
+        } else {
+            mNoRequestsView.setVisibility(View.GONE);
+            mRequestsRecyclerView.setVisibility(View.VISIBLE);
         }
     }
 }

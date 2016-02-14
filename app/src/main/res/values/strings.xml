@@ -92,4 +92,5 @@
     <string name="label_trip_list_fragment">My Trips</string>
     <string name="snackbar_request_accepted">Request Accepted</string>
     <string name="snackbar_request_declined">Request Declined</string>
+    <string name="label_no_requests">No requests as of now. Stay optimistic.</string>
 </resources>
