@@ -19,10 +19,13 @@ import droidsquad.voyage.model.objects.Trip;
 public class CreateTripController {
     private CreateTripActivity activity;
     private GooglePlacesAPI googlePlacesModel;
+    private boolean edit = false;
 
     public CreateTripController(CreateTripActivity activity) {
         this.activity = activity;
         googlePlacesModel = new GooglePlacesAPI(activity);
+        // determine whether this is an editing activity or not
+        edit = activity.getIntent().getBooleanExtra(activity.getString(R.string.edit_trip), edit);
     }
 
     /**
@@ -102,7 +105,22 @@ public class CreateTripController {
     /**
      * Attempts to create a Trip with the information in the views
      */
-    public void attemptCreateTrip() {
+    public void attemptSaveTrip() {
+        if (!edit) {
+            attemptCreateTrip();
+        }
+        else {
+            attemptUpdateTrip();
+        }
+    }
+
+    private void attemptUpdateTrip() {
+        // TODO: update the trip
+        Toast.makeText(activity, "Updating trip",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private void attemptCreateTrip() {
         // Get all the information from the views
         String tripName = activity.getTripNameView().getText().toString();
         String leavingFrom = googlePlacesModel.getSourceCityJSON().toString();
@@ -110,13 +128,24 @@ public class CreateTripController {
         String transportation = activity.getTransportation().getSelectedItem().toString();
         String creatorId = ParseTripModel.getUser();
 
-        //JSONObject leavingFrom = googlePlacesModel.getSourceCityJSON();
-        //JSONObject destination = googlePlacesModel.getDestCityJSON();
-
         Date dateFrom = activity.getCalendarFrom().getTime();
         Date dateTo = activity.getCalendarTo().getTime();
 
         boolean isPrivate = activity.getPrivateView().isChecked();
+        boolean hasError = hasError(tripName, leavingFrom, destination, transportation, creatorId,
+                dateFrom, dateTo);
+
+        if(hasError) return;
+
+        Trip newTrip = new Trip(tripName, leavingFrom, destination, isPrivate,
+                dateFrom, dateTo, transportation, creatorId);
+
+        finalizeTripCheck(newTrip);
+    }
+
+    private boolean hasError(String tripName, String leavingFrom,String destination, String
+            transportation, String creatorId, Date dateFrom, Date dateTo) {
+
         boolean hasError = false;
 
         // TODO: Scroll to and set the focus on the first View that has error
@@ -136,12 +165,7 @@ public class CreateTripController {
             hasError = true;
         }
 
-        if(hasError) return;
-
-        Trip newTrip = new Trip(tripName, leavingFrom, destination, isPrivate,
-                dateFrom, dateTo, transportation, creatorId);
-
-        finalizeTripCheck(newTrip);
+        return hasError;
     }
 
     /**

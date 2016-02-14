@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.fragmentController.TripListController;
+import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.view.activity.CreateTripActivity;
 
 /**

@@ -95,4 +95,11 @@ public class TripController {
     public CharSequence getTitle() {
         return trip.getName();
     }
+
+    /**
+     * Called to start editing the trip
+     */
+    public void editTrip() {
+        activity.editTripIntent(this.trip);
+    }
 }

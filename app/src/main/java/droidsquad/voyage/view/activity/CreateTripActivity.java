@@ -100,7 +100,17 @@ public class CreateTripActivity extends AppCompatActivity {
         // TODO: Listen for text changes on mTripNameView and clear the error when it changes
         // Clear error by calling mTripNameErrorView.setVisibility(View.GONE);
 
+        populateUI();
+
+    }
+
+    /**
+     * Populates UI depending on whether the trip is being created or edited
+     */
+    private void populateUI() {
+
         initDatePickers();
+
     }
 
     @Override
@@ -209,7 +219,7 @@ public class CreateTripActivity extends AppCompatActivity {
      * Called when the user presses the create trip button
      */
     public void createTripButtonPressed(View view) {
-        controller.attemptCreateTrip();
+        controller.attemptSaveTrip();
     }
 
     /**

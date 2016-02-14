@@ -23,6 +23,7 @@ import java.util.Locale;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.activityController.TripController;
+import droidsquad.voyage.model.objects.Trip;
 
 public class TripActivity extends AppCompatActivity {
     private CollapsingToolbarLayout mCollapsingToolbar;
@@ -50,8 +51,6 @@ public class TripActivity extends AppCompatActivity {
             }
         });
 
-        mController = new TripController(this);
-
         mController.setGooglePlacePhoto(mHeaderImageView);
     }
 
@@ -70,6 +69,8 @@ public class TripActivity extends AppCompatActivity {
             case R.id.trip_action_share:
                 startShareIntent();
                 return true;
+            case R.id.trip_action_edit:
+                mController.editTrip();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -147,5 +148,17 @@ public class TripActivity extends AppCompatActivity {
         sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Share"));
+    }
+
+    /**
+     * Called to start the intent for editing the trip via CreateTripActivity with an extra boolean
+     * to indicate the trip is being edited
+     * @param trip  current trip, needed to populate the CreateTripActivity fields
+     */
+    public void editTripIntent(Trip trip) {
+        Intent intent = new Intent(this, CreateTripActivity.class);
+        intent.putExtra(this.getString(R.string.intent_key_trip), trip);
+        intent.putExtra(getString(R.string.edit_trip), true);
+        startActivity(intent);
     }
 }
