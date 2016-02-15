@@ -52,7 +52,6 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         holder.invitationMsgView.setText(context.getString(R.string.request_message_template,
                 request.tripName));
         holder.elapsedTimeView.setText("");
-        holder.declineButton.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.cardview_light_background));
 
         holder.acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,8 +110,8 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         public TextView hostNameView;
         public TextView invitationMsgView;
         public TextView elapsedTimeView;
-        public Button acceptButton;
-        public AppCompatButton declineButton;
+        public TextView acceptButton;
+        public TextView declineButton;
 
         public ViewHolder(View view) {
             super(view);
@@ -121,8 +120,8 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
             hostNameView = (TextView) view.findViewById(R.id.user_name);
             invitationMsgView = (TextView) view.findViewById(R.id.trip_name);
             elapsedTimeView = (TextView) view.findViewById(R.id.elapsed_time);
-            acceptButton = (Button) view.findViewById(R.id.accept_button);
-            declineButton = (AppCompatButton) view.findViewById(R.id.decline_button);
+            acceptButton = (TextView) view.findViewById(R.id.accept_button);
+            declineButton = (TextView) view.findViewById(R.id.decline_button);
         }
     }
 

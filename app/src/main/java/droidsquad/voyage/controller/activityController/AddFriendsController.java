@@ -117,7 +117,7 @@ public class AddFriendsController {
             fbIDs.add(user.id);
         }
 
-        ParseTripModel.saveInvitees(mTrip.getTripId(), fbIDs, new ParseTripModel.TripASyncTaskCallback() {
+        ParseTripModel.saveInvitees(mTrip.getId(), fbIDs, new ParseTripModel.TripASyncTaskCallback() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Successfully added friends");
