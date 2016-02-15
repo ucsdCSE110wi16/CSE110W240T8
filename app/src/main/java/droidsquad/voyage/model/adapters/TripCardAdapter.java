@@ -123,6 +123,8 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                 break;
             default:
                 holder.mOtherMembers.setVisibility(View.VISIBLE);
+                String s = "... +" + (numMembers - 4);
+                holder.mOtherMembers.setText(s);
                 break;
         }
 

@@ -195,33 +195,29 @@ public class ParseTripModel {
     public static void getAllMembers(final Trip trip) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
         query.whereEqualTo("objectId", trip.getId());
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                for(ParseObject tripObj : objects) {
-                    ParseRelation<ParseObject> relation = tripObj.getRelation("members");
-                    ParseQuery<ParseObject> query = relation.getQuery();
-                    query.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> objects, ParseException e) {
-                            if(e == null) {
-                                ArrayList<String> members = new ArrayList<>();
-                                for (ParseObject member : objects) {
-                                    Log.d(TAG, "Trip User Added to Trip: " + (String)member.get("fbId"));
-                                    members.add((String) member.get("fbId"));
-                                }
-                                trip.setAllParticipants(members);
-                            }
-                            else {
-                                Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
-                                        + " Message: " + e.getMessage());
-                            }
-                        }
-                    });
-                }
 
+        try {
+            List<ParseObject> objects = query.find();
+            for (ParseObject tripObj : objects) {
+                ParseRelation<ParseObject> relation = tripObj.getRelation("members");
+                ParseQuery<ParseObject> queryRelation = relation.getQuery();
+                try {
+                    List<ParseObject> foundMembers = queryRelation.find();
+                    ArrayList<String> members = new ArrayList<>();
+                    for (ParseObject member : foundMembers) {
+                        Log.d(TAG, "Trip User Added to Trip: " + (String) member.get("fbId"));
+                        members.add((String) member.get("fbId"));
+                    }
+                    trip.setAllParticipants(members);
+                }
+                catch(ParseException e) {
+                    Log.d(TAG, "Error finding trip members!");
+                }
             }
-        });
+        }
+        catch(ParseException e) {
+            Log.d(TAG, "Error finding trip!");
+        }
     }
 
     /**
