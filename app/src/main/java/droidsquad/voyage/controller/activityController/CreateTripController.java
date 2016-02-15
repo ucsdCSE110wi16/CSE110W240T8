@@ -2,10 +2,10 @@ package droidsquad.voyage.controller.activityController;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
-import android.util.Log;
-import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,11 +19,9 @@ import droidsquad.voyage.model.objects.Trip;
 
 public class CreateTripController {
     private CreateTripActivity activity;
-    private GooglePlacesAPI googlePlacesModel;
 
     public CreateTripController(CreateTripActivity activity) {
         this.activity = activity;
-        googlePlacesModel = new GooglePlacesAPI(activity);
     }
 
     /**
@@ -33,7 +31,6 @@ public class CreateTripController {
         if (!activity.hasChanges()) {
             activity.exitActivity();
         } else {
-            activity.hideKeyboard();
             activity.showAlertDialog(new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -91,28 +88,17 @@ public class CreateTripController {
     }
 
     /**
-     * TODO: Add documentation
-     *
-     * @param textView
-     * @param i
-     */
-    public void setUpPlacesAutofill(AutoCompleteTextView textView, int i) {
-        googlePlacesModel.setUpPlacesAutofill(textView, i);
-    }
-
-    /**
      * Attempts to create a Trip with the information in the views
      */
     public void attemptCreateTrip() {
-        // Get all the information from the views
-        String tripName = activity.getTripNameView().getText().toString();
-        String leavingFrom = googlePlacesModel.getSourceCityJSON().toString();
-        String destination = googlePlacesModel.getDestCityJSON().toString();
-        String transportation = activity.getTransportation().getSelectedItem().toString();
         String creatorId = ParseTripModel.getUser();
 
-        //JSONObject leavingFrom = googlePlacesModel.getSourceCityJSON();
-        //JSONObject destination = googlePlacesModel.getDestCityJSON();
+        // Get all the information from the views
+        String tripName = activity.getTripNameView().getText().toString();
+        String transportation = activity.getTransportation().getSelectedItem().toString();
+
+        JSONObject leavingFrom = GooglePlacesAPI.getJSONFromPlace(activity.getOriginPlace());
+        JSONObject destination = GooglePlacesAPI.getJSONFromPlace(activity.getDestinationPlace());
 
         Date dateFrom = activity.getCalendarFrom().getTime();
         Date dateTo = activity.getCalendarTo().getTime();
@@ -127,20 +113,12 @@ public class CreateTripController {
             hasError = true;
         }
 
-        if(!googlePlacesModel.isSourceCityValid()) {
-            activity.displayError(activity.getLeavingFromWrapper(), activity.getString(R.string.error_trip_location));
-            hasError = true;
-        }
+        // TODO: Check if location views are empty and display error message
 
-        if(!googlePlacesModel.isDestCityValid()) {
-            activity.displayError(activity.getDestinationWrapper(), activity.getString(R.string.error_trip_location));
-            hasError = true;
-        }
+        if (hasError) return;
 
-        if(hasError) return;
-
-        Trip newTrip = new Trip(tripName, leavingFrom, destination, isPrivate,
-                dateFrom, dateTo, transportation, creatorId);
+        Trip newTrip = new Trip(tripName, creatorId, transportation, leavingFrom,
+                destination, isPrivate, dateFrom, dateTo);
 
         finalizeTripCheck(newTrip);
     }

@@ -42,6 +42,7 @@ public class TripActivity extends AppCompatActivity {
         mController = new TripController(this);
 
         initUI();
+
         mFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,7 +51,6 @@ public class TripActivity extends AppCompatActivity {
         });
 
         mController = new TripController(this);
-
         mController.setGooglePlacePhoto(mHeaderImageView);
     }
 

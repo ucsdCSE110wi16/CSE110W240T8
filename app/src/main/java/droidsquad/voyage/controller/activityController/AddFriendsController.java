@@ -4,28 +4,18 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.parse.FindCallback;
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
-
-import droidsquad.voyage.R;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
+import droidsquad.voyage.R;
 import droidsquad.voyage.model.ParseTripModel;
-import droidsquad.voyage.model.objects.Trip;
-import droidsquad.voyage.view.activity.AddFriendsActivity;
 import droidsquad.voyage.model.adapters.FBFriendsAdapter;
+import droidsquad.voyage.model.adapters.SelectedFBFriendsAdapter;
 import droidsquad.voyage.model.api.FacebookAPI;
 import droidsquad.voyage.model.objects.FacebookUser;
-import droidsquad.voyage.model.adapters.SelectedFBFriendsAdapter;
+import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.view.activity.AddFriendsActivity;
 
 public class AddFriendsController {
     private AddFriendsActivity mActivity;
@@ -127,7 +117,7 @@ public class AddFriendsController {
             fbIDs.add(user.id);
         }
 
-        ParseTripModel.saveInvitees(mTrip.getTripId(), fbIDs, new ParseTripModel.TripASyncTaskCallback() {
+        ParseTripModel.saveInvitees(mTrip.getId(), fbIDs, new ParseTripModel.TripASyncTaskCallback() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Successfully added friends");

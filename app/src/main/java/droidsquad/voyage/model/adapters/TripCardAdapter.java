@@ -1,7 +1,5 @@
 package droidsquad.voyage.model.adapters;
 
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,26 +12,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.parse.DeleteCallback;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.view.activity.TripActivity;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.view.activity.TripActivity;
 
 public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHolder> {
     private static final String TAG = TripCardAdapter.class.getSimpleName();
@@ -81,15 +75,13 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Trip trip = this.trips.get(position);
+        final Trip trip = trips.get(position);
 
         holder.mName.setText(trip.getName());
 
         try {
-            JSONObject origin = new JSONObject(trip.getOrigin());
-            JSONObject dest = new JSONObject(trip.getDestination());
-
-            holder.mCities.setText(origin.get("city") + " –> " + dest.get("city"));
+            holder.mCities.setText(
+                    trip.getOrigin().get("city") + " –> " + trip.getDestination().get("city"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -107,12 +99,10 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             case "Car":
                 holder.mTransportationIcon.setImageResource(R.drawable.ic_car);
                 break;
-
             case "Bus":
                 holder.mTransportationIcon.setImageResource(R.drawable.ic_bus);
                 break;
-
-            default :
+            default:
                 holder.mTransportationIcon.setImageResource(R.drawable.ic_flight);
                 break;
         }
@@ -139,7 +129,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                 deleteAlert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
-                        query.getInBackground(trip.getTripId(), new GetCallback<ParseObject>() {
+                        query.getInBackground(trip.getId(), new GetCallback<ParseObject>() {
                             public void done(ParseObject object, ParseException e) {
                                 if (e == null) {
                                     Log.d(TAG, "Query success!");
