@@ -75,12 +75,16 @@ public class CreateTripActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FROM_PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             Place place = handlePlaceSelected(resultCode, data);
-            mLeavingFromView.setText(place.getAddress());
-            mOriginPlace = place;
+            if (place != null) {
+                mLeavingFromView.setText(place.getAddress());
+                mOriginPlace = place;
+            }
         } else if (requestCode == TO_PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             Place place = handlePlaceSelected(resultCode, data);
-            mDestinationView.setText(place.getAddress());
-            mDestinationPlace = place;
+            if (place != null) {
+                mDestinationView.setText(place.getAddress());
+                mDestinationPlace = place;
+            }
         }
     }
 
@@ -223,6 +227,8 @@ public class CreateTripActivity extends AppCompatActivity {
             Status status = PlaceAutocomplete.getStatus(this, data);
             // TODO: Handle the error.
             Log.i(TAG, status.getStatusMessage());
+        } else if (resultCode == RESULT_CANCELED) {
+            // The user canceled the operation.
         }
         return place;
     }

@@ -97,12 +97,6 @@ public class CreateTripController {
         String tripName = activity.getTripNameView().getText().toString();
         String transportation = activity.getTransportation().getSelectedItem().toString();
 
-        JSONObject leavingFrom = GooglePlacesAPI.getJSONFromPlace(activity.getOriginPlace());
-        JSONObject destination = GooglePlacesAPI.getJSONFromPlace(activity.getDestinationPlace());
-
-        Date dateFrom = activity.getCalendarFrom().getTime();
-        Date dateTo = activity.getCalendarTo().getTime();
-
         boolean isPrivate = activity.getPrivateView().isChecked();
         boolean hasError = false;
 
@@ -114,8 +108,21 @@ public class CreateTripController {
         }
 
         // TODO: Check if location views are empty and display error message
+        if (activity.getOriginPlace() == null) {
+            hasError = true;
+        }
+
+        if (activity.getDestinationPlace() == null) {
+            hasError = true;
+        }
 
         if (hasError) return;
+
+        JSONObject leavingFrom = GooglePlacesAPI.getJSONFromPlace(activity.getOriginPlace());
+        JSONObject destination = GooglePlacesAPI.getJSONFromPlace(activity.getDestinationPlace());
+
+        Date dateFrom = activity.getCalendarFrom().getTime();
+        Date dateTo = activity.getCalendarTo().getTime();
 
         Trip newTrip = new Trip(tripName, creatorId, transportation, leavingFrom,
                 destination, isPrivate, dateFrom, dateTo);

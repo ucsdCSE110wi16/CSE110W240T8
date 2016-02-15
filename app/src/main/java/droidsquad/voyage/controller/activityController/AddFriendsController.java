@@ -29,7 +29,7 @@ public class AddFriendsController {
     public AddFriendsController(AddFriendsActivity activity) {
         mActivity = activity;
 
-        mTrip = (Trip) activity.getIntent().getSerializableExtra(
+        mTrip = activity.getIntent().getParcelableExtra(
                 activity.getString(R.string.intent_key_trip));
 
         mResultsAdapter = new FBFriendsAdapter(activity);
