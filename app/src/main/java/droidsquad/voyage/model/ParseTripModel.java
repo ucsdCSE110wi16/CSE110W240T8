@@ -102,6 +102,7 @@ public class ParseTripModel {
                     dateFrom, dateTo, transportation, creatorId);
 
             trip.setTripId(parseTrip.getObjectId());
+            getAllMembers(trip);
             allMyTrips.add(trip);
         }
 
@@ -129,6 +130,12 @@ public class ParseTripModel {
         });
     }
 
+    /**
+     * Gets the associated FB Users from Parse to set up Invitee Relations
+     * @param parseTrip
+     * @param fbIDs
+     * @param callback
+     */
     private static void getFBUsers(final ParseObject parseTrip, ArrayList<String> fbIDs, final TripASyncTaskCallback callback) {
         ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
         userQuery.whereContainedIn("fbId", fbIDs);
@@ -146,6 +153,12 @@ public class ParseTripModel {
         });
     }
 
+    /**
+     * Add members to the Invitee Relation of a trip in Parse
+     * @param objects
+     * @param parseTrip
+     * @param callback
+     */
     private static void setUpInviteeRelations(List<ParseUser> objects, ParseObject parseTrip, final TripASyncTaskCallback callback) {
         ParseRelation<ParseUser> relation = parseTrip.getRelation("invitees");
         for (ParseUser user: objects) {
@@ -172,6 +185,36 @@ public class ParseTripModel {
             default:
                 return Constants.ERROR_UNKNOWN;
         }
+    }
+
+    /**
+     * Gets all current members of a trip from Parse
+     * @param trip
+     */
+    public static void getAllMembers(final Trip trip) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
+        query.whereEqualTo("objectId", trip.getTripId());
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                for(ParseObject tripObj : objects) {
+                    ParseRelation<ParseObject> relation = tripObj.getRelation("members");
+                    ParseQuery<ParseObject> query = relation.getQuery();
+                    query.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> objects, ParseException e) {
+                            ArrayList<String> members = new ArrayList<String>();
+                            for(ParseObject member: objects) {
+                                //Log.d(TAG, "Trip User Added: " + member.getObjectId());
+                                members.add(member.getObjectId());
+                            }
+                            trip.setAllParticipants(members);
+                        }
+                    });
+                }
+
+            }
+        });
     }
 
     /**
