@@ -204,12 +204,18 @@ public class ParseTripModel {
                     query.findInBackground(new FindCallback<ParseObject>() {
                         @Override
                         public void done(List<ParseObject> objects, ParseException e) {
-                            ArrayList<String> members = new ArrayList<String>();
-                            for(ParseObject member: objects) {
-                                //Log.d(TAG, "Trip User Added: " + (String)member.get("fbId"));
-                                members.add((String)member.get("fbId"));
+                            if(e == null) {
+                                ArrayList<String> members = new ArrayList<>();
+                                for (ParseObject member : objects) {
+                                    Log.d(TAG, "Trip User Added to Trip: " + (String)member.get("fbId"));
+                                    members.add((String) member.get("fbId"));
+                                }
+                                trip.setAllParticipants(members);
                             }
-                            trip.setAllParticipants(members);
+                            else {
+                                Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                                        + " Message: " + e.getMessage());
+                            }
                         }
                     });
                 }
