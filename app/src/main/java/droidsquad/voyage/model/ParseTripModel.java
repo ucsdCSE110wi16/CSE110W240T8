@@ -206,8 +206,8 @@ public class ParseTripModel {
                         public void done(List<ParseObject> objects, ParseException e) {
                             ArrayList<String> members = new ArrayList<String>();
                             for(ParseObject member: objects) {
-                                //Log.d(TAG, "Trip User Added: " + member.getObjectId());
-                                members.add(member.getObjectId());
+                                //Log.d(TAG, "Trip User Added: " + (String)member.get("fbId"));
+                                members.add((String)member.get("fbId"));
                             }
                             trip.setAllParticipants(members);
                         }
