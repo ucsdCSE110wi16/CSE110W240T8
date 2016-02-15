@@ -25,6 +25,7 @@ public class RequestsController {
         setOnAdapterEmptyListener();
 
         mFragment.showProgress(true);
+        mFragment.refreshing(true);
         fetchData();
     }
 
@@ -95,11 +96,13 @@ public class RequestsController {
         });
     }
 
-    private void fetchData() {
+    public void fetchData() {
         ParseRequestModel.fetchRequests(new ParseRequestModel.OnRequestsReceivedCallback() {
             @Override
             public void onSuccess(List<Request> requests) {
+                Log.d(TAG, "Requests received. Got " + requests.size() + " requests.");
                 mFragment.showProgress(false);
+                mFragment.refreshing(false);
                 mFragment.showNoRequestsView(false);
                 mAdapter.updateAdapter(requests);
             }
@@ -107,7 +110,9 @@ public class RequestsController {
             @Override
             public void onFailure(String error) {
                 // TODO
+                Log.d(TAG, "Requests not received. Error: " + error);
                 mFragment.showProgress(false);
+                mFragment.refreshing(false);
             }
         });
     }

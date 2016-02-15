@@ -1,6 +1,5 @@
 package droidsquad.voyage.controller.activityController;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.ImageView;
@@ -11,10 +10,10 @@ import org.json.JSONObject;
 import java.util.Date;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.view.activity.AddFriendsActivity;
-import droidsquad.voyage.view.activity.TripActivity;
 import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.view.activity.AddFriendsActivity;
+import droidsquad.voyage.view.activity.TripActivity;
 
 public class TripController {
     private static final String TAG = TripController.class.getSimpleName();

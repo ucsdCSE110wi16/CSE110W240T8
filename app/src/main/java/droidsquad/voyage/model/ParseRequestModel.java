@@ -83,7 +83,7 @@ public class ParseRequestModel {
                 for (ParseUser user : users) {
                     for (Request request : requests) {
                         if (user.getObjectId().equals(request.hostId)) {
-                            request.hostName = (String) user.get("firstName") + " " +
+                            request.hostName = user.get("firstName") + " " +
                                     user.get("lastName");
 
                             request.hostPicURL = String.format(

@@ -2,8 +2,10 @@ package droidsquad.voyage.view.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +16,12 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.controller.fragmentController.RequestsController;
 
 public class RequestsFragment extends Fragment {
+    private static final String TAG = RequestsFragment.class.getSimpleName();
     private RequestsController mController;
     private RecyclerView mRequestsRecyclerView;
     private ProgressBar mProgressBar;
     private LinearLayout mNoRequestsView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,6 +41,14 @@ public class RequestsFragment extends Fragment {
         mRequestsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRequestsRecyclerView.setAdapter(mController.getAdapter());
 
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.d(TAG, "Refreshing requests");
+                mController.fetchData();
+            }
+        });
+
         return view;
     }
 
@@ -44,25 +56,24 @@ public class RequestsFragment extends Fragment {
         mRequestsRecyclerView = (RecyclerView) view.findViewById(R.id.requests_recycler_view);
         mProgressBar = (ProgressBar) view.findViewById(R.id.requests_progress_bar);
         mNoRequestsView = (LinearLayout) view.findViewById(R.id.no_requests_view);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
     }
 
     public void showProgress(boolean show) {
         if (show) {
-            mRequestsRecyclerView.setVisibility(View.GONE);
+            mSwipeRefreshLayout.setVisibility(View.GONE);
             mProgressBar.setVisibility(View.VISIBLE);
         } else {
-            mRequestsRecyclerView.setVisibility(View.VISIBLE);
+            mSwipeRefreshLayout.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(View.GONE);
         }
     }
 
     public void showNoRequestsView(boolean show) {
-        if (show) {
-            mNoRequestsView.setVisibility(View.VISIBLE);
-            mRequestsRecyclerView.setVisibility(View.GONE);
-        } else {
-            mNoRequestsView.setVisibility(View.GONE);
-            mRequestsRecyclerView.setVisibility(View.VISIBLE);
-        }
+        mNoRequestsView.setVisibility((show) ? View.VISIBLE : View.GONE);
+    }
+
+    public void refreshing(boolean b) {
+        mSwipeRefreshLayout.setRefreshing(b);
     }
 }

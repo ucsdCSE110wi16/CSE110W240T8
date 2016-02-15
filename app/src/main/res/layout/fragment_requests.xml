@@ -4,21 +4,19 @@
     android:layout_height="match_parent"
     tools:context="droidsquad.voyage.view.fragment.RequestsFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/requests_recycler_view"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent">
 
-    <ProgressBar
-        android:id="@+id/requests_progress_bar"
-        style="?android:progressBarStyleLarge"
-        android:indeterminate="true"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/requests_recycler_view"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:id="@+id/no_requests_view"
@@ -38,5 +36,14 @@
             android:layout_height="wrap_content"
             android:text="@string/label_no_requests"/>
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/requests_progress_bar"
+        style="?android:progressBarStyleLarge"
+        android:indeterminate="true"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
 </RelativeLayout>

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,8 +15,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.activityController.AddFriendsController;
 import droidsquad.voyage.controller.AutoWrappingLinearLayoutManager;
+import droidsquad.voyage.controller.activityController.AddFriendsController;
 
 public class AddFriendsActivity extends AppCompatActivity {
     private AddFriendsController controller;

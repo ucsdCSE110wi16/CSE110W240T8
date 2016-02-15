@@ -5,11 +5,11 @@ import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.view.activity.LoginActivity;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 import droidsquad.voyage.view.fragment.RequestsFragment;
 import droidsquad.voyage.view.fragment.TripListFragment;
-import droidsquad.voyage.model.objects.VoyageUser;
 
 /**
  * Controls the MainNavDrawerActivity. Basically just handles user interaction with the nav drawer,

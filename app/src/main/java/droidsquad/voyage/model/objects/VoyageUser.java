@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import droidsquad.voyage.R;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 
@@ -58,7 +57,7 @@ public class VoyageUser {
                     }
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "first_name,last_name,gender,id,friends");
+        parameters.putString("fields", "first_name,last_name,gender,id");
         request.setParameters(parameters);
         request.executeAsync();
 
