@@ -121,6 +121,8 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             case 1:
                 holder.mMember4.setVisibility(View.GONE);
                 break;
+            case 0:
+                break;
             default:
                 holder.mOtherMembers.setVisibility(View.VISIBLE);
                 String s = "... +" + (numMembers - 4);

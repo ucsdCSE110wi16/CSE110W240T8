@@ -66,7 +66,7 @@ public class ParseTripModel {
      */
     public static void searchForAllTrips(final ParseTripCallback callback) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
-        query.whereEqualTo("creatorId", ParseUser.getCurrentUser().getObjectId());
+        query.whereEqualTo("members", ParseUser.getCurrentUser().getObjectId());
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -110,10 +110,20 @@ public class ParseTripModel {
         callback.onCompleted(allMyTrips);
     }
 
+    /**
+     * Gt the Parse object ID for the current user
+     * @return
+     */
     public static String getUser() {
         return ParseUser.getCurrentUser().getObjectId();
     }
 
+    /**
+     * Save the invitees to Parse
+     * @param tripObjId
+     * @param fbIDs
+     * @param callback
+     */
     public static void saveInvitees(String tripObjId, final ArrayList<String> fbIDs, final TripASyncTaskCallback callback) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
         query.getInBackground(tripObjId, new GetCallback<ParseObject>() {
@@ -179,6 +189,11 @@ public class ParseTripModel {
         });
     }
 
+    /**
+     * Get the parse error String according to the code
+     * @param code
+     * @return
+     */
     private static String getParseErrorString(int code) {
         switch (code) {
             case 100:
