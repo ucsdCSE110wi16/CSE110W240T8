@@ -1,16 +1,24 @@
 package droidsquad.voyage.controller.activityController;
 
+
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.CreateTripActivity;
 import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.ParseTripModel;
@@ -19,12 +27,18 @@ import droidsquad.voyage.model.objects.Trip;
 public class CreateTripController {
     private CreateTripActivity activity;
     private GooglePlacesAPI googlePlacesModel;
+    private Trip trip;
     private boolean edit = false;
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
+    private Calendar calendarFrom;
+    private Calendar calendarTo;
 
     public CreateTripController(CreateTripActivity activity) {
         this.activity = activity;
         googlePlacesModel = new GooglePlacesAPI(activity);
         // determine whether this is an editing activity or not
+        trip = (Trip) activity.getIntent().getSerializableExtra(
+                activity.getString(R.string.intent_key_trip));
         edit = activity.getIntent().getBooleanExtra(activity.getString(R.string.edit_trip), edit);
     }
 
@@ -51,6 +65,14 @@ public class CreateTripController {
     }
 
     /**
+     * Update the dates views to display current state of calendars
+     */
+    private void updateDateViews() {
+        activity.getDateFromView().setText(dateFormat.format(calendarFrom.getTime()));
+        activity.getDateToView().setText(dateFormat.format(calendarTo.getTime()));
+    }
+
+    /**
      * Shows the date picker dialog and updates the calendar with date selected
      *
      * @param calendar Calendar to be contain date selected
@@ -59,8 +81,6 @@ public class CreateTripController {
         activity.showDatePickerDialog(new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                Calendar calendarFrom = activity.getCalendarFrom();
-                Calendar calendarTo = activity.getCalendarTo();
 
                 if (calendar.equals(calendarFrom)) {
                     long previousDateTime = calendarFrom.getTimeInMillis();
@@ -75,7 +95,7 @@ public class CreateTripController {
                     calendar.set(year, monthOfYear, dayOfMonth);
                 }
 
-                activity.updateDateViews();
+                updateDateViews();
             }
         }, calendar);
     }
@@ -87,9 +107,9 @@ public class CreateTripController {
      * @return {long} The minimum date allowed in Millis
      */
     public long getMinDateAllowed(Calendar calendar) {
-        return (calendar.equals(activity.getCalendarFrom()))
+        return (calendar.equals(calendarFrom))
                 ? System.currentTimeMillis() - 1000
-                : activity.getCalendarFrom().getTimeInMillis() - 1000;
+                : calendarFrom.getTimeInMillis() - 1000;
     }
 
     /**
@@ -128,8 +148,8 @@ public class CreateTripController {
         String transportation = activity.getTransportation().getSelectedItem().toString();
         String creatorId = ParseTripModel.getUser();
 
-        Date dateFrom = activity.getCalendarFrom().getTime();
-        Date dateTo = activity.getCalendarTo().getTime();
+        Date dateFrom = calendarFrom.getTime();
+        Date dateTo = calendarTo.getTime();
 
         boolean isPrivate = activity.getPrivateView().isChecked();
         boolean hasError = hasError(tripName, leavingFrom, destination, transportation, creatorId,
@@ -141,6 +161,87 @@ public class CreateTripController {
                 dateFrom, dateTo, transportation, creatorId);
 
         finalizeTripCheck(newTrip);
+    }
+
+    /**
+     * Populates UI depending on whether the trip is being created or edited
+     */
+    public void populateUI() {
+        initTextFields();
+        initDatePickers();
+    }
+
+    private void initTextFields() {
+        if (isEditing()) {
+            Trip trip = getTrip();
+            activity.getTripNameView().setText(trip.getName());
+            activity.getPrivateView().setChecked(trip.isPrivate());
+
+            int pos = 0;
+            String[] transportationMethods = activity.getResources().getStringArray(R.array.array_transportation_modes);
+            for (int i = 0; i < transportationMethods.length; i++) {
+                if (trip.getTransportation().equals(transportationMethods[i])) {
+                    pos = i;
+                    break;
+                }
+            }
+            activity.getTransportation().setSelection(pos);
+
+            try {
+                JSONObject origin = new JSONObject(trip.getOrigin());
+                JSONObject dest = new JSONObject(trip.getDestination());
+
+                activity.getLeavingFromView().setText(origin.get("address").toString());
+                activity.getDestinationView().setText(dest.get("address").toString());
+
+                googlePlacesModel.setmSourceID(origin.get("placeId").toString());
+                googlePlacesModel.setmSourceCityName(origin.get("city").toString());
+                googlePlacesModel.setmSourceCityFullAddress(origin.get("address").toString());
+
+                googlePlacesModel.setmDestID(dest.get("placeId").toString());
+                googlePlacesModel.setmDestCityName(dest.get("city").toString());
+                googlePlacesModel.setmDestCityFullAddress(dest.get("address").toString());
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Set up default dates on the date pickers
+     */
+    private void initDatePickers() {
+
+        calendarFrom = Calendar.getInstance();
+        calendarTo = Calendar.getInstance();
+
+        if(isEditing()) {
+            Trip trip = getTrip();
+            calendarFrom.setTimeInMillis(trip.getDateFrom().getTime());
+            calendarTo.setTimeInMillis(trip.getDateTo().getTime());
+        }
+        else {
+
+            calendarTo.add(Calendar.DAY_OF_WEEK, Constants.DEFAULT_TRIP_LENGTH);
+        }
+
+        activity.getDateFromView().setText(dateFormat.format(calendarFrom.getTime()));
+        activity.getDateToView().setText(dateFormat.format(calendarTo.getTime()));
+
+        activity.getDateFromView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDateDialog(calendarFrom);
+            }
+        });
+        activity.getDateToView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDateDialog(calendarTo);
+            }
+        });
     }
 
     private boolean hasError(String tripName, String leavingFrom,String destination, String
@@ -231,4 +332,13 @@ public class CreateTripController {
         // TODO else : stay on the same page and show snackBar with error and button to retry.
         // for reference for snackBar with button you can look at LoginActivity.java
     }
+
+    public Trip getTrip() {
+        return trip;
+    }
+
+    public boolean isEditing() {
+        return edit;
+    }
+
 }

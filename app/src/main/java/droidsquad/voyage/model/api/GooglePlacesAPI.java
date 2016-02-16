@@ -239,4 +239,27 @@ public class GooglePlacesAPI implements
 
     }
 
+    public void setmSourceCityName(String mSourceCityName) {
+        this.mSourceCityName = mSourceCityName;
+    }
+
+    public void setmDestCityName(String mDestCityName) {
+        this.mDestCityName = mDestCityName;
+    }
+
+    public void setmSourceCityFullAddress(String mSourceCityFullAddress) {
+        this.mSourceCityFullAddress = mSourceCityFullAddress;
+    }
+
+    public void setmDestCityFullAddress(String mDestCityFullAddress) {
+        this.mDestCityFullAddress = mDestCityFullAddress;
+    }
+
+    public void setmSourceID(String mSourceID) {
+        this.mSourceID = mSourceID;
+    }
+
+    public void setmDestID(String mDestID) {
+        this.mDestID = mDestID;
+    }
 }

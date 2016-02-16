@@ -17,12 +17,17 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.activityController.CreateTripController;
+import droidsquad.voyage.model.api.GooglePlacesAPI;
+import droidsquad.voyage.model.objects.Trip;
 
 public class CreateTripActivity extends AppCompatActivity {
     private CreateTripController controller;
@@ -43,11 +48,7 @@ public class CreateTripActivity extends AppCompatActivity {
     private CheckBox mPrivateView;
     private Spinner mTransportation;
 
-    private Calendar calendarFrom;
-    private Calendar calendarTo;
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
-    private static final int DEFAULT_TRIP_LENGTH = 7;
     private static final String TAG = CreateTripActivity.class.getSimpleName();
 
     @Override
@@ -100,18 +101,10 @@ public class CreateTripActivity extends AppCompatActivity {
         // TODO: Listen for text changes on mTripNameView and clear the error when it changes
         // Clear error by calling mTripNameErrorView.setVisibility(View.GONE);
 
-        populateUI();
+        controller.populateUI();
 
     }
 
-    /**
-     * Populates UI depending on whether the trip is being created or edited
-     */
-    private void populateUI() {
-
-        initDatePickers();
-
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -129,30 +122,6 @@ public class CreateTripActivity extends AppCompatActivity {
         controller.attemptClose();
     }
 
-    /**
-     * Set up default dates on the date pickers
-     */
-    private void initDatePickers() {
-        calendarFrom = Calendar.getInstance();
-        calendarTo = Calendar.getInstance();
-        calendarTo.add(Calendar.DAY_OF_WEEK, DEFAULT_TRIP_LENGTH);
-        mDateFromView.setText(dateFormat.format(calendarFrom.getTime()));
-        mDateToView.setText(dateFormat.format(calendarTo.getTime()));
-
-        mDateFromView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                controller.showDateDialog(calendarFrom);
-            }
-        });
-
-        mDateToView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                controller.showDateDialog(calendarTo);
-            }
-        });
-    }
 
     /**
      * Hide the soft keyboard
@@ -207,13 +176,6 @@ public class CreateTripActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    /**
-     * Update the dates views to display current state of calendars
-     */
-    public void updateDateViews() {
-        mDateFromView.setText(dateFormat.format(calendarFrom.getTime()));
-        mDateToView.setText(dateFormat.format(calendarTo.getTime()));
-    }
 
     /**
      * Called when the user presses the create trip button
@@ -271,14 +233,6 @@ public class CreateTripActivity extends AppCompatActivity {
 
     public AutoCompleteTextView getDestinationView() {
         return mDestinationView;
-    }
-
-    public Calendar getCalendarFrom() {
-        return calendarFrom;
-    }
-
-    public Calendar getCalendarTo() {
-        return calendarTo;
     }
 
     public Spinner getTransportation() {
