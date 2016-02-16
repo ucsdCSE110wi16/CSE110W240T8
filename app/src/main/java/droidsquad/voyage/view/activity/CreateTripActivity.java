@@ -9,9 +9,12 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -145,11 +148,28 @@ public class CreateTripActivity extends AppCompatActivity {
             }
         });
 
+        // Set the TextChanged listener to clear TripName error messages
+        mTripNameView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                hideError(mTripNameView);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
         // Set the Locations listener to show the PlaceAutocomplete Dialogs
         mLeavingFromView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startPlaceAutocompleteIntent(FROM_PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                hideError(mLeavingFromView);
             }
         });
 
@@ -157,11 +177,10 @@ public class CreateTripActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startPlaceAutocompleteIntent(TO_PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                hideError(mDestinationView);
             }
         });
 
-        // TODO: Listen for text changes on mTripNameView and clear the error when it changes
-        // Clear error by calling mTripNameErrorView.setVisibility(View.GONE);
     }
 
     /**
@@ -313,7 +332,36 @@ public class CreateTripActivity extends AppCompatActivity {
             mTripNameErrorView.setText(error);
             mTripNameErrorView.setVisibility(View.VISIBLE);
         } else {
-            ((TextInputLayout) view).setError(error);
+            ((EditText) view).setError(error);
+        }
+    }
+
+    /**
+     * Hides the error on the given view
+     *
+     * @param view  View to display the error on
+     */
+    public void hideError(View view) {
+        if (view == mTripNameView) {
+            mTripNameErrorView.setVisibility(View.GONE);
+        } else {
+            ((EditText) view).setError(null);
+        }
+    }
+
+    /**
+     * Sets focus on the given view
+     *
+     * @param view  View to display the error on
+     */
+    public void setFocus(View view) {
+        if (view == mTripNameView) {
+            if (mTripNameView.requestFocus()){
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(mTripNameView, InputMethodManager.SHOW_IMPLICIT);
+            }
+        } else {
+            System.out.println("HERE: " + ((EditText) view).getId());
         }
     }
 

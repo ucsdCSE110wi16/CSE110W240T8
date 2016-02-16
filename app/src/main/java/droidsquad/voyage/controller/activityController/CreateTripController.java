@@ -100,19 +100,22 @@ public class CreateTripController {
         boolean isPrivate = activity.getPrivateView().isChecked();
         boolean hasError = false;
 
-        // TODO: Scroll to and set the focus on the first View that has error
         /* Check for errors */
         if (tripName.length() < 3) {
             activity.displayError(activity.getTripNameView(), activity.getString(R.string.error_trip_name));
+            activity.setFocus(activity.getTripNameView());
             hasError = true;
         }
 
-        // TODO: Check if location views are empty and display error message
         if (activity.getOriginPlace() == null) {
+            activity.displayError(activity.getLeavingFromView(), activity.getString(R.string.error_trip_location));
+            activity.setFocus(activity.getLeavingFromView());
             hasError = true;
         }
 
         if (activity.getDestinationPlace() == null) {
+            activity.displayError(activity.getDestinationView(), activity.getString(R.string.error_trip_location));
+            activity.setFocus(activity.getDestinationView());
             hasError = true;
         }
 
