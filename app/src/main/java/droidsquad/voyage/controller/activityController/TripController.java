@@ -1,7 +1,11 @@
 package droidsquad.voyage.controller.activityController;
 
+import android.content.Intent;
 import android.util.Log;
 import android.widget.ImageView;
+
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.PlacePhotoResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,40 +13,46 @@ import org.json.JSONObject;
 import java.util.Date;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.view.activity.TripActivity;
 import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.view.activity.AddFriendsActivity;
+import droidsquad.voyage.view.activity.TripActivity;
 
 public class TripController {
-    private static final String TAG = TripController.class.getSimpleName();
-    private TripActivity activity;
+    private TripActivity mActivity;
     private Trip trip;
 
-    private GooglePlacesAPI mGooglePlacesModel;
-    private JSONObject mOrigin, mDest;
+    private static final String TAG = TripController.class.getSimpleName();
 
     public TripController(TripActivity instance) {
-        this.activity = instance;
-        trip = (Trip) activity.getIntent().getSerializableExtra(
-                activity.getString(R.string.intent_key_trip));
+        this.mActivity = instance;
 
-        try {
-            mOrigin = new JSONObject(trip.getOrigin());
-            mDest = new JSONObject(trip.getDestination());
-        } catch (JSONException e) {
-            Log.d(TAG, "JSON exception occurred: " + e.getMessage());
-        }
-
-        mGooglePlacesModel = new GooglePlacesAPI(activity);
+        trip = mActivity.getIntent().getParcelableExtra(
+                mActivity.getString(R.string.intent_key_trip));
     }
 
-    public void setGooglePlacePhoto(ImageView imageView) {
+    public void setGooglePlacePhoto(final ImageView imageView) {
         try {
-            String placeID = (String) mDest.get("placeId");
-
             Log.d(TAG, "Attempting to get photo from Google Places");
 
-            mGooglePlacesModel.loadPlaceImage(imageView, placeID, activity);
+            String placeID = trip.getDestination().getString("placeId");
+
+            final GooglePlacesAPI googlePlacesAPI = new GooglePlacesAPI(mActivity);
+            googlePlacesAPI.getPlaceImage(placeID, imageView.getWidth(), imageView.getHeight(),
+                    new ResultCallback<PlacePhotoResult>() {
+                        @Override
+                        public void onResult(PlacePhotoResult placePhotoResult) {
+                            if (!placePhotoResult.getStatus().isSuccess()) {
+                                Log.d(TAG, "Couldn\'t retrieve the photo successfully.");
+                                return;
+                            }
+                            Log.d(TAG, "Successfully retrieved photo from photo bundle.");
+
+                            imageView.setImageBitmap(placePhotoResult.getBitmap());
+                            mActivity.setColors();
+                            googlePlacesAPI.disconnectGoogleAPIClient();
+                        }
+                    });
         } catch (JSONException e) {
             Log.d(TAG, "JSONException occurred: " + e.getMessage());
         }
@@ -73,7 +83,7 @@ public class TripController {
     public String getOrigin() {
         String origin = "";
         try {
-            origin = mOrigin.get("city").toString();
+            origin = trip.getOrigin().get("city").toString();
         } catch (JSONException e) {
             Log.d(TAG, "JSON exception occurred: " + e.getMessage());
         }
@@ -84,12 +94,18 @@ public class TripController {
     public String getDestination() {
         String destination = "";
         try {
-            destination = mDest.get("city").toString();
+            destination = trip.getDestination().get("city").toString();
         } catch (JSONException e) {
             Log.d(TAG, "JSON exception occurred: " + e.getMessage());
         }
 
         return destination;
+    }
+
+    public void launchAddFriends() {
+        Intent intent = new Intent(mActivity, AddFriendsActivity.class);
+        intent.putExtra(mActivity.getString(R.string.intent_key_trip), trip);
+        mActivity.startActivity(intent);
     }
 
     public CharSequence getTitle() {
@@ -100,6 +116,6 @@ public class TripController {
      * Called to start editing the trip
      */
     public void editTrip() {
-        activity.editTripIntent(this.trip);
+        mActivity.editTripIntent(this.trip);
     }
 }

@@ -31,17 +31,8 @@
         <item>Female</item>
         <item>Other</item>
     </string-array>
-    <string name="error_empty_mobile_num">Please enter a mobile number</string>
-    <string name="error_invalid_mobile_num">Please enter a valid mobile number</string>
-    <string name="error_short_password">Password should be at least 8 characters</string>
-    <string name="error_password_lowercase">Password must contain at least 1 lowercase character</string>
-    <string name="error_password_uppercase">Password must contain at least 1 uppercase character</string>
-    <string name="error_password_number">Password must contain at least 1 number</string>
-    <string name="error_email_already_taken">That email is already taken</string>
-    <string name="error_unkown">Something went wrong. Please try again in a while.</string>
     <string name="title_activity_blah">BlahActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
-    <string name="error_no_internet_connection">No connection.</string>
     <string name="label_login_facebook">Continue with Facebook</string>
     <string name="label_sign_up_facebook">Sign Up with Facebook</string>
 
@@ -63,8 +54,8 @@
     <string name="help_trip_private">Only members who you invite will see this trip.</string>
     <string name="help_trip_public">This trip will be visible to all your friends.</string>
     <string name="create_trip_alert_dialog_message">Are you sure you want to discard the changes?</string>
-    <string name="error_trip_name">"Name must be at least 3 character long"</string>
-    <string name="error_trip_location">"Please enter a valid location"</string>
+    <string name="error_trip_name">Name must be at least 3 character long</string>
+    <string name="error_trip_location">Please enter a valid location</string>
 
     <string-array name="array_transportation_modes">
         <item>Plane</item>
@@ -74,7 +65,6 @@
 
     - See more at: http://www.ahotbrew.com/android-dropdown-spinner-example/#sthash.TShO44xy.dpuf
     <string name="title_activity_trip_list">TripListActivity</string>
-    <string name="title_activity_pending_invitations">Pending Invitations</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -94,4 +84,16 @@
     <string name="error_overlap">You have an overlap with another existing trip:&#160;</string>
     <string name="error_overlap_continue">. Do you want to continue?</string>
     <string name="edit_trip">edit_trip</string>
+
+    <!-- Deletion alert dialog-->
+    <string name="delete_alert">Are you sure you want to delete this trip?</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="label_requests_fragment">Requests</string>
+    <string name="request_message_template">invited you to join %1$s</string>
+    <string name="label_trip_list_fragment">My Trips</string>
+    <string name="snackbar_request_accepted">Request Accepted</string>
+    <string name="snackbar_request_declined">Request Declined</string>
+    <string name="label_no_requests">No requests as of now. Stay optimistic.</string>
 </resources>

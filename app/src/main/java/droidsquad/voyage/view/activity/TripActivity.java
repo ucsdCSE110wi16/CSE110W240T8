@@ -43,14 +43,15 @@ public class TripActivity extends AppCompatActivity {
         mController = new TripController(this);
 
         initUI();
+
         mFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(TripActivity.this, AddFriendsActivity.class);
-                startActivity(intent);
+                mController.launchAddFriends();
             }
         });
 
+        mController = new TripController(this);
         mController.setGooglePlacePhoto(mHeaderImageView);
     }
 

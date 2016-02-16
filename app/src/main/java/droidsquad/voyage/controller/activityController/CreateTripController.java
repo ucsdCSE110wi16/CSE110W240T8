@@ -12,6 +12,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import android.widget.DatePicker;
+import android.widget.Toast;
+
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,7 +54,6 @@ public class CreateTripController {
         if (!activity.hasChanges()) {
             activity.exitActivity();
         } else {
-            activity.hideKeyboard();
             activity.showAlertDialog(new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -113,16 +117,6 @@ public class CreateTripController {
     }
 
     /**
-     * TODO: Add documentation
-     *
-     * @param textView
-     * @param i
-     */
-    public void setUpPlacesAutofill(AutoCompleteTextView textView, int i) {
-        googlePlacesModel.setUpPlacesAutofill(textView, i);
-    }
-
-    /**
      * Attempts to create a Trip with the information in the views
      */
     public void attemptSaveTrip() {
@@ -141,24 +135,28 @@ public class CreateTripController {
     }
 
     private void attemptCreateTrip() {
+        String creatorId = ParseTripModel.getUser();
+
         // Get all the information from the views
         String tripName = activity.getTripNameView().getText().toString();
-        String leavingFrom = googlePlacesModel.getSourceCityJSON().toString();
-        String destination = googlePlacesModel.getDestCityJSON().toString();
         String transportation = activity.getTransportation().getSelectedItem().toString();
-        String creatorId = ParseTripModel.getUser();
 
         Date dateFrom = calendarFrom.getTime();
         Date dateTo = calendarTo.getTime();
 
         boolean isPrivate = activity.getPrivateView().isChecked();
-        boolean hasError = hasError(tripName, leavingFrom, destination, transportation, creatorId,
+
+        // TODO: refactor, see hasError()
+        boolean hasError = hasError(tripName, "", "", transportation, creatorId,
                 dateFrom, dateTo);
 
         if(hasError) return;
 
-        Trip newTrip = new Trip(tripName, leavingFrom, destination, isPrivate,
-                dateFrom, dateTo, transportation, creatorId);
+        JSONObject leavingFrom = GooglePlacesAPI.getJSONFromPlace(activity.getOriginPlace());
+        JSONObject destination = GooglePlacesAPI.getJSONFromPlace(activity.getDestinationPlace());
+
+        Trip newTrip = new Trip(tripName, creatorId, transportation, leavingFrom, destination, isPrivate,
+                dateFrom, dateTo);
 
         finalizeTripCheck(newTrip);
     }
@@ -188,19 +186,12 @@ public class CreateTripController {
             activity.getTransportation().setSelection(pos);
 
             try {
-                JSONObject origin = new JSONObject(trip.getOrigin());
-                JSONObject dest = new JSONObject(trip.getDestination());
+                JSONObject origin = trip.getOrigin();
+                JSONObject dest = trip.getDestination();
 
                 activity.getLeavingFromView().setText(origin.get("address").toString());
                 activity.getDestinationView().setText(dest.get("address").toString());
 
-                googlePlacesModel.setmSourceID(origin.get("placeId").toString());
-                googlePlacesModel.setmSourceCityName(origin.get("city").toString());
-                googlePlacesModel.setmSourceCityFullAddress(origin.get("address").toString());
-
-                googlePlacesModel.setmDestID(dest.get("placeId").toString());
-                googlePlacesModel.setmDestCityName(dest.get("city").toString());
-                googlePlacesModel.setmDestCityFullAddress(dest.get("address").toString());
 
 
             } catch (JSONException e) {
@@ -244,25 +235,28 @@ public class CreateTripController {
         });
     }
 
+    // TODO: remove redundant inputs
     private boolean hasError(String tripName, String leavingFrom,String destination, String
             transportation, String creatorId, Date dateFrom, Date dateTo) {
 
         boolean hasError = false;
 
-        // TODO: Scroll to and set the focus on the first View that has error
         /* Check for errors */
         if (tripName.length() < 3) {
             activity.displayError(activity.getTripNameView(), activity.getString(R.string.error_trip_name));
+            activity.setFocus(activity.getTripNameView());
             hasError = true;
         }
 
-        if(!googlePlacesModel.isSourceCityValid()) {
-            activity.displayError(activity.getLeavingFromWrapper(), activity.getString(R.string.error_trip_location));
+        if (activity.getOriginPlace() == null) {
+            activity.displayError(activity.getLeavingFromView(), activity.getString(R.string.error_trip_location));
+            activity.setFocus(activity.getLeavingFromView());
             hasError = true;
         }
 
-        if(!googlePlacesModel.isDestCityValid()) {
-            activity.displayError(activity.getDestinationWrapper(), activity.getString(R.string.error_trip_location));
+        if (activity.getDestinationPlace() == null) {
+            activity.displayError(activity.getDestinationView(), activity.getString(R.string.error_trip_location));
+            activity.setFocus(activity.getDestinationView());
             hasError = true;
         }
 
@@ -318,7 +312,6 @@ public class CreateTripController {
      */
     public void completeSave(Trip newTrip) {
         ParseTripModel.saveTrip(newTrip);
-
         // TODO show progress spinning thingy and wait till the trip has been saved to parse
 
         // if success

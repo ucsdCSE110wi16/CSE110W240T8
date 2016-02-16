@@ -1,5 +1,6 @@
 package droidsquad.voyage.controller.activityController;
 
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
@@ -7,22 +8,29 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import droidsquad.voyage.view.activity.AddFriendsActivity;
+import droidsquad.voyage.R;
+import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.adapters.FBFriendsAdapter;
+import droidsquad.voyage.model.adapters.SelectedFBFriendsAdapter;
 import droidsquad.voyage.model.api.FacebookAPI;
 import droidsquad.voyage.model.objects.FacebookUser;
-import droidsquad.voyage.model.adapters.SelectedFBFriendsAdapter;
+import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.view.activity.AddFriendsActivity;
 
 public class AddFriendsController {
     private AddFriendsActivity mActivity;
     private FBFriendsAdapter mResultsAdapter;
     private SelectedFBFriendsAdapter mSelectedFriendsAdapter;
     private FacebookUser[] friends;
+    private Trip mTrip;
 
     public static final String TAG = AddFriendsController.class.getSimpleName();
 
     public AddFriendsController(AddFriendsActivity activity) {
         mActivity = activity;
+
+        mTrip = activity.getIntent().getParcelableExtra(
+                activity.getString(R.string.intent_key_trip));
 
         mResultsAdapter = new FBFriendsAdapter(activity);
         mSelectedFriendsAdapter = new SelectedFBFriendsAdapter(activity);
@@ -101,8 +109,29 @@ public class AddFriendsController {
         mResultsAdapter.updateResults(queriedFriends);
     }
 
-    private void addFriendsToTrip() {
-        // TODO: Add user in the pending array of the trip and send notification
+    public void addFriendsToTrip() {
+        Log.d(TAG, "Adding " + mSelectedFriendsAdapter.mSelectedUsers.size() + " friends to Trip.");
+        mActivity.showProgress(true);
+        ArrayList<String> fbIDs = new ArrayList<>();
+        for (FacebookUser user : mSelectedFriendsAdapter.mSelectedUsers) {
+            fbIDs.add(user.id);
+        }
+
+        ParseTripModel.saveInvitees(mTrip.getId(), fbIDs, new ParseTripModel.TripASyncTaskCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "Successfully added friends");
+                mActivity.finish();
+            }
+
+            @Override
+            public void onFaliure(String error) {
+                mActivity.showProgress(false);
+                Snackbar snackbar = Snackbar.make(mActivity.findViewById(R.id.selected_friends_card_view),
+                        error, Snackbar.LENGTH_SHORT);
+                snackbar.show();
+            }
+        });
     }
 
     public RecyclerView.Adapter getResultsAdapter() {

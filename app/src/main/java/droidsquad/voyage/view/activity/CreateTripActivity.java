@@ -4,21 +4,28 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -26,8 +33,6 @@ import java.util.Locale;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.activityController.CreateTripController;
-import droidsquad.voyage.model.api.GooglePlacesAPI;
-import droidsquad.voyage.model.objects.Trip;
 
 public class CreateTripActivity extends AppCompatActivity {
     private CreateTripController controller;
@@ -36,19 +41,27 @@ public class CreateTripActivity extends AppCompatActivity {
     private TextInputLayout mDestinationWrapper;
 
     private EditText mTripNameView;
+    private EditText mLeavingFromView;
+    private EditText mDestinationView;
 
     private TextView mDateFromView;
     private TextView mDateToView;
     private TextView mPrivateHelpView;
     private TextView mTripNameErrorView;
 
-    private AutoCompleteTextView mLeavingFromView;
-    private AutoCompleteTextView mDestinationView;
-
     private CheckBox mPrivateView;
     private Spinner mTransportation;
 
+    private Calendar mCalendarFrom;
+    private Calendar mCalendarTo;
 
+    private Place mOriginPlace;
+    private Place mDestinationPlace;
+
+    private static final int DEFAULT_TRIP_LENGTH = 7;
+    private static final int FROM_PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final int TO_PLACE_AUTOCOMPLETE_REQUEST_CODE = 2;
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
     private static final String TAG = CreateTripActivity.class.getSimpleName();
 
     @Override
@@ -57,54 +70,25 @@ public class CreateTripActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_trip);
 
         controller = new CreateTripController(this);
-
         initUI();
     }
 
-    /**
-     * Initialize all the UI elements of this activity
-     */
-    private void initUI() {
-        mTripNameView = (EditText) findViewById(R.id.trip_name);
-        mPrivateView = (CheckBox) findViewById(R.id.private_check);
-        mTransportation = (Spinner) findViewById(R.id.transportation);
-        mLeavingFromView = (AutoCompleteTextView) findViewById(R.id.leaving_from);
-        mDestinationView = (AutoCompleteTextView) findViewById(R.id.destination);
-
-        mDateFromView = (TextView) findViewById(R.id.date_from);
-        mDateToView = (TextView) findViewById(R.id.date_to);
-
-        mPrivateHelpView = (TextView) findViewById(R.id.trip_private_help);
-        mTripNameErrorView = (TextView) findViewById(R.id.trip_name_error);
-
-        mLeavingFromWrapper = (TextInputLayout) findViewById(R.id.leaving_from_wrapper);
-        mDestinationWrapper = (TextInputLayout) findViewById(R.id.destination_wrapper);
-
-        // Set up toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.trip_toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_close);
-        toolbar.setTitle("");
-
-        setSupportActionBar(toolbar);
-
-        controller.setUpPlacesAutofill(mLeavingFromView, 0);
-        controller.setUpPlacesAutofill(mDestinationView, 1);
-
-        // Set Checkbox Listener for changing Help Text
-        mPrivateView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                togglePrivateCheckbox();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == FROM_PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            Place place = handlePlaceSelected(resultCode, data);
+            if (place != null) {
+                mLeavingFromView.setText(place.getAddress());
+                mOriginPlace = place;
             }
-        });
-
-        // TODO: Listen for text changes on mTripNameView and clear the error when it changes
-        // Clear error by calling mTripNameErrorView.setVisibility(View.GONE);
-
-        controller.populateUI();
-
+        } else if (requestCode == TO_PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            Place place = handlePlaceSelected(resultCode, data);
+            if (place != null) {
+                mDestinationView.setText(place.getAddress());
+                mDestinationPlace = place;
+            }
+        }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -122,6 +106,126 @@ public class CreateTripActivity extends AppCompatActivity {
         controller.attemptClose();
     }
 
+    /**
+     * Initialize all the UI elements of this activity
+     */
+    private void initUI() {
+        mTripNameView = (EditText) findViewById(R.id.trip_name);
+        mLeavingFromView = (EditText) findViewById(R.id.leaving_from);
+        mDestinationView = (EditText) findViewById(R.id.destination);
+
+        mDateFromView = (TextView) findViewById(R.id.date_from);
+        mDateToView = (TextView) findViewById(R.id.date_to);
+        mPrivateHelpView = (TextView) findViewById(R.id.trip_private_help);
+        mTripNameErrorView = (TextView) findViewById(R.id.trip_name_error);
+
+        mLeavingFromWrapper = (TextInputLayout) findViewById(R.id.leaving_from_wrapper);
+        mDestinationWrapper = (TextInputLayout) findViewById(R.id.destination_wrapper);
+
+        mPrivateView = (CheckBox) findViewById(R.id.private_check);
+        mTransportation = (Spinner) findViewById(R.id.transportation);
+
+        // Set up toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.trip_toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_close);
+        toolbar.setTitle("");
+
+        setSupportActionBar(toolbar);
+        setOnClickListeners();
+
+        controller.populateUI();
+    }
+
+    /**
+     * Set all the onClickListeners on views of this activity
+     */
+    private void setOnClickListeners() {
+        // Set Checkbox Listener for changing Help Text
+        mPrivateView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                togglePrivateCheckbox();
+            }
+        });
+
+        // Set the TextChanged listener to clear TripName error messages
+        mTripNameView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                hideError(mTripNameView);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        // Set the Locations listener to show the PlaceAutocomplete Dialogs
+        mLeavingFromView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startPlaceAutocompleteIntent(FROM_PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                hideError(mLeavingFromView);
+            }
+        });
+
+        mDestinationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startPlaceAutocompleteIntent(TO_PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                hideError(mDestinationView);
+            }
+        });
+
+    }
+
+    /**
+     * Start the PlaceAutocomplete Intent for the user to selecte a google place
+     *
+     * @param requestCode The request code to be returned after this Intent finishes
+     */
+    private void startPlaceAutocompleteIntent(int requestCode) {
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                .build();
+        try {
+            Intent intent =
+                    new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                            .setFilter(typeFilter)
+                            .build(this);
+            startActivityForResult(intent, requestCode);
+        } catch (GooglePlayServicesRepairableException e) {
+            // TODO: Handle the error.
+        } catch (GooglePlayServicesNotAvailableException e) {
+            // TODO: Handle the error.
+        }
+    }
+
+    /**
+     * Get the Place object once user has selected a place from the dialog
+     *
+     * @param resultCode Activity result from the PlaceAutocomplete Intent response
+     * @param data       The Data from the PlaceAutocomplete Intent
+     * @return The Place object selected by the user
+     */
+    private Place handlePlaceSelected(int resultCode, Intent data) {
+        Place place = null;
+        if (resultCode == RESULT_OK) {
+            place = PlaceAutocomplete.getPlace(this, data);
+            Log.i(TAG, "Place: " + place.getName());
+        } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+            Status status = PlaceAutocomplete.getStatus(this, data);
+            // TODO: Handle the error.
+            Log.i(TAG, status.getStatusMessage());
+        } else if (resultCode == RESULT_CANCELED) {
+            // The user canceled the operation.
+        }
+        return place;
+    }
 
     /**
      * Hide the soft keyboard
@@ -153,6 +257,7 @@ public class CreateTripActivity extends AppCompatActivity {
     public void showAlertDialog(DialogInterface.OnClickListener positiveListener,
                                 DialogInterface.OnClickListener negativeListener,
                                 String message) {
+        hideKeyboard();
         new AlertDialog.Builder(this)
                 .setMessage(message)
                 .setPositiveButton(android.R.string.yes, positiveListener)
@@ -176,7 +281,6 @@ public class CreateTripActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-
     /**
      * Called when the user presses the create trip button
      */
@@ -195,7 +299,36 @@ public class CreateTripActivity extends AppCompatActivity {
             mTripNameErrorView.setText(error);
             mTripNameErrorView.setVisibility(View.VISIBLE);
         } else {
-            ((TextInputLayout) view).setError(error);
+            ((EditText) view).setError(error);
+        }
+    }
+
+    /**
+     * Hides the error on the given view
+     *
+     * @param view  View to display the error on
+     */
+    public void hideError(View view) {
+        if (view == mTripNameView) {
+            mTripNameErrorView.setVisibility(View.GONE);
+        } else {
+            ((EditText) view).setError(null);
+        }
+    }
+
+    /**
+     * Sets focus on the given view
+     *
+     * @param view  View to display the error on
+     */
+    public void setFocus(View view) {
+        if (view == mTripNameView) {
+            if (mTripNameView.requestFocus()){
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(mTripNameView, InputMethodManager.SHOW_IMPLICIT);
+            }
+        } else {
+            System.out.println("HERE: " + ((EditText) view).getId());
         }
     }
 
@@ -227,12 +360,20 @@ public class CreateTripActivity extends AppCompatActivity {
         return mPrivateView;
     }
 
-    public AutoCompleteTextView getLeavingFromView() {
+    public EditText getLeavingFromView() {
         return mLeavingFromView;
     }
 
-    public AutoCompleteTextView getDestinationView() {
+    public EditText getDestinationView() {
         return mDestinationView;
+    }
+
+    public Calendar getCalendarFrom() {
+        return mCalendarFrom;
+    }
+
+    public Calendar getCalendarTo() {
+        return mCalendarTo;
     }
 
     public Spinner getTransportation() {
@@ -253,5 +394,13 @@ public class CreateTripActivity extends AppCompatActivity {
 
     public TextInputLayout getDestinationWrapper() {
         return mDestinationWrapper;
+    }
+
+    public Place getOriginPlace() {
+        return mOriginPlace;
+    }
+
+    public Place getDestinationPlace() {
+        return mDestinationPlace;
     }
 }

@@ -11,6 +11,11 @@
             android:id="@+id/nav_trips"
             android:icon="@drawable/ic_card_travel_black_48dp"
             android:title="Trips" />
+
+        <item
+            android:id="@+id/nav_requests"
+            android:icon="@drawable/ic_request"
+            android:title="Requests" />
     </group>
 
     <group android:id="@+id/group2">

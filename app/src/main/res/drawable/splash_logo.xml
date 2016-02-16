@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:drawable="@color/cardview_light_background" />
+
+    <item
+        android:gravity="center">
+        <!-- TODO Change the src to another drawable with app logo and name (also appropriately sized) -->
+        <bitmap
+            android:gravity="center"
+            android:antialias="true"
+            android:src="@mipmap/ic_launcher" />
+    </item>
+
+</layer-list>
