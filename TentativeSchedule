@@ -27,13 +27,17 @@ Update login - app only uses Facebook login
 Start linking up with FB friends mechanisms
 
 Features Done by WEEK 7:
-Delete trip
+Delete/Edit trip (trip admin only)
 Invite Members to Current Trip
--use Parse user groups to do this
+    - use Parse user groups to do this
+    - FB friends
 Member Request Notifications & Trip Notifications
--user can send trip invitations
-(Maybe) Start on feed activity 
--Use FB API
+    -user can send trip invitations (the trip admin)
+    -user can receive push notifications from other users
+Pending Invitations
+    -accepting/rejecting trip invitations
+(Maybe) Start on feed activity
+    -Use FB API
 
 Features Done by WEEK 8: 1ST MILESTONE: BASELINE
 View Own Trip History
