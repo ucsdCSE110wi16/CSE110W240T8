@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.TripActivity;
@@ -86,7 +87,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         final Trip trip = trips.get(position);
 
         holder.mName.setText(trip.getName());
@@ -107,63 +108,15 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         holder.mPrivateIcon.setVisibility(
                 (trip.isPrivate()) ? View.VISIBLE : View.GONE);
 
-        int numMembers = 0;
-        if(trip.getAllParticipants() != null)
-            numMembers = trip.getAllParticipants().size();
-
-        switch(4 - numMembers) {
-            case 4:
-                holder.mMember1.setVisibility(View.GONE);
-            case 3:
-                holder.mMember2.setVisibility(View.GONE);
-            case 2:
-                holder.mMember3.setVisibility(View.GONE);
-            case 1:
-                holder.mMember4.setVisibility(View.GONE);
-                break;
-            case 0:
-                break;
-            default:
-                holder.mOtherMembers.setVisibility(View.VISIBLE);
-                String s = "... +" + (numMembers - 4);
-                holder.mOtherMembers.setText(s);
-                break;
-        }
-
-        if(trip.getAllParticipants() == null) {
-            Log.d(TAG, "SOMETHING IS WRONG HERE!!");
-            return;
-        }
-
-        ArrayList<String> picURLs = setUpPicURLs(trip);
-        if(picURLs == null) {
-            Log.d(TAG, "ERROR with PicURLs");
-            return;
-        }
-
-        for(int i = 0; i < 4; i++) {
-            if(picURLs.size() == i)
-                break;
-            ImageView currentView;
-            switch(i) {
-                case 3:
-                    currentView = holder.mMember4;
-                    break;
-                case 2:
-                    currentView = holder.mMember3;
-                    break;
-                case 1:
-                    currentView = holder.mMember2;
-                    break;
-                default:
-                    currentView = holder.mMember1;
-                    break;
+        ParseTripModel.setAllMembers(trip, new ParseTripModel.TripASyncTaskCallback() {
+            @Override
+            public void onSuccess() {
+                setMemberPics(trip, holder);
             }
-            Picasso.with(context)
-                    .load(picURLs.get(i))
-                    .placeholder(R.drawable.ic_account_circle_gray)
-                    .into(currentView);
-        }
+
+            @Override
+            public void onFailure(String error) {}
+        });
 
         switch (trip.getTransportation()) {
             case "Car":
@@ -238,16 +191,74 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
 
     }
 
+    private void setMemberPics(Trip trip, ViewHolder holder) {
+        int numMembers = 0;
+        if (trip.getAllParticipants() != null)
+            numMembers = trip.getAllParticipants().size();
+
+        switch (4 - numMembers) {
+            case 4:
+                holder.mMember1.setVisibility(View.GONE);
+            case 3:
+                holder.mMember2.setVisibility(View.GONE);
+            case 2:
+                holder.mMember3.setVisibility(View.GONE);
+            case 1:
+                holder.mMember4.setVisibility(View.GONE);
+                break;
+            case 0:
+                break;
+            default:
+                holder.mOtherMembers.setVisibility(View.VISIBLE);
+                String s = "... +" + (numMembers - 4);
+                holder.mOtherMembers.setText(s);
+                break;
+        }
+
+        if (trip.getAllParticipants() == null) {
+            Log.d(TAG, "SOMETHING IS WRONG HERE!!");
+            return;
+        }
+
+        ArrayList<String> picURLs = setUpPicURLs(trip);
+        if (picURLs == null) {
+            Log.d(TAG, "ERROR with PicURLs");
+            return;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            if (picURLs.size() == i)
+                break;
+            ImageView currentView;
+            switch (i) {
+                case 3:
+                    currentView = holder.mMember4;
+                    break;
+                case 2:
+                    currentView = holder.mMember3;
+                    break;
+                case 1:
+                    currentView = holder.mMember2;
+                    break;
+                default:
+                    currentView = holder.mMember1;
+                    break;
+            }
+            Picasso.with(context)
+                    .load(picURLs.get(i))
+                    .into(currentView);
+        }
+    }
+
     public ArrayList<String> setUpPicURLs(Trip trip) {
-        ArrayList<String> fbIds = trip.getAllParticipants();
+        ArrayList<Trip.TripMember> members = trip.getAllParticipants();
         ArrayList<String> picURLs = new ArrayList<String>();
-        if(fbIds == null) {
+        if(members == null) {
             Log.d(TAG, "ERROR with fbIds");
             return null;
         }
-        for(int i = 0; i < fbIds.size(); i++) {
-            String picURL = String.format(Constants.FB_PICTURE_URL, fbIds.get(i), "square");
-            Log.d(TAG, "picURL obtained: " + picURL);
+        for(int i = 0; i < members.size(); i++) {
+            String picURL = String.format(Constants.FB_PICTURE_URL, members.get(i).fbId, "normal");
             if(picURL == null) {
                 Log.d(TAG, "ERROR obtaining picURL");
                 break;

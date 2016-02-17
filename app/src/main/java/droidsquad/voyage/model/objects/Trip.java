@@ -7,6 +7,7 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -23,10 +24,11 @@ public class Trip implements Parcelable {
     private Date dateTo;
     private boolean isPrivate;
 
-    private ArrayList<String> allParticipants;
+    private ArrayList<TripMember> allParticipants;
 
     public Trip() {
         // No Arguments Constructor
+        this.allParticipants = new ArrayList<>();
     }
 
     public Trip(String name, String creatorId, String transportation, JSONObject origin,
@@ -39,9 +41,11 @@ public class Trip implements Parcelable {
         this.dateTo = dateTo;
         this.isPrivate = isPrivate;
         this.creatorId = creatorId;
+        this.allParticipants = new ArrayList<>();
     }
 
     protected Trip(Parcel in) {
+        this();
         Log.i(TAG, "Retrieving Trip from Parcel");
         id = in.readString();
         creatorId = in.readString();
@@ -59,7 +63,14 @@ public class Trip implements Parcelable {
         dateFrom = new Date(in.readLong());
         dateTo = new Date(in.readLong());
         isPrivate = in.readByte() != 0;
-        allParticipants = in.createStringArrayList();
+        int numOfParticipants = in.readInt();
+
+        for (int i = 0; i < numOfParticipants; i++) {
+            String name = in.readString();
+            String objectId = in.readString();
+            String fbId = in.readString();
+            addMember(name, objectId, fbId);
+        }
     }
 
     public static final Creator<Trip> CREATOR = new Creator<Trip>() {
@@ -90,7 +101,13 @@ public class Trip implements Parcelable {
         dest.writeLong(dateFrom.getTime());
         dest.writeLong(dateTo.getTime());
         dest.writeByte((byte) (isPrivate ? 1 : 0));
-        dest.writeStringList(allParticipants);
+        dest.writeInt(allParticipants.size());
+
+        for (TripMember participant : allParticipants) {
+            dest.writeString(participant.name);
+            dest.writeString(participant.objectId);
+            dest.writeString(participant.fbId);
+        }
     }
 
     @Override
@@ -116,12 +133,12 @@ public class Trip implements Parcelable {
                 || (other.getDateTo().equals(this.dateTo) && other.getDateFrom().equals(this.dateFrom));
     }
 
-    public ArrayList<String> getAllParticipants() {
+    public ArrayList<TripMember> getAllParticipants() {
         return allParticipants;
     }
 
-    public void setAllParticipants(ArrayList<String> members) {
-        allParticipants = members;
+    public void addMember(String name, String objectId, String fbId) {
+        allParticipants.add(new TripMember(name, objectId, fbId));
     }
 
     public String getName() {
@@ -194,5 +211,15 @@ public class Trip implements Parcelable {
 
     public String getId() {
         return id;
+    }
+
+    public class TripMember implements Serializable {
+        public String name, objectId, fbId;
+
+        public TripMember(String name, String objectId, String fbId) {
+            this.name = name;
+            this.objectId = objectId;
+            this.fbId = fbId;
+        }
     }
 }

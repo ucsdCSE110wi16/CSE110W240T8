@@ -102,8 +102,6 @@ public class ParseTripModel {
 
             trip.setDateFrom(parseTrip.getDate("dateFrom"));
             trip.setDateTo(parseTrip.getDate("dateTo"));
-
-            getAllMembers(trip);
             allMyTrips.add(trip);
         }
 
@@ -135,7 +133,7 @@ public class ParseTripModel {
                     Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
                             + " Message: " + e.getMessage());
 
-                    callback.onFaliure(getParseErrorString(e.getCode()));
+                    callback.onFailure(getParseErrorString(e.getCode()));
                 }
             }
         });
@@ -158,7 +156,7 @@ public class ParseTripModel {
                 } else {
                     Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
                             + " Message: " + e.getMessage());
-                    callback.onFaliure(getParseErrorString(e.getCode()));
+                    callback.onFailure(getParseErrorString(e.getCode()));
                 }
             }
         });
@@ -183,7 +181,7 @@ public class ParseTripModel {
                 } else {
                     Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
                             + " Message: " + e.getMessage());
-                    callback.onFaliure(getParseErrorString(e.getCode()));
+                    callback.onFailure(getParseErrorString(e.getCode()));
                 }
             }
         });
@@ -207,32 +205,42 @@ public class ParseTripModel {
      * Gets all current members of a trip from Parse
      * @param trip
      */
-    public static void getAllMembers(final Trip trip) {
+    public static void setAllMembers(final Trip trip, final TripASyncTaskCallback callback) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
-        query.whereEqualTo("objectId", trip.getId());
+        query.getInBackground(trip.getId(), new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseTrip, ParseException e) {
+                if (e != null) {
+                    Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                            + " Message: " + e.getMessage());
+                    callback.onFailure(getParseErrorString(e.getCode()));
+                    return;
+                }
 
-        try {
-            List<ParseObject> objects = query.find();
-            for (ParseObject tripObj : objects) {
-                ParseRelation<ParseObject> relation = tripObj.getRelation("members");
-                ParseQuery<ParseObject> queryRelation = relation.getQuery();
-                try {
-                    List<ParseObject> foundMembers = queryRelation.find();
-                    ArrayList<String> members = new ArrayList<>();
-                    for (ParseObject member : foundMembers) {
-                        Log.d(TAG, "Trip User Added to Trip: " + (String) member.get("fbId"));
-                        members.add((String) member.get("fbId"));
+                ParseRelation<ParseUser> memberRelation = parseTrip.getRelation("members");
+                memberRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(List<ParseUser> tripMembers, ParseException e) {
+                        if (e != null) {
+                            Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                                    + " Message: " + e.getMessage());
+                            callback.onFailure(getParseErrorString(e.getCode()));
+                            return;
+                        }
+
+                        for (ParseUser member : tripMembers) {
+                            String name = member.get("firstName") + " " + member.get("lastName");
+                            String objectId = member.getObjectId();
+                            String fbId = (String) member.get("fbId");
+
+                            trip.addMember(name, objectId, fbId);
+                        }
+
+                        callback.onSuccess();
                     }
-                    trip.setAllParticipants(members);
-                }
-                catch(ParseException e) {
-                    Log.d(TAG, "Error finding trip members!");
-                }
+                });
             }
-        }
-        catch(ParseException e) {
-            Log.d(TAG, "Error finding trip!");
-        }
+        });
     }
 
     /**
@@ -244,6 +252,6 @@ public class ParseTripModel {
 
     public interface TripASyncTaskCallback {
         void onSuccess ();
-        void onFaliure(String error);
+        void onFailure(String error);
     }
 }

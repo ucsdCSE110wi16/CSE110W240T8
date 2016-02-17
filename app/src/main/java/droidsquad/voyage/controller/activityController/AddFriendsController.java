@@ -125,7 +125,7 @@ public class AddFriendsController {
             }
 
             @Override
-            public void onFaliure(String error) {
+            public void onFailure(String error) {
                 mActivity.showProgress(false);
                 Snackbar snackbar = Snackbar.make(mActivity.findViewById(R.id.selected_friends_card_view),
                         error, Snackbar.LENGTH_SHORT);

@@ -66,7 +66,7 @@ public class FacebookAPI {
                     }
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,picture.type(square){url}");
+        parameters.putString("fields", "id,name,picture.type(normal){url}");
         request.setParameters(parameters);
         request.executeAsync();
     }
