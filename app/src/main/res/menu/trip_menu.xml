@@ -24,8 +24,8 @@
         app:showAsAction="never"/>
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/trip_action_leave_trip"
         android:orderInCategory="400"
-        android:title="Report"
+        android:title="Leave Trip"
         app:showAsAction="never" />
 </menu>

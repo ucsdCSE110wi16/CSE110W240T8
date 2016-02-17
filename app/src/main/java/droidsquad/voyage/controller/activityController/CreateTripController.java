@@ -3,7 +3,6 @@ package droidsquad.voyage.controller.activityController;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.widget.DatePicker;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -12,10 +11,11 @@ import java.util.Calendar;
 import java.util.Date;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.view.activity.CreateTripActivity;
-import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.ParseTripModel;
+import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.util.Constants;
+import droidsquad.voyage.view.activity.CreateTripActivity;
 
 public class CreateTripController {
     private CreateTripActivity activity;
@@ -178,19 +178,15 @@ public class CreateTripController {
 
     /**
      * Completes the save process after we know adding a new trip is a valid action
-     * @param newTrip
+     * @param newTrip Trip object to save to the backend
      */
     public void completeSave(Trip newTrip) {
         ParseTripModel.saveTrip(newTrip);
         // TODO show progress spinning thingy and wait till the trip has been saved to parse
 
         // if success
-        activity.exitActivity();
-        CharSequence text = "Trip Created";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(activity.getApplicationContext(), text, duration);
-        toast.show();
+        activity.setResult(Constants.RESULT_CODE_TRIP_CREATED);
+        activity.finish();
 
         // TODO else : stay on the same page and show snackBar with error and button to retry.
         // for reference for snackBar with button you can look at LoginActivity.java

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.fragmentController.TripListController;
+import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.CreateTripActivity;
 
 /**
@@ -24,6 +26,7 @@ public class TripListFragment extends Fragment {
     private TripListController controller;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private FloatingActionButton mFab;
 
     public static Fragment newInstance() {
         return new TripListFragment();
@@ -70,8 +73,8 @@ public class TripListFragment extends Fragment {
             }
         });
 
-        FloatingActionButton fb = (FloatingActionButton) v.findViewById(R.id.fab);
-        fb.setOnClickListener(new View.OnClickListener() {
+        mFab = (FloatingActionButton) v.findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 controller.createTripButtonPressed();
@@ -86,7 +89,35 @@ public class TripListFragment extends Fragment {
      */
     public void createTrip() {
         Intent intent = new Intent(getContext(), CreateTripActivity.class);
-        getContext().startActivity(intent);
+        startActivityForResult(intent, Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Snackbar snackbar = Snackbar.make(mFab, "", Snackbar.LENGTH_SHORT);
+
+        switch (requestCode) {
+            case Constants.REQUEST_CODE_TRIP_ACTIVITY :
+                switch (resultCode) {
+                    case Constants.RESULT_CODE_TRIP_DELETED :
+                        snackbar.setText(R.string.snackbar_trip_deleted);
+                        snackbar.show();
+                        break;
+
+                    case Constants.RESULT_CODE_TRIP_LEFT :
+                        snackbar.setText(R.string.snackbar_trip_left);
+                        snackbar.show();
+                        break;
+                }
+                break;
+
+            case Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY :
+                if (resultCode == Constants.RESULT_CODE_TRIP_CREATED) {
+                    snackbar.setText(R.string.snackbar_trip_created);
+                    snackbar.show();
+                }
+                break;
+        }
+    }
 }

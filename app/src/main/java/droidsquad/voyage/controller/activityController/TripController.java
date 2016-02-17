@@ -1,20 +1,23 @@
 package droidsquad.voyage.controller.activityController;
 
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.ImageView;
 
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlacePhotoResult;
+import com.parse.ParseUser;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Date;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.AddFriendsActivity;
 import droidsquad.voyage.view.activity.TripActivity;
 
@@ -110,5 +113,53 @@ public class TripController {
 
     public CharSequence getTitle() {
         return trip.getName();
+    }
+
+    public boolean isCreator() {
+        return trip.getCreatorId().equals(ParseUser.getCurrentUser().getObjectId());
+    }
+
+    public void deleteTrip() {
+        Log.d(TAG, "Deleting trip: " + trip.getName());
+        ParseTripModel.deleteTrip(trip, new ParseTripModel.TripASyncTaskCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "Successfully deleted");
+                mActivity.setResult(Constants.RESULT_CODE_TRIP_DELETED);
+                mActivity.finish();
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.d(TAG, "Couldn\'t delete the trip. Error: " + error);
+                Snackbar snackbar = Snackbar.make(
+                        mActivity.findViewById(android.R.id.content), error,
+                        Snackbar.LENGTH_SHORT);
+
+                snackbar.show();
+            }
+        });
+    }
+
+    public void leaveTrip() {
+        Log.d(TAG, "Leaving trip: " + trip.getName());
+        ParseTripModel.leaveTrip(trip, new ParseTripModel.TripASyncTaskCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "Successfully Left trip");
+                mActivity.setResult(Constants.RESULT_CODE_TRIP_LEFT);
+                mActivity.finish();
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.d(TAG, "Couldn\'t leave the trip. Error: " + error);
+                Snackbar snackbar = Snackbar.make(
+                        mActivity.findViewById(android.R.id.content), error,
+                        Snackbar.LENGTH_SHORT);
+
+                snackbar.show();
+            }
+        });
     }
 }

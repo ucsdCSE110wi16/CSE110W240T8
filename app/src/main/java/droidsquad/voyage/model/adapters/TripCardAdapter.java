@@ -1,8 +1,5 @@
 package droidsquad.voyage.model.adapters;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -13,11 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.parse.DeleteCallback;
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -31,11 +23,12 @@ import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.TripActivity;
+import droidsquad.voyage.view.fragment.TripListFragment;
 
 public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHolder> {
     private static final String TAG = TripCardAdapter.class.getSimpleName();
     private ArrayList<Trip> trips = new ArrayList<>();
-    private Context context;
+    private TripListFragment mFragment;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mName;
@@ -67,9 +60,9 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         }
     }
 
-    public TripCardAdapter(Context context) {
+    public TripCardAdapter(TripListFragment context) {
         this.trips = new ArrayList<>();
-        this.context = context;
+        this.mFragment = context;
     }
 
     public void updateData(ArrayList<Trip> trips) {
@@ -101,7 +94,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
 
         // Set the dates
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
-        String dates = context.getString(R.string.trip_dates,
+        String dates = mFragment.getString(R.string.trip_dates,
                 dateFormat.format(trip.getDateFrom()), dateFormat.format(trip.getDateTo()));
         holder.mDates.setText(dates);
 
@@ -135,59 +128,12 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             public void onClick(View v) {
                 Log.d(TAG, "Card clicked for trip: " + trip.getName());
 
-                Intent intent = new Intent(context, TripActivity.class);
-                intent.putExtra(context.getString(R.string.intent_key_trip), trip);
-                context.startActivity(intent);
+                Intent intent = new Intent(mFragment.getContext(), TripActivity.class);
+                intent.putExtra(mFragment.getString(R.string.intent_key_trip), trip);
+                mFragment.startActivityForResult(intent, Constants.REQUEST_CODE_TRIP_ACTIVITY);
             }
         });
 
-        holder.mTripCard.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Log.d(TAG, "Card long clicked for delete: " + trip.getName());
-
-                AlertDialog.Builder deleteAlert = new AlertDialog.Builder(context);
-                deleteAlert.setMessage(R.string.delete_alert);
-
-                deleteAlert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
-                        query.getInBackground(trip.getId(), new GetCallback<ParseObject>() {
-                            public void done(ParseObject object, ParseException e) {
-                                if (e == null) {
-                                    Log.d(TAG, "Query success!");
-                                    object.deleteInBackground(new DeleteCallback() {
-                                        @Override
-                                        public void done(ParseException e) {
-                                            if (e == null) {
-                                                Log.d(TAG, "deletion successful");
-                                            } else {
-                                                Log.d(TAG, "deletion unsuccessful");
-                                            }
-                                        }
-                                    });
-                                } else {
-                                    Log.d(TAG, "Query unsuccessful");
-                                }
-                            }
-                        });
-
-                        //refresh triplist after deletion
-                        trips.remove(trip);
-                        updateData(trips);
-                        notifyDataSetChanged();
-                    }
-                });
-                deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
-                deleteAlert.show();
-
-                return true;
-            }
-        });
 
     }
 
@@ -244,7 +190,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                     currentView = holder.mMember1;
                     break;
             }
-            Picasso.with(context)
+            Picasso.with(mFragment.getContext())
                     .load(picURLs.get(i))
                     .into(currentView);
         }
@@ -252,7 +198,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
 
     public ArrayList<String> setUpPicURLs(Trip trip) {
         ArrayList<Trip.TripMember> members = trip.getAllParticipants();
-        ArrayList<String> picURLs = new ArrayList<String>();
+        ArrayList<String> picURLs = new ArrayList<>();
         if(members == null) {
             Log.d(TAG, "ERROR with fbIds");
             return null;

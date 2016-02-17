@@ -1,5 +1,7 @@
 package droidsquad.voyage.view.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -7,6 +9,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -57,6 +60,7 @@ public class TripActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.trip_menu, menu);
+        setUIForCreator(mController.isCreator(), menu);
         return true;
     }
 
@@ -69,9 +73,52 @@ public class TripActivity extends AppCompatActivity {
             case R.id.trip_action_share:
                 startShareIntent();
                 return true;
+
+            case R.id.trip_action_delete_trip:
+                showDeleteTripDialog();
+                return true;
+
+            case R.id.trip_action_leave_trip:
+                showLeaveTripDialog();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showLeaveTripDialog() {
+        AlertDialog.Builder deleteAlert = new AlertDialog.Builder(this);
+        deleteAlert.setMessage(R.string.delete_trip_alert);
+
+        deleteAlert.setPositiveButton("Leave", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                mController.leaveTrip();
+            }
+        });
+        deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        deleteAlert.show();
+    }
+
+    private void showDeleteTripDialog() {
+        AlertDialog.Builder deleteAlert = new AlertDialog.Builder(this);
+        deleteAlert.setMessage(R.string.delete_trip_alert);
+
+        deleteAlert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                mController.deleteTrip();
+            }
+        });
+        deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        deleteAlert.show();
     }
 
     /**
@@ -105,6 +152,22 @@ public class TripActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+    private void setUIForCreator(boolean isCreator, Menu menu) {
+        if (isCreator) {
+            menu.findItem(R.id.trip_action_leave_trip).setVisible(false);
+        } else {
+            // Just a member
+            // Shouldn't be able to delete the trip
+            menu.findItem(R.id.trip_action_delete_trip).setVisible(false);
+
+            // Shouldn't be able to add people
+            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mFAB.getLayoutParams();
+            params.setAnchorId(View.NO_ID);
+            mFAB.setLayoutParams(params);
+            mFAB.setVisibility(View.GONE);
+        }
     }
 
     /**

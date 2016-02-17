@@ -6,10 +6,10 @@ import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import droidsquad.voyage.view.fragment.TripListFragment;
 import droidsquad.voyage.model.ParseTripModel;
-import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.model.adapters.TripCardAdapter;
+import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.view.fragment.TripListFragment;
 
 public class TripListController {
     private TripListFragment fragment;
@@ -30,7 +30,7 @@ public class TripListController {
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         // specify an adapter (see also next example)
-        adapter = new TripCardAdapter(context);
+        adapter = new TripCardAdapter(fragment);
         recyclerView.setAdapter(adapter);
     }
 
