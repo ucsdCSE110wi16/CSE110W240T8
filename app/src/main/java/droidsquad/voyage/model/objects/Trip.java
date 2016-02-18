@@ -23,12 +23,14 @@ public class Trip implements Parcelable {
     private Date dateFrom;
     private Date dateTo;
     private boolean isPrivate;
+    public boolean membersAreSet;
 
     private ArrayList<TripMember> allParticipants;
 
     public Trip() {
         // No Arguments Constructor
         this.allParticipants = new ArrayList<>();
+        membersAreSet = false;
     }
 
     public Trip(String name, String creatorId, String transportation, JSONObject origin,
@@ -42,6 +44,7 @@ public class Trip implements Parcelable {
         this.isPrivate = isPrivate;
         this.creatorId = creatorId;
         this.allParticipants = new ArrayList<>();
+        membersAreSet = false;
     }
 
     protected Trip(Parcel in) {
@@ -71,6 +74,7 @@ public class Trip implements Parcelable {
             String fbId = in.readString();
             addMember(name, objectId, fbId);
         }
+        membersAreSet = in.readByte() != 0;
     }
 
     public static final Creator<Trip> CREATOR = new Creator<Trip>() {
@@ -108,6 +112,8 @@ public class Trip implements Parcelable {
             dest.writeString(participant.objectId);
             dest.writeString(participant.fbId);
         }
+
+        dest.writeByte((byte) (membersAreSet ? 1 : 0));
     }
 
     @Override

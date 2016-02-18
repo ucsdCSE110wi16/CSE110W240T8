@@ -14,6 +14,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,7 +26,10 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.controller.AutoWrappingLinearLayoutManager;
 import droidsquad.voyage.controller.activityController.TripController;
+import droidsquad.voyage.model.adapters.FBFriendsAdapter;
+import droidsquad.voyage.model.objects.FacebookUser;
 
 public class TripActivity extends AppCompatActivity {
     private CollapsingToolbarLayout mCollapsingToolbar;
@@ -34,6 +38,7 @@ public class TripActivity extends AppCompatActivity {
     private TextView mTripLocTextView;
     private TextView mTripDatesTextView;
     private TripController mController;
+    private RecyclerView mMembersRecyclerView;
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
 
@@ -55,6 +60,16 @@ public class TripActivity extends AppCompatActivity {
 
         mController = new TripController(this);
         mController.setGooglePlacePhoto(mHeaderImageView);
+        mController.setMembers(mMembersRecyclerView);
+
+        if (mController.isCreator()) {
+            mController.mMemAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
+                @Override
+                public void onClick(FacebookUser user) {
+                    showKickMemberDialog(user);
+                }
+            });
+        }
     }
 
     @Override
@@ -121,6 +136,24 @@ public class TripActivity extends AppCompatActivity {
         deleteAlert.show();
     }
 
+    private void showKickMemberDialog(final FacebookUser user) {
+        AlertDialog.Builder deleteAlert = new AlertDialog.Builder(this);
+        deleteAlert.setMessage(getString(R.string.kick_friend_alert, user.name,
+                mController.trip.getName()));
+
+        deleteAlert.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                mController.kickMember(user);
+            }
+        });
+        deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        deleteAlert.show();
+    }
+
     /**
      * Initialize all the UI elements of this Activity
      */
@@ -130,6 +163,11 @@ public class TripActivity extends AppCompatActivity {
         mFAB = (FloatingActionButton) findViewById(R.id.fab);
         mTripLocTextView = (TextView) findViewById(R.id.trip_locations);
         mTripDatesTextView = (TextView) findViewById(R.id.trip_dates);
+
+        mMembersRecyclerView = (RecyclerView) findViewById(R.id.members_recycler_view);
+        mMembersRecyclerView.setLayoutManager(new AutoWrappingLinearLayoutManager(this));
+        mMembersRecyclerView.setNestedScrollingEnabled(false);
+        mMembersRecyclerView.setHasFixedSize(false);
 
         // Set the dates
         String dates = getString(R.string.trip_dates,

@@ -14,4 +14,8 @@ public class Constants {
     public static final int RESULT_CODE_TRIP_DELETED = 5001;
     public static final int RESULT_CODE_TRIP_LEFT = 5002;
     public static final int RESULT_CODE_TRIP_CREATED = 5003;
+
+    // Parse Related constants
+    public static final String PARSE_RELATION_MEMBERS = "members";
+    public static final String PARSE_RELATION_INVITEES = "invitees";
 }

@@ -91,7 +91,15 @@
 
             <android.support.v7.widget.AppCompatTextView
                 android:layout_width="match_parent"
-                android:layout_height="400dp" />
+                android:layout_height="wrap_content"
+                android:text="@string/label_members"
+                android:layout_marginTop="@dimen/activity_vertical_margin" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/members_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"/>
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

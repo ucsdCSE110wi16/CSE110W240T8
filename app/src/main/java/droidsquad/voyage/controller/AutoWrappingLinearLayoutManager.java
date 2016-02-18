@@ -1,16 +1,19 @@
 package droidsquad.voyage.controller;
 
+import android.app.Activity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import droidsquad.voyage.view.activity.AddFriendsActivity;
-
 public class AutoWrappingLinearLayoutManager extends LinearLayoutManager {
     private int[] mMeasuredDimension = new int[2];
 
-    public AutoWrappingLinearLayoutManager(AddFriendsActivity activity, int orientation, boolean reverseLayout)    {
+    public AutoWrappingLinearLayoutManager(Activity activity) {
+        super(activity);
+    }
+
+    public AutoWrappingLinearLayoutManager(Activity activity, int orientation, boolean reverseLayout)    {
         super(activity, orientation, reverseLayout);
     }
 
