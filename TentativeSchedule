@@ -40,12 +40,20 @@ Pending Invitations
     -Use FB API
 
 Features Done by WEEK 8: 1ST MILESTONE: BASELINE
+Polish/finish up notifications
+-broadcast receiver for push notifications
+-send notifications about trip events (i.e. updates, upcoming trip, trip deleted)
 View Own Trip History
-User Ranking
+-see a GoogleMaps map with pins showing places I've already been to
 FB Feed activity
-View Profile
+-get all public trips from friends
+-when scroll to the bottom, refresh
+Trip search
+-be able to search for a trip in a user's list of trips
 
 Features Done by WEEK 9:
+View Profile
+User Ranking
 Chat feature/New Features?
 Finalization Testing
 
