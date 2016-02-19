@@ -2,60 +2,12 @@ DROID SQUAD USER STORIES (1 = greatest priority, 5 = lowest priority)
 
 ********** Current Iteration **********
 
-USER STORY: 
-As a traveler client, I want to be able to view all the current trips I am currently signed up for so that the trip information is 
-accessible.
-
-SCENARIOS:
-Given I am signed in and on the trip list activity, when I open it for the first
-time, then I will be able to view all of the current trips I am participating
-in and is not past.
-Given I am signed in and on the trip list activity and I am not part of any
-trips, when I open it for the first time, then I will see that no trips have
-been added via text/graphic.
-Given I am signed in and the trip list activity has already been loaded, when I
-swipe down to refresh, then the activity will reload the data from the server
-and the list of trips will be updated.
-Estimation of Time for Completion: 1 wk
-Customer Priority: 1
-
-
-
-USER STORY: Member Request Notifications
-As a traveler who is not currently a member of the group that invited me, I want to receive notifications for invites to join that 
-existing trip group, so that I can know that I have the opportunity to join in.
-Estimation of Time for Completion: 1 wk
-Customer Priority: 2
-
-SCENARIOS:
-Given that I have a valid account with the app, when my friend sends an invitation to me 
-to join their trip group, then I will be sent a notification about that invitation.
-When I receive a notification, then I will be able to view the invitation and accept or
-reject the invitation.
-When I accept the invitation, then I will become a member of the trip.
-When I become a member of the trip, then I will be able to view it in my list of trips.
-Given I am an invitee for a trip, when I receive a notification to join a trip
-and I click on it, then I will be able to see all the invitations I have not responded to yet.
-Given I am an invitee for a trip, when I receive a notification to join a trip
-and I dismiss it, then I will still be able to see it when I view all my pending
-invitations.
-
-
-
-USER STORY: Invite members to current trip
-As a group leader for a trip, I want to be able to add/delete friends from the trip so that I can form traveling group.
-
-SCENARIOS:
-Given I am a group leader and viewing the trip details, when I press an add
-friend/invite button, then they will receive a notification/request to join the trip.
-Estimation of Time for Completion: 1 wk
-Customer Priority: 1
-
-
 
 USER STORY: View Trip Details
 As a trip participant, I want to be able to view details of the trip I am
 participating in so that I can remind myself and be aware about important details.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 2
 
 SCENARIOS:
 Given I am a group leader, when I view the trip details, then I should be able
@@ -63,6 +15,43 @@ to have options to administrate the trip (edit, delete, etc).
 Given I am a trip participant, when I view the trip details, then I should be
 able to see the trip details (title, description, source, destination, friends,
 start and end date, transportation).
+
+
+
+USER STORY: Trip Notifications
+As a member of a planned trip, I want to receive notifications about updates for their current trip so that I'll be up-to-date with 
+any changes or upcoming dates.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 3
+
+SCENARIOS: 
+Given that I am a trip member, when the trip gets updated, then I will be sent a notification about it.
+
+
+
+USER STORY: Friend's Updates
+As a traveler client, I want to be able to see my friends' and/or public trips so that I can keep updated with what my friends are 
+doing.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 4
+
+SCENARIOS:
+Given that I am a user with a valid account on the app, when I go on my feed, then I can see view the trips of my friends 
+as well as public trips in the feed.
+When I see a trip that I am interested in joining, then I can send a request to add myself to the trip.
+
+
+
+USER STORY: View Own Trip History
+As a traveler client, I want to be able to view their own trip history so that I can keep track of where I've been in the past.
+Estimation of Time for Completion: 1 day
+Customer Priority: 4
+
+SCENARIOS:
+Given that I have a valid account on the app, when I go the trip history page, then I can view all the past trips I've
+participated in.
+When I click on a past trip, then I can view the details about the trip.
+
 
 
 ********** TODO **********
@@ -76,18 +65,12 @@ Given I am currently signed in and on the news feed activity, when I open it for
 the first time then it will be populated with public trips that my friends are
 involved in.
 Estimation of Time for Completion: 1 wk
-Customer Priority: 2
+Customer Priority: 4
 
 USER STORY: Create Profile
 As a traveler client, I want to create a user profile with my information (Full Name, Age, Location, Picture, and Bio) so that other 
 travelers can get a quick overview of who I am.
 Estimation of Time for Completion: 2-3 days
-Customer Priority: 3
-
-USER STORY: Trip Notifications
-As a member of a planned trip, I want to receive notifications about updates for their current trip so that I'll be up-to-date with 
-any changes or upcoming dates.
-Estimation of Time for Completion: 1 wk
 Customer Priority: 3
 
 USER STORY: View Profile 
@@ -101,17 +84,6 @@ As a traveler client, I want to see another user's ratings based on cleanliness 
 can figure out whether I would like to travel with them.
 Estimation of Time for Completion: 1 wk
 Customer Priority: 4
-
-USER STORY: View Own Trip History
-As a traveler client, I want to be able to view their own trip history so that I can keep track of where I've been in the past.
-Estimation of Time for Completion: 1 day
-Customer Priority: 4
-
-USER STORY: Friend's Updates
-As a traveler client, I want to be able to see my friends' and/or public trips so that I can keep updated with what my friends are 
-doing.
-Estimation of Time for Completion: 1 wk
-Customer Priority: 5
 
 USER STORY: Delete Account
 As a traveler client, I want to be able to delete my account so that I will not be affiliated with this app's services anymore.
@@ -145,3 +117,45 @@ As a group leader for a trip, I want to be able to create a trip with more
 fluid UX that displays descriptions for the trip options and software keyboard
 that hides itself in proper contexts.
 Estimation of Time for Completion: 1 day
+
+USER STORY: Member Request Notifications
+As a traveler who is not currently a member of the group that invited me, I want to receive notifications for invites to join that 
+existing trip group, so that I can know that I have the opportunity to join in.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 2
+SCENARIOS:
+Given that I have a valid account with the app, when my friend sends an invitation to me 
+to join their trip group, then I will be sent a notification about that invitation.
+When I receive a notification, then I will be able to view the invitation and accept or
+reject the invitation.
+When I accept the invitation, then I will become a member of the trip.
+When I become a member of the trip, then I will be able to view it in my list of trips.
+Given I am an invitee for a trip, when I receive a notification to join a trip
+and I click on it, then I will be able to see all the invitations I have not responded to yet.
+Given I am an invitee for a trip, when I receive a notification to join a trip
+and I dismiss it, then I will still be able to see it when I view all my pending
+invitations.
+
+USER STORY: Invite members to current trip
+As a group leader for a trip, I want to be able to add/delete friends from the trip so that I can form traveling group.
+SCENARIOS:
+Given I am a group leader and viewing the trip details, when I press an add
+friend/invite button, then they will receive a notification/request to join the trip.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 1
+
+USER STORY: 
+As a traveler client, I want to be able to view all the current trips I am currently signed up for so that the trip information is 
+accessible.
+SCENARIOS:
+Given I am signed in and on the trip list activity, when I open it for the first
+time, then I will be able to view all of the current trips I am participating
+in and is not past.
+Given I am signed in and on the trip list activity and I am not part of any
+trips, when I open it for the first time, then I will see that no trips have
+been added via text/graphic.
+Given I am signed in and the trip list activity has already been loaded, when I
+swipe down to refresh, then the activity will reload the data from the server
+and the list of trips will be updated.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 1
