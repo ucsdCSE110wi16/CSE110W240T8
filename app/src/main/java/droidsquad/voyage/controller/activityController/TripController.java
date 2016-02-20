@@ -68,6 +68,9 @@ public class TripController {
         }
     }
 
+    public void editTrip() {
+        mActivity.editTripIntent(this.trip);
+    }
     /**
      * @return The id of the icon corresponding to the type of transportation
      */

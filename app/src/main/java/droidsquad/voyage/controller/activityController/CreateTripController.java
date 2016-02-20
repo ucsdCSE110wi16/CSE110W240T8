@@ -19,9 +19,11 @@ import droidsquad.voyage.view.activity.CreateTripActivity;
 
 public class CreateTripController {
     private CreateTripActivity activity;
+    private boolean edit = false;
 
     public CreateTripController(CreateTripActivity activity) {
         this.activity = activity;
+        edit = activity.getIntent().getBooleanExtra(activity.getString(R.string.edit_trip), edit);
     }
 
     /**

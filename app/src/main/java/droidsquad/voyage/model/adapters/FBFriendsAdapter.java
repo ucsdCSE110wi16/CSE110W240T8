@@ -1,6 +1,7 @@
 package droidsquad.voyage.model.adapters;
 
 import android.app.Activity;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +46,9 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
         View clickableView;
         if (mClickDeleteInstead) {
             // Redundant casting to get rid of a currently unresolved error in android sdk
-            ((LinearLayout)holder.itemView).setForeground(null);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                ((LinearLayout)holder.itemView).setForeground(null);
+            }
             holder.mDeleteImageView.setVisibility(View.VISIBLE);
             clickableView = holder.mDeleteImageView;
         } else {

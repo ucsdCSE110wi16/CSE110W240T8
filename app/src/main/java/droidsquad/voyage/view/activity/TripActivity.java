@@ -30,6 +30,7 @@ import droidsquad.voyage.controller.AutoWrappingLinearLayoutManager;
 import droidsquad.voyage.controller.activityController.TripController;
 import droidsquad.voyage.model.adapters.FBFriendsAdapter;
 import droidsquad.voyage.model.objects.FacebookUser;
+import droidsquad.voyage.model.objects.Trip;
 
 public class TripActivity extends AppCompatActivity {
     private CollapsingToolbarLayout mCollapsingToolbar;
@@ -96,6 +97,8 @@ public class TripActivity extends AppCompatActivity {
             case R.id.trip_action_leave_trip:
                 showLeaveTripDialog();
                 return true;
+            case R.id.trip_action_edit:
+                mController.editTrip();
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -247,5 +250,17 @@ public class TripActivity extends AppCompatActivity {
         sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Share"));
+    }
+
+    /**
+     * Called to start the intent for editing the trip via CreateTripActivity with an extra boolean
+     * to indicate the trip is being edited
+     * @param trip  current trip, needed to populate the CreateTripActivity fields
+     */
+    public void editTripIntent(Trip trip) {
+        Intent intent = new Intent(this, CreateTripActivity.class);
+        intent.putExtra(this.getString(R.string.intent_key_trip), trip);
+        intent.putExtra(getString(R.string.edit_trip), true);
+        startActivity(intent);
     }
 }
