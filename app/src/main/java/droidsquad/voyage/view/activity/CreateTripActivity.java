@@ -153,7 +153,7 @@ public class CreateTripActivity extends AppCompatActivity {
         mTripNameView.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                hideError(mTripNameView);
+                controller.hideError(mTripNameView);
             }
 
             @Override
@@ -170,7 +170,23 @@ public class CreateTripActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startPlaceAutocompleteIntent(FROM_PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                hideError(mLeavingFromView);
+            }
+        });
+
+        mLeavingFromView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                controller.hideError(mLeavingFromView);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
 
@@ -178,7 +194,23 @@ public class CreateTripActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startPlaceAutocompleteIntent(TO_PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                hideError(mDestinationView);
+            }
+        });
+
+        mDestinationView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                controller.hideError(mDestinationView);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
 
@@ -291,56 +323,11 @@ public class CreateTripActivity extends AppCompatActivity {
     }
 
     /**
-     * Displays the error on the given view
-     *
-     * @param view  View to display the error on
-     * @param error The error to be displayed
+     * Called to show soft keyboard
      */
-    public void displayError(View view, String error) {
-        if (view == mTripNameView) {
-            mTripNameErrorView.setText(error);
-            mTripNameErrorView.setVisibility(View.VISIBLE);
-        } else {
-            ((EditText) view).setError(error);
-        }
-    }
-
-    /**
-     * Hides the error on the given view
-     *
-     * @param view  View to display the error on
-     */
-    public void hideError(View view) {
-        if (view == mTripNameView) {
-            mTripNameErrorView.setVisibility(View.GONE);
-        } else {
-            ((EditText) view).setError(null);
-        }
-    }
-
-    /**
-     * Sets focus on the given view
-     *
-     * @param view  View to display the error on
-     */
-    public void setFocus(View view) {
-        if (view == mTripNameView) {
-            if (mTripNameView.requestFocus()){
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(mTripNameView, InputMethodManager.SHOW_IMPLICIT);
-            }
-        } else {
-            System.out.println("HERE: " + ((EditText) view).getId());
-        }
-    }
-
-    /**
-     * @return true if user has made changes to the forms
-     */
-    public boolean hasChanges() {
-        return mTripNameView.getText().length() > 0 ||
-                mLeavingFromView.getText().length() > 0 ||
-                mDestinationView.getText().length() > 0;
+    public void showKeyBoard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
     }
 
     /**
@@ -349,13 +336,16 @@ public class CreateTripActivity extends AppCompatActivity {
     public void exitActivity() {
         finish();
         // tell the parent activity it has been updated
-
     }
 
     /* GETTERS */
 
     public EditText getTripNameView() {
         return mTripNameView;
+    }
+
+    public TextView getTripNameErrorView() {
+        return mTripNameErrorView;
     }
 
     public CheckBox getPrivateView() {
