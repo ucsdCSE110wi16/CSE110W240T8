@@ -1,8 +1,13 @@
 package droidsquad.voyage.controller.activityController;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -30,7 +35,7 @@ public class CreateTripController {
      * Display alert dialog if user has unsaved changes, exit activity otherwise
      */
     public void attemptClose() {
-        if (!activity.hasChanges()) {
+        if (!hasChanges()) {
             activity.exitActivity();
         } else {
             activity.showAlertDialog(new DialogInterface.OnClickListener() {
@@ -104,20 +109,20 @@ public class CreateTripController {
 
         /* Check for errors */
         if (tripName.length() < 3) {
-            activity.displayError(activity.getTripNameView(), activity.getString(R.string.error_trip_name));
-            activity.setFocus(activity.getTripNameView());
+            displayError(activity.getTripNameView(), activity.getString(R.string.error_trip_name));
+            setFocus(activity.getTripNameView());
             hasError = true;
         }
 
         if (activity.getOriginPlace() == null) {
-            activity.displayError(activity.getLeavingFromView(), activity.getString(R.string.error_trip_location));
-            activity.setFocus(activity.getLeavingFromView());
+            displayError(activity.getLeavingFromView(), activity.getString(R.string.error_trip_location));
+            setFocus(activity.getLeavingFromView());
             hasError = true;
         }
 
         if (activity.getDestinationPlace() == null) {
-            activity.displayError(activity.getDestinationView(), activity.getString(R.string.error_trip_location));
-            activity.setFocus(activity.getDestinationView());
+            displayError(activity.getDestinationView(), activity.getString(R.string.error_trip_location));
+            setFocus(activity.getDestinationView());
             hasError = true;
         }
 
@@ -133,6 +138,59 @@ public class CreateTripController {
                 destination, isPrivate, dateFrom, dateTo);
 
         finalizeTripCheck(newTrip);
+    }
+
+    /**
+     * Displays the error on the given view
+     *
+     * @param view  View to display the error on
+     * @param error The error to be displayed
+     */
+    public void displayError(View view, String error) {
+        if (view == activity.getTripNameErrorView()) {
+            ((TextView)view).setText(error);
+            view.setVisibility(View.VISIBLE);
+        } else {
+            ((EditText) view).setError(error);
+        }
+    }
+
+    /**
+     * Hides the error on the given view
+     *
+     * @param view  View to display the error on
+     */
+    public void hideError(View view) {
+        if (view == activity.getTripNameView()) {
+            //view.setVisibility(View.GONE);
+            ((EditText) view).setError(null);
+        } else {
+            ((EditText) view).setError(null);
+        }
+    }
+
+    /**
+     * Sets focus on the given view
+     *
+     * @param view  View to display the error on
+     */
+    public void setFocus(View view) {
+        if (view == activity.getTripNameView()) {
+            if (view.requestFocus()){
+                activity.showKeyBoard(activity.getTripNameView());
+            }
+        } else {
+            System.out.println("HERE: " + ((EditText) view).getId());
+        }
+    }
+
+    /**
+     * @return true if user has made changes to the forms
+     */
+    public boolean hasChanges() {
+        return activity.getTripNameView().getText().length() > 0 ||
+                activity.getLeavingFromView().getText().length() > 0 ||
+                activity.getDestinationView().getText().length() > 0;
     }
 
     /**
