@@ -64,6 +64,42 @@ public class ParseTripModel {
         });
     }
 
+    public static void updateTrip(final Trip trip) {
+        Log.d(TAG, "Attempting to update trip to parse.\nTrip: " + trip.toString());
+
+        getParseTrip(trip.getId(), new ParseTripReceivedCallback() {
+            @Override
+            public void onSuccess(final ParseObject parseTrip) {
+                Log.d(TAG, "Trip queried");
+                parseTrip.put("name", trip.getName());
+                parseTrip.put("creatorId", trip.getCreatorId());
+                parseTrip.put("origin", trip.getOrigin());
+                parseTrip.put("destination", trip.getDestination());
+                parseTrip.put("private", trip.isPrivate());
+                parseTrip.put("dateFrom", trip.getDateFrom());
+                parseTrip.put("dateTo", trip.getDateTo());
+                parseTrip.put("transportation", trip.getTransportation());
+
+                parseTrip.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            Log.d(TAG, "SUCCESS");
+                            trip.setId(parseTrip.getObjectId());
+                        } else {
+                            Log.d(TAG, "FAILED");
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+            }
+        });
+    }
+
     /**
      * Gets all the trips from the database that this user is part of
      *
@@ -371,6 +407,7 @@ public class ParseTripModel {
                 return Constants.ERROR_UNKNOWN;
         }
     }
+
 
     /**
      * Interface to implement a callback that is accepted in methods of this class

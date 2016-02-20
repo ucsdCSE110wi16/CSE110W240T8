@@ -169,22 +169,13 @@ public class CreateTripController {
     public long getMinDateAllowed(Calendar calendar) {
         return (calendar.equals(activity.getCalendarFrom()))
                 ? System.currentTimeMillis() - 1000
-                : activity.getCalendarFrom().getTimeInMillis() - 1000;
+                : calendarFrom.getTimeInMillis() - 1000;
     }
 
     /**
      * Attempts to save a Trip with the information in the views
      */
     public void attemptSaveTrip() {
-        if (edit) {
-            attemptUpdateTrip();
-        }
-        else {
-            attemptCreateTrip();
-        }
-    }
-
-    private void attemptCreateTrip() {
         String creatorId = ParseTripModel.getUser();
 
         // Get all the information from the views
@@ -218,17 +209,14 @@ public class CreateTripController {
         JSONObject leavingFrom = GooglePlacesAPI.getJSONFromPlace(activity.getOriginPlace());
         JSONObject destination = GooglePlacesAPI.getJSONFromPlace(activity.getDestinationPlace());
 
-        Date dateFrom = activity.getCalendarFrom().getTime();
-        Date dateTo = activity.getCalendarTo().getTime();
+        Date dateFrom = calendarFrom.getTime();
+        Date dateTo = calendarTo.getTime();
 
         Trip newTrip = new Trip(tripName, creatorId, transportation, leavingFrom,
                 destination, isPrivate, dateFrom, dateTo);
+        newTrip.setId(trip.getId());
 
         finalizeTripCheck(newTrip);
-    }
-
-    private void attemptUpdateTrip() {
-
     }
 
     /**
@@ -255,6 +243,7 @@ public class CreateTripController {
     public boolean compareForOverlaps(final Trip newTrip, ArrayList<Trip> trip) {
         for(Trip t: trip) {
             if(newTrip.overlaps(t)) {
+                // TODO: make sure the overlap isn't with the same trip (new name)
                 String message = activity.getString(R.string.error_overlap) + t.getName() +
                         activity.getString(R.string.error_overlap_continue);
                 activity.showAlertDialog(new DialogInterface.OnClickListener() {
@@ -279,7 +268,12 @@ public class CreateTripController {
      * @param newTrip Trip object to save to the backend
      */
     public void completeSave(Trip newTrip) {
-        ParseTripModel.saveTrip(newTrip);
+        if (edit) {
+            ParseTripModel.updateTrip(newTrip);
+        }
+        else {
+            ParseTripModel.saveTrip(newTrip);
+        }
         // TODO show progress spinning thingy and wait till the trip has been saved to parse
 
         // if success
