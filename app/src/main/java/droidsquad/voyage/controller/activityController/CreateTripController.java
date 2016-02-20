@@ -4,16 +4,18 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.ParseTripModel;
@@ -24,11 +26,48 @@ import droidsquad.voyage.view.activity.CreateTripActivity;
 
 public class CreateTripController {
     private CreateTripActivity activity;
+    private Trip trip;
     private boolean edit = false;
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
+    private Calendar calendarFrom;
+    private Calendar calendarTo;
 
     public CreateTripController(CreateTripActivity activity) {
         this.activity = activity;
+        trip = activity.getIntent().getParcelableExtra(
+                activity.getString(R.string.intent_key_trip));
         edit = activity.getIntent().getBooleanExtra(activity.getString(R.string.edit_trip), edit);
+    }
+
+    public void populateUI() {
+        initTextFields();
+        initDatePickers();
+    }
+    private void initTextFields() {
+        if (edit) {     // only populate text fields if editing a trip
+            activity.getTripNameView().setText(trip.getName());
+            activity.getPrivateView().setChecked(trip.isPrivate());
+
+            int pos = 0;
+            String[] transportationMethods = activity.getResources().getStringArray(R.array.array_transportation_modes);
+            for (int i = 0; i < transportationMethods.length; i++) {
+                if (trip.getTransportation().equals(transportationMethods[i])) {
+                    pos = i;
+                    break;
+                }
+            }
+            activity.getTransportation().setSelection(pos);
+
+            try {
+                JSONObject origin = trip.getOrigin();
+                JSONObject dest = trip.getDestination();
+
+                activity.getLeavingFromView().setText(origin.get("address").toString());
+                activity.getDestinationView().setText(dest.get("address").toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -50,6 +89,14 @@ public class CreateTripController {
                 }
             }, activity.getString(R.string.create_trip_alert_dialog_message));
         }
+    }
+
+    /**
+     * Update the dates views to display current state of calendars
+     */
+    private void updateDateViews() {
+        activity.getDateFromView().setText(dateFormat.format(calendarFrom.getTime()));
+        activity.getDateToView().setText(dateFormat.format(calendarTo.getTime()));
     }
 
     /**
@@ -77,9 +124,43 @@ public class CreateTripController {
                     calendar.set(year, monthOfYear, dayOfMonth);
                 }
 
-                activity.updateDateViews();
+                updateDateViews();
             }
         }, calendar);
+    }
+
+    /**
+     * Set up default dates on the date pickers
+     */
+    private void initDatePickers() {
+
+        calendarFrom = Calendar.getInstance();
+        calendarTo = Calendar.getInstance();
+
+        if(edit) {
+            calendarFrom.setTimeInMillis(trip.getDateFrom().getTime());
+            calendarTo.setTimeInMillis(trip.getDateTo().getTime());
+        }
+        else {
+
+            calendarTo.add(Calendar.DAY_OF_WEEK, Constants.DEFAULT_TRIP_LENGTH);
+        }
+
+        activity.getDateFromView().setText(dateFormat.format(calendarFrom.getTime()));
+        activity.getDateToView().setText(dateFormat.format(calendarTo.getTime()));
+
+        activity.getDateFromView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDateDialog(calendarFrom);
+            }
+        });
+        activity.getDateToView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDateDialog(calendarTo);
+            }
+        });
     }
 
     /**
@@ -95,9 +176,18 @@ public class CreateTripController {
     }
 
     /**
-     * Attempts to create a Trip with the information in the views
+     * Attempts to save a Trip with the information in the views
      */
-    public void attemptCreateTrip() {
+    public void attemptSaveTrip() {
+        if (edit) {
+            attemptUpdateTrip();
+        }
+        else {
+            attemptCreateTrip();
+        }
+    }
+
+    private void attemptCreateTrip() {
         String creatorId = ParseTripModel.getUser();
 
         // Get all the information from the views
@@ -138,6 +228,10 @@ public class CreateTripController {
                 destination, isPrivate, dateFrom, dateTo);
 
         finalizeTripCheck(newTrip);
+    }
+
+    private void attemptUpdateTrip() {
+
     }
 
     /**

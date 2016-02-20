@@ -14,7 +14,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -132,8 +131,10 @@ public class CreateTripActivity extends AppCompatActivity {
         toolbar.setTitle("");
 
         setSupportActionBar(toolbar);
-        initDatePickers();
         setOnClickListeners();
+
+        // initialize the UI for either creating or editing a trip
+        controller.populateUI();
     }
 
     /**
@@ -215,30 +216,6 @@ public class CreateTripActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * Set up default dates on the date pickers
-     */
-    private void initDatePickers() {
-        mCalendarFrom = Calendar.getInstance();
-        mCalendarTo = Calendar.getInstance();
-        mCalendarTo.add(Calendar.DAY_OF_WEEK, DEFAULT_TRIP_LENGTH);
-        mDateFromView.setText(dateFormat.format(mCalendarFrom.getTime()));
-        mDateToView.setText(dateFormat.format(mCalendarTo.getTime()));
-
-        mDateFromView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                controller.showDateDialog(mCalendarFrom);
-            }
-        });
-
-        mDateToView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                controller.showDateDialog(mCalendarTo);
-            }
-        });
-    }
 
     /**
      * Start the PlaceAutocomplete Intent for the user to selecte a google place
@@ -339,18 +316,10 @@ public class CreateTripActivity extends AppCompatActivity {
     }
 
     /**
-     * Update the dates views to display current state of calendars
-     */
-    public void updateDateViews() {
-        mDateFromView.setText(dateFormat.format(mCalendarFrom.getTime()));
-        mDateToView.setText(dateFormat.format(mCalendarTo.getTime()));
-    }
-
-    /**
      * Called when the user presses the create trip button
      */
     public void createTripButtonPressed(View view) {
-        controller.attemptCreateTrip();
+        controller.attemptSaveTrip();
     }
 
     /**
