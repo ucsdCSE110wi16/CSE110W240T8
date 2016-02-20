@@ -16,6 +16,9 @@ import org.json.JSONException;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
@@ -68,6 +71,17 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     public void updateData(ArrayList<Trip> trips) {
         this.trips = trips;
     }
+
+    public void sortTrips(ArrayList<Trip> trips) {
+        Collections.sort(trips, new Comparator<Trip>() {
+            public int compare(Trip m1, Trip m2) {
+                return m1.getDateTo().compareTo(m2.getDateTo());
+            }
+        });
+
+        this.trips = trips;
+    }
+
 
     // Create new views (invoked by the layout manager)
     @Override

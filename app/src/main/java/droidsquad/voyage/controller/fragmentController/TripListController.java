@@ -51,6 +51,7 @@ public class TripListController {
      * @param trips New trips to update the adapter with
      */
     public void updateAdapter(ArrayList<Trip> trips) {
+        adapter.sortTrips(trips);
         adapter.updateData(trips);
         refreshData();
     }
