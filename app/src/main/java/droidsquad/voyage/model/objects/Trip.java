@@ -228,4 +228,16 @@ public class Trip implements Parcelable {
             this.fbId = fbId;
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof Trip))
+            return false;
+        Trip trip = (Trip) o;
+        return name.equals(trip.getName()) && creatorId.equals(trip.getCreatorId()) &&
+                transportation.equals(trip.getTransportation()) && isPrivate == trip.isPrivate()
+                && dateFrom.equals(trip.getDateFrom()) && dateTo.equals(trip.getDateTo())
+                && destination.toString().equals(trip.getDestination().toString())
+                && origin.toString().equals(trip.getOrigin().toString());
+    }
 }

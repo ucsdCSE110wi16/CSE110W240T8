@@ -3,6 +3,7 @@ package droidsquad.voyage.controller.activityController;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -42,6 +43,7 @@ public class CreateTripController {
     public void populateUI() {
         initTextFields();
         initDatePickers();
+        updateDateViews();
     }
 
     /**
@@ -318,12 +320,12 @@ public class CreateTripController {
     /**
      * Check for trip overlaps between existing trips for a user, and a newly created one
      * @param newTrip
-     * @param trip
+     * @param trips
      * @return
      */
-    public boolean compareForOverlaps(final Trip newTrip, ArrayList<Trip> trip) {
-        for(Trip t: trip) {
-            if(newTrip.overlaps(t)) {
+    public boolean compareForOverlaps(final Trip newTrip, ArrayList<Trip> trips) {
+        for(Trip t: trips) {
+            if(newTrip.overlaps(t) && !trip.equals(t)) {
                 // TODO: make sure the overlap isn't with the same trip (new name)
                 String message = activity.getString(R.string.error_overlap) + t.getName() +
                         activity.getString(R.string.error_overlap_continue);
