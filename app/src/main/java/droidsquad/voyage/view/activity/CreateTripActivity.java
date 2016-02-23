@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -57,6 +58,8 @@ public class CreateTripActivity extends AppCompatActivity {
 
     private Place mOriginPlace;
     private Place mDestinationPlace;
+
+    private Button mCreateTripButton;
 
     private static final int DEFAULT_TRIP_LENGTH = 7;
     private static final int FROM_PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
@@ -124,6 +127,8 @@ public class CreateTripActivity extends AppCompatActivity {
 
         mPrivateView = (CheckBox) findViewById(R.id.private_check);
         mTransportation = (Spinner) findViewById(R.id.transportation);
+
+        mCreateTripButton = (Button) findViewById(R.id.create_trip_button);
 
         // Set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.trip_toolbar);
@@ -395,4 +400,9 @@ public class CreateTripActivity extends AppCompatActivity {
     public Place getDestinationPlace() {
         return mDestinationPlace;
     }
+
+    public Button getCreateTripButton(){
+        return mCreateTripButton;
+    }
+
 }

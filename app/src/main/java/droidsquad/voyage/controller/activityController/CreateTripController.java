@@ -43,8 +43,19 @@ public class CreateTripController {
         initTextFields();
         initDatePickers();
     }
+
+    /**
+     * Changes button text from Create to Update
+     */
+    private void changeCreateButtonText(){
+        activity.getCreateTripButton().setText(Constants.UPDATE_TRIP);
+    }
+
     private void initTextFields() {
         if (edit) {     // only populate text fields if editing a trip
+
+            changeCreateButtonText();
+
             activity.getTripNameView().setText(trip.getName());
             activity.getPrivateView().setChecked(trip.isPrivate());
 
@@ -142,7 +153,6 @@ public class CreateTripController {
             calendarTo.setTimeInMillis(trip.getDateTo().getTime());
         }
         else {
-
             calendarTo.add(Calendar.DAY_OF_WEEK, Constants.DEFAULT_TRIP_LENGTH);
         }
 
@@ -195,32 +205,48 @@ public class CreateTripController {
             hasError = true;
         }
 
-        if (activity.getOriginPlace() == null) {
+        if (activity.getOriginPlace() == null && !edit) {
             displayError(activity.getLeavingFromView(), activity.getString(R.string.error_trip_location));
-            setFocus(activity.getLeavingFromView());
             hasError = true;
         }
 
-        if (activity.getDestinationPlace() == null) {
+        if (activity.getDestinationPlace() == null && !edit) {
             displayError(activity.getDestinationView(), activity.getString(R.string.error_trip_location));
-            setFocus(activity.getDestinationView());
             hasError = true;
         }
 
         if (hasError) return;
 
-        JSONObject leavingFrom = GooglePlacesAPI.getJSONFromPlace(activity.getOriginPlace());
-        JSONObject destination = GooglePlacesAPI.getJSONFromPlace(activity.getDestinationPlace());
+        JSONObject leavingFrom;
+        JSONObject destination;
+
+        if (activity.getOriginPlace() != null) {
+            leavingFrom = GooglePlacesAPI.getJSONFromPlace(activity.getOriginPlace());
+        }
+        else {
+            leavingFrom = trip.getOrigin();
+        }
+
+        if (activity.getDestinationPlace() != null) {
+            destination = GooglePlacesAPI.getJSONFromPlace(activity.getDestinationPlace());
+        }
+        else {
+            destination = trip.getDestination();
+        }
 
         Date dateFrom = calendarFrom.getTime();
         Date dateTo = calendarTo.getTime();
 
-        /** TODO: Do not create a new trip **/
         Trip newTrip = new Trip(tripName, creatorId, transportation, leavingFrom,
-                destination, isPrivate, dateFrom, dateTo);
-        newTrip.setId(trip.getId());
+                    destination, isPrivate, dateFrom, dateTo);
 
         finalizeTripCheck(newTrip);
+
+
+
+
+
+
     }
 
     /**
@@ -324,7 +350,7 @@ public class CreateTripController {
      */
     public void completeSave(Trip newTrip) {
         if (edit) {
-            ParseTripModel.updateTrip(newTrip);
+            ParseTripModel.updateTrip(newTrip, trip.getId());
         }
         else {
             ParseTripModel.saveTrip(newTrip);
