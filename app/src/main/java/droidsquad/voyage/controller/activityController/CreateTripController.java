@@ -215,6 +215,7 @@ public class CreateTripController {
         Date dateFrom = calendarFrom.getTime();
         Date dateTo = calendarTo.getTime();
 
+        /** TODO: Do not create a new trip **/
         Trip newTrip = new Trip(tripName, creatorId, transportation, leavingFrom,
                 destination, isPrivate, dateFrom, dateTo);
         newTrip.setId(trip.getId());
@@ -261,8 +262,6 @@ public class CreateTripController {
             if (view.requestFocus()){
                 activity.showKeyBoard(activity.getTripNameView());
             }
-        } else {
-            System.out.println("HERE: " + ((EditText) view).getId());
         }
     }
 
