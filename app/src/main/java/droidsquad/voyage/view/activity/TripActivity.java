@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -31,6 +32,7 @@ import droidsquad.voyage.controller.activityController.TripController;
 import droidsquad.voyage.model.adapters.FBFriendsAdapter;
 import droidsquad.voyage.model.objects.FacebookUser;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.util.Constants;
 
 public class TripActivity extends AppCompatActivity {
     private CollapsingToolbarLayout mCollapsingToolbar;
@@ -60,6 +62,24 @@ public class TripActivity extends AppCompatActivity {
         });
 
         mController = new TripController(this);
+        populateData();
+    }
+
+    private void populateData() {
+        // Set the dates
+        String dates = getString(R.string.trip_dates,
+                dateFormat.format(mController.getDateFrom()),
+                dateFormat.format(mController.getDateTo()));
+        mTripDatesTextView.setText(dates);
+
+        // Set the locations
+        String transportation = getString(R.string.trip_locations,
+                mController.getOrigin(), mController.getDestination());
+        mTripLocTextView.setText(transportation);
+        mTripLocTextView.setCompoundDrawablesWithIntrinsicBounds(mController.getDrawableId(), 0, 0, 0);
+
+        mCollapsingToolbar.setTitle(mController.getTitle());
+
         mController.setGooglePlacePhoto(mHeaderImageView);
         mController.setMembers(mMembersRecyclerView);
 
@@ -172,24 +192,12 @@ public class TripActivity extends AppCompatActivity {
         mMembersRecyclerView.setNestedScrollingEnabled(false);
         mMembersRecyclerView.setHasFixedSize(false);
 
-        // Set the dates
-        String dates = getString(R.string.trip_dates,
-                dateFormat.format(mController.getDateFrom()),
-                dateFormat.format(mController.getDateTo()));
-        mTripDatesTextView.setText(dates);
-
-        // Set the locations
-        String transportation = getString(R.string.trip_locations,
-                mController.getOrigin(), mController.getDestination());
-        mTripLocTextView.setText(transportation);
-        mTripLocTextView.setCompoundDrawablesWithIntrinsicBounds(mController.getDrawableId(), 0, 0, 0);
 
         // Set up toolbar and action bar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         mCollapsingToolbar.setExpandedTitleTypeface(Typeface.create("sans-serif", Typeface.BOLD));
-        mCollapsingToolbar.setTitle(mController.getTitle());
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -208,6 +216,9 @@ public class TripActivity extends AppCompatActivity {
             params.setAnchorId(View.NO_ID);
             mFAB.setLayoutParams(params);
             mFAB.setVisibility(View.GONE);
+
+            // Shouldn't be able to edit trip
+            menu.findItem(R.id.trip_action_edit).setVisible(false);
         }
     }
 
@@ -261,6 +272,23 @@ public class TripActivity extends AppCompatActivity {
         Intent intent = new Intent(this, CreateTripActivity.class);
         intent.putExtra(this.getString(R.string.intent_key_trip), trip);
         intent.putExtra(getString(R.string.edit_trip), true);
-        startActivity(intent);
+        startActivityForResult(intent, Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY);
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+
+            case Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY :
+                if (resultCode == Constants.RESULT_CODE_TRIP_UPDATED) {
+                    mController.trip = data.getParcelableExtra(getString(R.string.intent_key_trip));
+                    populateData();
+                    Snackbar snackbar = Snackbar.make(mMembersRecyclerView,
+                            R.string.snackbar_trip_updated, Snackbar.LENGTH_SHORT);
+                    snackbar.show();
+                }
+                break;
+        }
     }
 }

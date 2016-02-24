@@ -1,9 +1,8 @@
 package droidsquad.voyage.controller.activityController;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Log;
+import android.content.Intent;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -352,16 +351,20 @@ public class CreateTripController {
      */
     public void completeSave(Trip newTrip) {
         if (edit) {
-            ParseTripModel.updateTrip(newTrip, trip.getId());
+            newTrip.setId(trip.getId());
+            ParseTripModel.updateTrip(newTrip);
+            Intent intent = new Intent();
+            intent.putExtra(activity.getString(R.string.intent_key_trip), newTrip);
+            activity.setResult(Constants.RESULT_CODE_TRIP_UPDATED, intent);
+            activity.finish();
         }
         else {
+            // TODO show progress spinning thingy and wait till the trip has been saved to parse
             ParseTripModel.saveTrip(newTrip);
+            activity.setResult(Constants.RESULT_CODE_TRIP_CREATED);
+            activity.finish();
         }
-        // TODO show progress spinning thingy and wait till the trip has been saved to parse
 
-        // if success
-        activity.setResult(Constants.RESULT_CODE_TRIP_CREATED);
-        activity.finish();
 
         // TODO else : stay on the same page and show snackBar with error and button to retry.
         // for reference for snackBar with button you can look at LoginActivity.java

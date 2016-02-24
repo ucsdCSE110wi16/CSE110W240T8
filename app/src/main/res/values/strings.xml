@@ -103,4 +103,5 @@
     <string name="label_members">Members</string>
     <string name="snackbar_member_removed">Member removed</string>
     <string name="edit_trip">edit_trip</string>
+    <string name="snackbar_trip_updated">Trip Updated</string>
 </resources>

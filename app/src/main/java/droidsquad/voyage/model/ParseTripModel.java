@@ -64,8 +64,9 @@ public class ParseTripModel {
         });
     }
 
-    public static void updateTrip(final Trip trip, String oldTripId) {
+    public static void updateTrip(final Trip trip) {
         Log.d(TAG, "Attempting to update trip to parse.\nTrip: " + trip.toString());
+        String oldTripId = trip.getId();
 
         getParseTrip(oldTripId, new ParseTripReceivedCallback() {
             @Override
