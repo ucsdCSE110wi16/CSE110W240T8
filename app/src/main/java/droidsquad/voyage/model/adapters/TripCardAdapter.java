@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -22,6 +23,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.controller.activityController.TripController;
 import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
@@ -38,6 +40,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         public TextView mCities;
         public TextView mDates;
         public TextView mOtherMembers;
+        public TextView mAdmin;
         public ImageView mPrivateIcon;
         public ImageView mTransportationIcon;
         public ImageView mMember1;
@@ -53,6 +56,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             mCities = (TextView) view.findViewById(R.id.trip_card_cities);
             mDates = (TextView) view.findViewById(R.id.trip_card_date_range);
             mOtherMembers = (TextView) view.findViewById(R.id.trip_card_other_members);
+            mAdmin = (TextView) view.findViewById(R.id.trip_card_admin);
             mPrivateIcon = (ImageView) view.findViewById(R.id.trip_card_private_icon);
             mTransportationIcon = (ImageView) view.findViewById(R.id.trip_card_transportation_icon);
             mMember1 = (ImageView) view.findViewById(R.id.trip_card_member_profile_pic1);
@@ -115,6 +119,9 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         holder.mPrivateIcon.setVisibility(
                 (trip.isPrivate()) ? View.VISIBLE : View.GONE);
 
+        holder.mAdmin.setVisibility(
+                (isAdmin(trip)) ? View.VISIBLE : View.GONE);
+
         ParseTripModel.setAllMembers(trip, new ParseTripModel.TripASyncTaskCallback() {
             @Override
             public void onSuccess() {
@@ -124,6 +131,8 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             @Override
             public void onFailure(String error) {}
         });
+
+
 
         switch (trip.getTransportation()) {
             case "Car":
@@ -232,6 +241,10 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     @Override
     public int getItemCount() {
         return trips.size();
+    }
+
+    public boolean isAdmin(Trip trip){
+        return trip.getCreatorId().equals(ParseUser.getCurrentUser().getObjectId());
     }
 
 }
