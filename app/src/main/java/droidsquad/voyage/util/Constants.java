@@ -21,4 +21,7 @@ public class Constants {
     // Parse Related constants
     public static final String PARSE_RELATION_MEMBERS = "members";
     public static final String PARSE_RELATION_INVITEES = "invitees";
+
+    public static final String OVERLAP_FROM = " from ";
+    public static final String OVERLAP_TO = " to ";
 }

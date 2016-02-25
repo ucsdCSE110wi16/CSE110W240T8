@@ -136,7 +136,8 @@ public class Trip implements Parcelable {
     public boolean overlaps(Trip other) {
         return (other.getDateFrom().before(this.dateTo) && other.getDateFrom().after(this.dateFrom))
                 || (other.getDateTo().before(this.dateTo) && other.getDateTo().after(this.dateFrom))
-                || (other.getDateTo().equals(this.dateTo) && other.getDateFrom().equals(this.dateFrom));
+                || (other.getDateTo().equals(this.dateTo)
+                || other.getDateFrom().equals(this.dateFrom));
     }
 
     public ArrayList<TripMember> getAllParticipants() {

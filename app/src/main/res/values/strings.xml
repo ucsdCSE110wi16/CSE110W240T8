@@ -81,7 +81,7 @@
     <string name="fb_friend_search_hint">Add friends to trip</string>
 
     <!-- Overlap dialog error -->
-    <string name="error_overlap">You have an overlap with another existing trip:&#160;</string>
+    <string name="error_overlap">This trip overlaps with another existing trip:&#160;</string>
     <string name="error_overlap_continue">. Do you want to continue?</string>
 
     <!-- Deletion alert dialog-->

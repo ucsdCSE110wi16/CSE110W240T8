@@ -180,7 +180,7 @@ public class CreateTripController {
                     // set to calendar
                     calendarTo.setTimeInMillis(calendarTo.getTimeInMillis() + diff);
 
-                // Calendar TO selected
+                    // Calendar TO selected
                 } else {
                     calendar.set(year, monthOfYear, dayOfMonth);
                 }
@@ -324,6 +324,9 @@ public class CreateTripController {
      * any other trips the user is already enrolled in
      */
     public void finalizeTripCheck(final Trip newTrip) {
+
+        if (edit) newTrip.setId(trip.getId());
+
         ParseTripModel.searchForAllTrips(new ParseTripModel.ParseTripCallback() {
             @Override
             public void onCompleted(ArrayList<Trip> trip) {
@@ -334,6 +337,25 @@ public class CreateTripController {
         });
     }
 
+    // Helper method to format JSON objects
+    private String intToMonth(int month){
+        switch (month){
+            case 0: return "Jan ";
+            case 1: return "Feb ";
+            case 2: return "Mar ";
+            case 3: return "Apr ";
+            case 4: return "May ";
+            case 5: return "Jun ";
+            case 6: return "Jul ";
+            case 7: return "Aug ";
+            case 8: return "Sep ";
+            case 9: return "Oct ";
+            case 10: return "Nov ";
+            case 11: return "Dec ";
+            default: return " ";
+        }
+    }
+
     /**
      * Check for trip overlaps between existing trips for a user, and a newly created one
      * @param newTrip
@@ -342,10 +364,18 @@ public class CreateTripController {
      */
     public boolean compareForOverlaps(final Trip newTrip, ArrayList<Trip> trips) {
         for(Trip t: trips) {
-            if(newTrip.overlaps(t) && !trip.equals(t)) {
-                // TODO: make sure the overlap isn't with the same trip (new name)
-                String message = activity.getString(R.string.error_overlap) + t.getName() +
+
+            if (edit && trip.equals(t)) continue;
+
+            if(newTrip.overlaps(t)) {
+                String message = activity.getString(R.string.error_overlap) +
+                        t.getName() +
+                        Constants.OVERLAP_FROM + intToMonth(t.getDateFrom().getMonth()) +
+                        t.getDateFrom().getDate() +
+                        Constants.OVERLAP_TO + intToMonth(t.getDateTo().getMonth()) +
+                        t.getDateTo().getDate() +
                         activity.getString(R.string.error_overlap_continue);
+
                 activity.showAlertDialog(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
