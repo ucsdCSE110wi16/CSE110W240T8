@@ -140,6 +140,7 @@ public class CreateTripActivity extends AppCompatActivity {
 
         // initialize the UI for either creating or editing a trip
         controller.populateUI();
+        hideKeyboard();
     }
 
     /**
@@ -367,6 +368,14 @@ public class CreateTripActivity extends AppCompatActivity {
 
     public Calendar getCalendarFrom() {
         return mCalendarFrom;
+    }
+
+    public void setCalendarFrom(Calendar calendarFrom){
+        mCalendarFrom = calendarFrom;
+    }
+
+    public void setCalendarTo(Calendar calendarTo){
+        mCalendarTo = calendarTo;
     }
 
     public Calendar getCalendarTo() {

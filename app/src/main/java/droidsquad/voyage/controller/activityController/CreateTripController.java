@@ -3,6 +3,7 @@ package droidsquad.voyage.controller.activityController;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -31,6 +32,7 @@ public class CreateTripController {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
     private Calendar calendarFrom;
     private Calendar calendarTo;
+    private static final String TAG = CreateTripController.class.getSimpleName();
 
     public CreateTripController(CreateTripActivity activity) {
         this.activity = activity;
@@ -112,33 +114,11 @@ public class CreateTripController {
     }
 
     /**
-     * Shows the date picker dialog and updates the calendar with date selected
-     *
-     * @param calendar Calendar to be contain date selected
+     * Update activity's calendars
      */
-    public void showDateDialog(final Calendar calendar) {
-        activity.showDatePickerDialog(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                Calendar calendarFrom = activity.getCalendarFrom();
-                Calendar calendarTo = activity.getCalendarTo();
-
-                if (calendar.equals(calendarFrom)) {
-                    long previousDateTime = calendarFrom.getTimeInMillis();
-
-                    // Compute difference and adjust the toDate accordingly
-                    calendarFrom.set(year, monthOfYear, dayOfMonth);
-                    long diff = calendarFrom.getTimeInMillis() - previousDateTime;
-
-                    // set to calendar
-                    calendarTo.setTimeInMillis(calendarTo.getTimeInMillis() + diff);
-                } else {
-                    calendar.set(year, monthOfYear, dayOfMonth);
-                }
-
-                updateDateViews();
-            }
-        }, calendar);
+    private void updateCalendars(Calendar calendarFrom, Calendar calendarTo){
+        activity.setCalendarFrom(calendarFrom);
+        activity.setCalendarTo(calendarTo);
     }
 
     /**
@@ -157,8 +137,8 @@ public class CreateTripController {
             calendarTo.add(Calendar.DAY_OF_WEEK, Constants.DEFAULT_TRIP_LENGTH);
         }
 
-        activity.getDateFromView().setText(dateFormat.format(calendarFrom.getTime()));
-        activity.getDateToView().setText(dateFormat.format(calendarTo.getTime()));
+        updateCalendars(calendarFrom, calendarTo);
+        updateDateViews();
 
         activity.getDateFromView().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,15 +155,58 @@ public class CreateTripController {
     }
 
     /**
+     * Shows the date picker dialog and updates the calendar with date selected
+     *
+     * @param calendar Calendar to be contain date selected
+     */
+    public void showDateDialog(final Calendar calendar) {
+
+        activity.showDatePickerDialog(new DatePickerDialog.OnDateSetListener() {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+
+                Calendar calendarFrom = activity.getCalendarFrom();
+                Calendar calendarTo = activity.getCalendarTo();
+
+                // Calendar FROM selected
+                if (calendar == calendarFrom) {
+                    long previousDateTime = calendarFrom.getTimeInMillis();
+
+                    // Compute difference and adjust the toDate accordingly
+                    calendarFrom.set(year, monthOfYear, dayOfMonth);
+                    long diff = calendarFrom.getTimeInMillis() - previousDateTime;
+
+                    // set to calendar
+                    calendarTo.setTimeInMillis(calendarTo.getTimeInMillis() + diff);
+
+                // Calendar TO selected
+                } else {
+                    calendar.set(year, monthOfYear, dayOfMonth);
+                }
+
+                updateDateViews();
+                updateCalendars(calendarFrom, calendarTo);
+
+            }
+        }, calendar);
+    }
+
+    /**
      * Get the minimum date user is allowed to pick from the calendar
      *
      * @param calendar Calendar for which minimum date will be computed from
      * @return {long} The minimum date allowed in Millis
      */
     public long getMinDateAllowed(Calendar calendar) {
-        return (calendar.equals(activity.getCalendarFrom()))
-                ? System.currentTimeMillis() - 1000
-                : calendarFrom.getTimeInMillis() - 1000;
+        if (calendar == activity.getCalendarFrom()){
+            Log.d(TAG, "getMinDate of TODAY");
+            return System.currentTimeMillis() - 1000;
+        }
+        else {
+            Log.d(TAG, "getMinDate of FROM");
+            return calendarFrom.getTimeInMillis() - 1000;
+        }
     }
 
     /**
@@ -242,11 +265,6 @@ public class CreateTripController {
                     destination, isPrivate, dateFrom, dateTo);
 
         finalizeTripCheck(newTrip);
-
-
-
-
-
 
     }
 
