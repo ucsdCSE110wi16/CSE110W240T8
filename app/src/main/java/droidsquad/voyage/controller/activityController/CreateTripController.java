@@ -34,6 +34,15 @@ public class CreateTripController {
     private Calendar calendarTo;
     private static final String TAG = CreateTripController.class.getSimpleName();
 
+    // Old fields to check for changes
+    String oldTripName;
+    String oldTransportation;
+    boolean oldIsPrivate;
+    String oldOrigin;
+    String oldDestination;
+    Date oldDateFrom;
+    Date oldDateTo;
+
     public CreateTripController(CreateTripActivity activity) {
         this.activity = activity;
         trip = activity.getIntent().getParcelableExtra(
@@ -44,6 +53,7 @@ public class CreateTripController {
     public void populateUI() {
         initTextFields();
         initDatePickers();
+        getOldFields();
         updateDateViews();
     }
 
@@ -52,6 +62,34 @@ public class CreateTripController {
      */
     private void changeCreateButtonText(){
         activity.getCreateTripButton().setText(Constants.UPDATE_TRIP);
+    }
+
+    private void getOldFields() {
+        if (edit) {
+
+            oldTripName = trip.getName();
+            oldIsPrivate = trip.isPrivate();
+
+            try {
+                JSONObject origin = trip.getOrigin();
+                JSONObject dest = trip.getDestination();
+                oldOrigin = origin.get("address").toString();
+                oldDestination = dest.get("address").toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            oldDateFrom = calendarFrom.getTime();
+            oldDateTo = calendarTo.getTime();
+            oldTransportation = trip.getTransportation();
+
+        }
+        else {
+            oldIsPrivate = activity.getPrivateView().isChecked();
+            oldDateFrom = calendarFrom.getTime();
+            oldDateTo = calendarTo.getTime();
+            oldTransportation = activity.getTransportation().getSelectedItem().toString();
+        }
     }
 
     private void initTextFields() {
@@ -314,9 +352,28 @@ public class CreateTripController {
      * @return true if user has made changes to the forms
      */
     public boolean hasChanges() {
-        return activity.getTripNameView().getText().length() > 0 ||
-                activity.getLeavingFromView().getText().length() > 0 ||
-                activity.getDestinationView().getText().length() > 0;
+
+        if (!edit){
+
+            return activity.getTripNameView().getText().length() > 0 ||
+                    activity.getPrivateView().isChecked() != oldIsPrivate ||
+                    activity.getDestinationPlace() != null ||
+                    activity.getOriginPlace() != null ||
+                    !activity.getCalendarFrom().getTime().equals(oldDateFrom) ||
+                    !activity.getCalendarTo().getTime().equals(oldDateTo) ||
+                    !activity.getTransportation().getSelectedItem().toString().equals(oldTransportation);
+        }
+        else {
+
+            return !activity.getTripNameView().getText().toString().equals(oldTripName) ||
+                    activity.getPrivateView().isChecked() != oldIsPrivate ||
+                    activity.getOriginPlace() != null ||
+                    activity.getDestinationPlace() != null ||
+                    !activity.getCalendarFrom().getTime().equals(oldDateFrom) ||
+                    !activity.getCalendarTo().getTime().equals(oldDateTo) ||
+                    !activity.getTransportation().getSelectedItem().toString().equals(oldTransportation);
+        }
+
     }
 
     /**
