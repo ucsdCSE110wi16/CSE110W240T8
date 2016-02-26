@@ -116,8 +116,6 @@
                     android:id="@+id/trip_card_member_profile_pic2"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:layout_marginLeft="-15dp"
-                    android:layout_marginStart="-15dp"
                     android:gravity="center_horizontal"
                     android:src="@drawable/ic_account_circle" />
                 <de.hdodenhof.circleimageview.CircleImageView
