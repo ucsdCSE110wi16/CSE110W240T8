@@ -195,20 +195,7 @@ public class TripController {
     }
 
     private void updateMembersAdapter() {
-        ArrayList<FacebookUser> fbUsers = new ArrayList<>();
-        ArrayList<Trip.TripMember> members = trip.getAllParticipants();
-        String currentUserId = ParseUser.getCurrentUser().getObjectId();
-
-        for (Trip.TripMember member : members) {
-            // Shouldn't show the option to remove myself
-            if (isCreator() && member.objectId.equals(currentUserId)) {
-                continue;
-            }
-            fbUsers.add(new FacebookUser(member.fbId, member.name,
-                    String.format(Constants.FB_PICTURE_URL, member.fbId, "normal")));
-        }
-
-        mMemAdapter.updateResults(fbUsers);
+        updateFBFriendsAdapter(trip.getAllParticipants(), mMemAdapter);
     }
 
     public void setInvitees(final RecyclerView recyclerView) {
@@ -227,11 +214,14 @@ public class TripController {
     }
 
     private void updateInviteesAdapter() {
+        updateFBFriendsAdapter(trip.getAllInvitees(), mInviteesAdapter);
+    }
+
+    private void updateFBFriendsAdapter(ArrayList<Trip.TripMember> users, FBFriendsAdapter adapter) {
         ArrayList<FacebookUser> fbUsers = new ArrayList<>();
-        ArrayList<Trip.TripMember> members = trip.getAllInvitees();
         String currentUserId = ParseUser.getCurrentUser().getObjectId();
 
-        for (Trip.TripMember member : members) {
+        for (Trip.TripMember member : users) {
             // Shouldn't show the option to remove myself
             if (isCreator() && member.objectId.equals(currentUserId)) {
                 continue;
@@ -240,44 +230,24 @@ public class TripController {
                     String.format(Constants.FB_PICTURE_URL, member.fbId, "normal")));
         }
 
-        mInviteesAdapter.updateResults(fbUsers);
+        adapter.updateResults(fbUsers);
     }
 
 
     public void kickMember(final FacebookUser fbUser) {
-        ArrayList<Trip.TripMember> tripMembers = trip.getAllParticipants();
-        String userId = "";
-        for (Trip.TripMember member : tripMembers) {
-            if (member.fbId.endsWith(fbUser.id)) {
-                userId = member.objectId;
-                break;
-            }
-        }
-
-        // Remove user from member
-        ParseTripModel.removeUserFromRelation(trip.getId(), userId, Constants.PARSE_RELATION_MEMBERS,
-                new ParseTripModel.TripASyncTaskCallback() {
-                    @Override
-                    public void onSuccess() {
-                        mMemAdapter.removeFriend(fbUser);
-                        Snackbar snackbar = Snackbar.make(mActivity.findViewById(android.R.id.content),
-                                R.string.snackbar_member_removed, Snackbar.LENGTH_SHORT);
-                        snackbar.show();
-                    }
-
-                    @Override
-                    public void onFailure(String error) {
-                        Snackbar snackbar = Snackbar.make(mActivity.findViewById(android.R.id.content),
-                                error, Snackbar.LENGTH_SHORT);
-                        snackbar.show();
-                    }
-                });
+        kickUser(fbUser, trip.getAllParticipants(), mMemAdapter, Constants.PARSE_RELATION_MEMBERS,
+                mActivity.getString(R.string.snackbar_member_removed));
     }
 
     public void kickInvitee(final FacebookUser fbUser) {
-        ArrayList<Trip.TripMember> tripInvitees = trip.getAllInvitees();
+        kickUser(fbUser, trip.getAllInvitees(), mInviteesAdapter, Constants.PARSE_RELATION_INVITEES,
+                mActivity.getString(R.string.snackbar_invitee_removed));
+    }
+
+    public void kickUser(final FacebookUser fbUser, ArrayList<Trip.TripMember> users, final FBFriendsAdapter adapter,
+                         String relation, final String snackBarMessage) {
         String userId = "";
-        for (Trip.TripMember member : tripInvitees) {
+        for (Trip.TripMember member : users) {
             if (member.fbId.endsWith(fbUser.id)) {
                 userId = member.objectId;
                 break;
@@ -285,13 +255,13 @@ public class TripController {
         }
 
         // Remove user from member
-        ParseTripModel.removeUserFromRelation(trip.getId(), userId, Constants.PARSE_RELATION_INVITEES,
+        ParseTripModel.removeUserFromRelation(trip.getId(), userId, relation,
                 new ParseTripModel.TripASyncTaskCallback() {
                     @Override
                     public void onSuccess() {
-                        mInviteesAdapter.removeFriend(fbUser);
+                        adapter.removeFriend(fbUser);
                         Snackbar snackbar = Snackbar.make(mActivity.findViewById(android.R.id.content),
-                                R.string.snackbar_invitee_removed, Snackbar.LENGTH_SHORT);
+                                snackBarMessage, Snackbar.LENGTH_SHORT);
                         snackbar.show();
                     }
 
@@ -303,4 +273,5 @@ public class TripController {
                     }
                 });
     }
+
 }
