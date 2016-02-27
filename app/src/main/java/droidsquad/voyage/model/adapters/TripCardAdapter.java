@@ -129,7 +129,8 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             }
 
             @Override
-            public void onFailure(String error) {}
+            public void onFailure(String error) {
+            }
         });
 
 
@@ -161,21 +162,41 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     }
 
     private void setMemberPics(Trip trip, ViewHolder holder) {
-        int numMembers = 0;
-        if (trip.getAllParticipants() != null)
-            numMembers = trip.getAllParticipants().size();
+        if (trip.getAllParticipants() == null) {
+            Log.d(TAG, "Error getting all participants");
+        }
+        int numMembers = trip.getAllParticipants().size();
 
         switch (4 - numMembers) {
             case 4:
                 holder.mMember1.setVisibility(View.GONE);
-            case 3:
                 holder.mMember2.setVisibility(View.GONE);
-            case 2:
                 holder.mMember3.setVisibility(View.GONE);
-            case 1:
                 holder.mMember4.setVisibility(View.GONE);
+                break;
+            case 3:
+                holder.mMember1.setVisibility(View.VISIBLE);
+                holder.mMember2.setVisibility(View.GONE);
+                holder.mMember3.setVisibility(View.GONE);
+                holder.mMember4.setVisibility(View.GONE);
+                break;
+            case 2:
+                holder.mMember1.setVisibility(View.VISIBLE);
+                holder.mMember2.setVisibility(View.VISIBLE);
+                holder.mMember3.setVisibility(View.GONE);
+                holder.mMember4.setVisibility(View.GONE);
+                break;
+            case 1:
+                holder.mMember1.setVisibility(View.VISIBLE);
+                holder.mMember2.setVisibility(View.VISIBLE);
+                holder.mMember3.setVisibility(View.VISIBLE);
+                holder.mMember4.setVisibility(View.GONE);
+                break;
             case 0:
-                holder.mOtherMembers.setVisibility(View.GONE);
+                holder.mMember1.setVisibility(View.VISIBLE);
+                holder.mMember2.setVisibility(View.VISIBLE);
+                holder.mMember3.setVisibility(View.VISIBLE);
+                holder.mMember4.setVisibility(View.VISIBLE);
                 break;
             default:
                 holder.mOtherMembers.setVisibility(View.VISIBLE);
@@ -183,6 +204,9 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                 holder.mOtherMembers.setText(s);
                 break;
         }
+
+        if(4 - numMembers >= 0)
+            holder.mOtherMembers.setVisibility(View.GONE);
 
         if (trip.getAllParticipants() == null) {
             Log.d(TAG, "SOMETHING IS WRONG HERE!!");
