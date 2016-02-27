@@ -26,10 +26,12 @@ public class Trip implements Parcelable {
     public boolean membersAreSet;
 
     private ArrayList<TripMember> allParticipants;
+    private ArrayList<TripMember> allInvitees;
 
     public Trip() {
         // No Arguments Constructor
         this.allParticipants = new ArrayList<>();
+        this.allInvitees = new ArrayList<>();
         membersAreSet = false;
     }
 
@@ -144,8 +146,16 @@ public class Trip implements Parcelable {
         return allParticipants;
     }
 
+    public ArrayList<TripMember> getAllInvitees() {
+        return allInvitees;
+    }
+
     public void addMember(String name, String objectId, String fbId) {
         allParticipants.add(new TripMember(name, objectId, fbId));
+    }
+
+    public void addInvitee(String name, String objectId, String fbId) {
+        allInvitees.add(new TripMember(name, objectId, fbId));
     }
 
     public String getName() {
