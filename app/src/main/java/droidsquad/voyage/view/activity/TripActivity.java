@@ -236,6 +236,7 @@ public class TripActivity extends AppCompatActivity {
     }
 
     private void setUIForCreator(boolean isCreator, Menu menu) {
+        // TODO: add if clause for if just spectator (not actually in trip)
         if (isCreator) {
             menu.findItem(R.id.trip_action_leave_trip).setVisible(false);
         } else {

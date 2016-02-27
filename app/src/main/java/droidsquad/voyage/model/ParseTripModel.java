@@ -118,6 +118,18 @@ public class ParseTripModel {
         });
     }
 
+    public static void searchAllPublicTrips(final ParseTripCallback callback) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
+        query.whereEqualTo("private", false);
+
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                getAllMyTrips(objects, callback);
+            }
+        });
+    }
+
     /**
      * Gt the Parse object ID for the current user
      * @return User ID of the current user
