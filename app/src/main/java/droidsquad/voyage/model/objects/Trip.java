@@ -133,6 +133,10 @@ public class Trip implements Parcelable {
                 || (other.getDateTo().equals(this.dateTo) && other.getDateFrom().equals(this.dateFrom));
     }
 
+    public void resetParticipantData() {
+        allParticipants = new ArrayList<>();
+    }
+
     public ArrayList<TripMember> getAllParticipants() {
         return allParticipants;
     }

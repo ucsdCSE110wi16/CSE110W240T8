@@ -174,8 +174,8 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                 holder.mMember3.setVisibility(View.GONE);
             case 1:
                 holder.mMember4.setVisibility(View.GONE);
-                break;
             case 0:
+                holder.mOtherMembers.setVisibility(View.GONE);
                 break;
             default:
                 holder.mOtherMembers.setVisibility(View.VISIBLE);

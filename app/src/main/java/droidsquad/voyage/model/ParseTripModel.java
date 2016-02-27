@@ -214,6 +214,8 @@ public class ParseTripModel {
                             return;
                         }
 
+                        trip.resetParticipantData();
+
                         for (ParseUser member : tripMembers) {
                             String name = member.get("firstName") + " " + member.get("lastName");
                             String objectId = member.getObjectId();
