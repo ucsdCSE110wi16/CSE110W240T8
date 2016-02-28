@@ -11,13 +11,15 @@ public class Constants {
     // Request Codes
     public static final int REQUEST_CODE_TRIP_ACTIVITY = 9001;
     public static final int REQUEST_CODE_CREATE_TRIP_ACTIVITY = 9002;
+    public static final int REQUEST_CODE_ADD_FRIENDS_ACTIVITY = 9003;
 
     // Result Codes
     public static final int RESULT_CODE_TRIP_DELETED = 5001;
     public static final int RESULT_CODE_TRIP_LEFT = 5002;
     public static final int RESULT_CODE_TRIP_UPDATED = 5003;
+    public static final int RESULT_CODE_TRIP_CREATED = 5004;
+    public static final int RESULT_CODE_INVITEES_ADDED = 5005;
 
-    public static final int RESULT_CODE_TRIP_CREATED = 5003;
     // Parse Related constants
     public static final String PARSE_RELATION_MEMBERS = "members";
     public static final String PARSE_RELATION_INVITEES = "invitees";

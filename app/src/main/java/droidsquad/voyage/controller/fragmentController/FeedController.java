@@ -11,9 +11,6 @@ import droidsquad.voyage.model.adapters.TripCardAdapter;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.view.fragment.FeedFragment;
 
-/**
- * Created by Andrew on 2/27/16.
- */
 public class FeedController {
     private FeedFragment fragment;
     private Context context;

@@ -58,7 +58,9 @@ public class TripActivity extends AppCompatActivity {
         mFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mController.launchAddFriends();
+                Intent intent = new Intent(TripActivity.this, AddFriendsActivity.class);
+                intent.putExtra(getString(R.string.intent_key_trip), mController.trip);
+                startActivityForResult(intent, Constants.REQUEST_CODE_ADD_FRIENDS_ACTIVITY);
             }
         });
 
@@ -314,14 +316,23 @@ public class TripActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Snackbar snackbar = Snackbar.make(mMembersRecyclerView, "", Snackbar.LENGTH_SHORT);
         switch (requestCode) {
 
             case Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY :
                 if (resultCode == Constants.RESULT_CODE_TRIP_UPDATED) {
                     mController.trip = data.getParcelableExtra(getString(R.string.intent_key_trip));
                     populateData();
-                    Snackbar snackbar = Snackbar.make(mMembersRecyclerView,
-                            R.string.snackbar_trip_updated, Snackbar.LENGTH_SHORT);
+                    snackbar.setText(R.string.snackbar_trip_updated);
+                    snackbar.show();
+                }
+                break;
+
+            case Constants.REQUEST_CODE_ADD_FRIENDS_ACTIVITY :
+                if (resultCode == Constants.RESULT_CODE_INVITEES_ADDED) {
+                    mController.trip = data.getParcelableExtra(getString(R.string.intent_key_trip));
+                    populateData();
+                    snackbar.setText(R.string.snackbar_invitees_added);
                     snackbar.show();
                 }
                 break;
