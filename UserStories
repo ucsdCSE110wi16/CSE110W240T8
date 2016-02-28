@@ -15,15 +15,14 @@ When I see a trip that I am interested in joining, then I can send a request to 
 
 
 
-USER STORY: View Own Trip History
-As a traveler client, I want to be able to view their own trip history so that I can keep track of where I've been in the past.
-Estimation of Time for Completion: 1 day
-Customer Priority: 4
-
-SCENARIOS:
-Given that I have a valid account on the app, when I go the trip history page, then I can view all the past trips I've
-participated in.
-When I click on a past trip, then I can view the details about the trip.
+USER STORY: Trip Notifications
+As a member of a planned trip, I want to receive notifications about updates for their current trip so that I'll be up-to-date with 
+any changes or upcoming dates.
+Estimation of Time for Completion: 1 wk
+Customer Priority: 3
+SCENARIOS: 
+Given that I am a trip member, when the trip gets updated, then I will be sent a notification about it.
+Customer Priority: 1
 
 
 ********** TODO **********
@@ -102,15 +101,6 @@ Given I am signed in and the trip list activity has already been loaded, when I
 swipe down to refresh, then the activity will reload the data from the server
 and the list of trips will be updated.
 Estimation of Time for Completion: 1 wk
-
-USER STORY: Trip Notifications
-As a member of a planned trip, I want to receive notifications about updates for their current trip so that I'll be up-to-date with 
-any changes or upcoming dates.
-Estimation of Time for Completion: 1 wk
-Customer Priority: 3
-SCENARIOS: 
-Given that I am a trip member, when the trip gets updated, then I will be sent a notification about it.
-Customer Priority: 1
 
 USER STORY: View Trip Details
 As a trip participant, I want to be able to view details of the trip I am
