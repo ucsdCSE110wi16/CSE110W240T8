@@ -79,4 +79,9 @@ public class AutoWrappingLinearLayoutManager extends LinearLayoutManager {
             recycler.recycleView(view);
         }
     }
+
+    @Override
+    public boolean supportsPredictiveItemAnimations() {
+        return false;
+    }
 }

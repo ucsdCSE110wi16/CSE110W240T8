@@ -30,6 +30,7 @@ public class TripController {
 
     private static final String TAG = TripController.class.getSimpleName();
     public FBFriendsAdapter mMemAdapter;
+    public FBFriendsAdapter mInviteesAdapter;
 
     public TripController(TripActivity instance) {
         this.mActivity = instance;
@@ -38,6 +39,7 @@ public class TripController {
                 mActivity.getString(R.string.intent_key_trip));
 
         mMemAdapter = new FBFriendsAdapter(mActivity, isCreator());
+        mInviteesAdapter = new FBFriendsAdapter(mActivity, isCreator());
     }
 
     public void setGooglePlacePhoto(final ImageView imageView) {
@@ -174,11 +176,18 @@ public class TripController {
     }
 
     public void updateMembersAdapter() {
+        updateFBFriendsAdapter(trip.getAllMembers(), mMemAdapter);
+    }
+
+    public void updateInviteesAdapter() {
+        updateFBFriendsAdapter(trip.getAllInvitees(), mInviteesAdapter);
+    }
+
+    private void updateFBFriendsAdapter(ArrayList<Trip.TripMember> users, FBFriendsAdapter adapter) {
         ArrayList<FacebookUser> fbUsers = new ArrayList<>();
-        ArrayList<Trip.TripMember> members = trip.getAllMembers();
         String currentUserId = ParseUser.getCurrentUser().getObjectId();
 
-        for (Trip.TripMember member : members) {
+        for (Trip.TripMember member : users) {
             // Shouldn't show the option to remove myself
             if (isCreator() && member.objectId.equals(currentUserId)) {
                 continue;
@@ -187,13 +196,24 @@ public class TripController {
                     String.format(Constants.FB_PICTURE_URL, member.fbId, "normal")));
         }
 
-        mMemAdapter.updateResults(fbUsers);
+        adapter.updateResults(fbUsers);
     }
 
+
     public void kickMember(final FacebookUser fbUser) {
-        ArrayList<Trip.TripMember> tripMembers = trip.getAllMembers();
+        kickUser(fbUser, trip.getAllMembers(), mMemAdapter, Constants.PARSE_RELATION_MEMBERS,
+                mActivity.getString(R.string.snackbar_member_removed));
+    }
+
+    public void kickInvitee(final FacebookUser fbUser) {
+        kickUser(fbUser, trip.getAllInvitees(), mInviteesAdapter, Constants.PARSE_RELATION_INVITEES,
+                mActivity.getString(R.string.snackbar_invitee_removed));
+    }
+
+    public void kickUser(final FacebookUser fbUser, ArrayList<Trip.TripMember> users, final FBFriendsAdapter adapter,
+                         String relation, final String snackBarMessage) {
         String userId = "";
-        for (Trip.TripMember member : tripMembers) {
+        for (Trip.TripMember member : users) {
             if (member.fbId.endsWith(fbUser.id)) {
                 userId = member.objectId;
                 break;
@@ -201,13 +221,13 @@ public class TripController {
         }
 
         // Remove user from member
-        ParseTripModel.removeUserFromRelation(trip.getId(), userId, Constants.PARSE_RELATION_MEMBERS,
+        ParseTripModel.removeUserFromRelation(trip.getId(), userId, relation,
                 new ParseTripModel.TripASyncTaskCallback() {
                     @Override
                     public void onSuccess() {
-                        mMemAdapter.removeFriend(fbUser);
+                        adapter.removeFriend(fbUser);
                         Snackbar snackbar = Snackbar.make(mActivity.findViewById(android.R.id.content),
-                                R.string.snackbar_member_removed, Snackbar.LENGTH_SHORT);
+                                snackBarMessage, Snackbar.LENGTH_SHORT);
                         snackbar.show();
                     }
 
@@ -219,4 +239,5 @@ public class TripController {
                     }
                 });
     }
+
 }

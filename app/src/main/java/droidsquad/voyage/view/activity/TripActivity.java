@@ -42,6 +42,7 @@ public class TripActivity extends AppCompatActivity {
     private TextView mTripDatesTextView;
     private TripController mController;
     private RecyclerView mMembersRecyclerView;
+    private RecyclerView mInviteesRecyclerView;
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
 
@@ -82,14 +83,24 @@ public class TripActivity extends AppCompatActivity {
 
         mController.setGooglePlacePhoto(mHeaderImageView);
 
+        // set and populate members and invitees list
         mMembersRecyclerView.setAdapter(mController.mMemAdapter);
         mController.updateMembersAdapter();
+
+        mInviteesRecyclerView.setAdapter(mController.mInviteesAdapter);
+        mController.updateInviteesAdapter();
 
         if (mController.isCreator()) {
             mController.mMemAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
                 @Override
                 public void onClick(FacebookUser user) {
                     showKickMemberDialog(user);
+                }
+            });
+            mController.mInviteesAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
+                @Override
+                public void onClick(FacebookUser user) {
+                    showKickInviteeDialog(user);
                 }
             });
         }
@@ -179,6 +190,24 @@ public class TripActivity extends AppCompatActivity {
         deleteAlert.show();
     }
 
+    private void showKickInviteeDialog(final FacebookUser user) {
+        AlertDialog.Builder deleteAlert = new AlertDialog.Builder(this);
+        deleteAlert.setMessage(getString(R.string.kick_friend_alert, user.name,
+                mController.trip.getName()));
+
+        deleteAlert.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                mController.kickInvitee(user);
+            }
+        });
+        deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        deleteAlert.show();
+    }
+
     /**
      * Initialize all the UI elements of this Activity
      */
@@ -194,6 +223,10 @@ public class TripActivity extends AppCompatActivity {
         mMembersRecyclerView.setNestedScrollingEnabled(false);
         mMembersRecyclerView.setHasFixedSize(false);
 
+        mInviteesRecyclerView = (RecyclerView) findViewById(R.id.invitees_recycler_view);
+        mInviteesRecyclerView.setLayoutManager(new AutoWrappingLinearLayoutManager(this));
+        mInviteesRecyclerView.setNestedScrollingEnabled(false);
+        mInviteesRecyclerView.setHasFixedSize(false);
 
         // Set up toolbar and action bar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -206,6 +239,7 @@ public class TripActivity extends AppCompatActivity {
     }
 
     private void setUIForCreator(boolean isCreator, Menu menu) {
+        // TODO: add if clause for if just spectator (not actually in trip)
         if (isCreator) {
             menu.findItem(R.id.trip_action_leave_trip).setVisible(false);
         } else {

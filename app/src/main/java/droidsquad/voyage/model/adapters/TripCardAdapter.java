@@ -1,6 +1,7 @@
 package droidsquad.voyage.model.adapters;
 
 import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,7 +28,7 @@ import droidsquad.voyage.view.fragment.TripListFragment;
 public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHolder> {
     private static final String TAG = TripCardAdapter.class.getSimpleName();
     private ArrayList<Trip> trips = new ArrayList<>();
-    private TripListFragment mFragment;
+    private Fragment mFragment;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mName;
@@ -59,9 +60,9 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         }
     }
 
-    public TripCardAdapter(TripListFragment context) {
+    public TripCardAdapter(Fragment fragment) {
         this.trips = new ArrayList<>();
-        this.mFragment = context;
+        this.mFragment = fragment;
     }
 
     public void updateData(ArrayList<Trip> trips) {
