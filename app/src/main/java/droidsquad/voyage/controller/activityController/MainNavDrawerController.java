@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.VoyageUser;
+import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.LoginActivity;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 import droidsquad.voyage.view.fragment.FeedFragment;
@@ -26,6 +27,32 @@ public class MainNavDrawerController {
         this.activity = activity;
         fragmentManager = activity.getSupportFragmentManager();
         this.user = new VoyageUser();
+
+
+        // Open appropriate fragment based on intent
+        String fragmentToOpen = activity.getIntent().getStringExtra(Constants.KEY_FRAGMENT_MAIN_ACTIVITY);
+
+        if (fragmentToOpen == null) {
+            tripsPressed();
+        } else {
+            switch (fragmentToOpen) {
+                case Constants.FRAGMENT_REQUESTS :
+                    requestsPressed();
+                    break;
+
+                case Constants.FRAGMENT_SETTINGS :
+                    settingsPressed();
+                    break;
+
+                case Constants.FRAGMENT_FEED :
+                    feedPressed();
+                    break;
+
+                default:
+                    tripsPressed();
+                    break;
+            }
+        }
     }
 
     public void pendingInvitationsPressed() {

@@ -8,6 +8,14 @@ public class Constants {
     public static final String FB_PICTURE_URL = "https://graph.facebook.com/%s/picture?type=%s";
     public static final String UPDATE_TRIP = "Update";
 
+    // Intent Keys
+    public static final String KEY_FRAGMENT_MAIN_ACTIVITY = "FRAGMENT_MAIN_ACTIVITY";
+
+
+    public static final String FRAGMENT_REQUESTS = "FRAGMENT_REQUESTS";
+    public static final String FRAGMENT_SETTINGS = "FRAGMENT_SETTINGS";
+    public static final String FRAGMENT_FEED = "FRAGMENT_FEED";
+
     // Request Codes
     public static final int REQUEST_CODE_TRIP_ACTIVITY = 9001;
     public static final int REQUEST_CODE_CREATE_TRIP_ACTIVITY = 9002;
