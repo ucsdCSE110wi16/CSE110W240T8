@@ -26,10 +26,13 @@ public class ParseNotificationModel {
             ids.add(user.getObjectId());
         }
 
+        ParseUser currentUser = ParseUser.getCurrentUser();
         JSONObject data = new JSONObject();
         try {
-            data.put("title", ParseUser.getCurrentUser().get("firstName"));
+            data.put("title", currentUser.get("firstName") + " " + currentUser.get("lastName"));
             data.put("alert", "invited you to join " + parseTrip.get("name"));
+            data.put("fbId", currentUser.get("fbId"));
+            data.put("type", "tripInvitation");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -44,10 +47,7 @@ public class ParseNotificationModel {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    Log.d(TAG, "Notification successfully sent");
-                } else {
-                    Log.d(TAG, "Parse exception occurred. code = " +
-                            e.getCode() + " message = " + e.getMessage());
+                    Log.d(TAG, "Invitation successfully sent");
                 }
             }
         });

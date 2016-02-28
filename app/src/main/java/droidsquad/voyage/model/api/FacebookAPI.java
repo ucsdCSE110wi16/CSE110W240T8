@@ -71,15 +71,8 @@ public class FacebookAPI {
         request.executeAsync();
     }
 
-    /**
-     * Loads the facebook profile picture of the user with the given id into the given view
-     *
-     * @param imageView The ImageView to load the picture into
-     * @param id User id to get the picture from
-     * @param type Type of the picture to get from facebook {small, large, square...}
-     */
-    public static void loadProfilePicIntoView(final ImageView imageView,
-                                              final String id, final String type) {
+    public static void getProfilePic(final String id,
+                                     final String type, final ProfilePicCallback callback) {
         new AsyncTask<Void, Void, Bitmap>() {
             @Override
             protected Bitmap doInBackground(Void... params) {
@@ -100,12 +93,33 @@ public class FacebookAPI {
             @Override
             protected void onPostExecute(Bitmap bitmap) {
                 if (bitmap != null)
-                    imageView.setImageBitmap(bitmap);
+                    callback.onCompleted(bitmap);
             }
         }.execute();
     }
 
+    /**
+     * Loads the facebook profile picture of the user with the given id into the given view
+     *
+     * @param imageView The ImageView to load the picture into
+     * @param id User id to get the picture from
+     * @param type Type of the picture to get from facebook {small, large, square...}
+     */
+    public static void loadProfilePicIntoView(final ImageView imageView,
+                                              final String id, final String type) {
+        getProfilePic(id, type, new ProfilePicCallback() {
+            @Override
+            public void onCompleted(Bitmap bitmap) {
+                imageView.setImageBitmap(bitmap);
+            }
+        });
+    }
+
     public interface FBFriendsArrayCallback {
         void onCompleted(FacebookUser[] friends);
+    }
+
+    public interface ProfilePicCallback {
+        void onCompleted(Bitmap bitmap);
     }
 }
