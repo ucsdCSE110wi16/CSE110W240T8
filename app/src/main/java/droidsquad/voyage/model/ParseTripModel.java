@@ -36,15 +36,7 @@ public class ParseTripModel {
     public static void saveTrip(final Trip trip) {
         Log.d(TAG, "Attempting to save trip to parse.\nTrip: " + trip.toString());
 
-        final ParseObject parseTrip = new ParseObject("Trip");
-        parseTrip.put("name", trip.getName());
-        parseTrip.put("creatorId", trip.getCreatorId());
-        parseTrip.put("origin", trip.getOrigin());
-        parseTrip.put("destination", trip.getDestination());
-        parseTrip.put("private", trip.isPrivate());
-        parseTrip.put("dateFrom", trip.getDateFrom());
-        parseTrip.put("dateTo", trip.getDateTo());
-        parseTrip.put("transportation", trip.getTransportation());
+        final ParseObject parseTrip = getParseObjectFromTrip(trip);
 
         //TODO: Initialize UserGroup stuff for new trips?
         ParseRelation<ParseUser> relation = parseTrip.getRelation("members");
@@ -57,8 +49,7 @@ public class ParseTripModel {
                     Log.d(TAG, "SUCCESS");
                     trip.setId(parseTrip.getObjectId());
                 } else {
-                    Log.d(TAG, "FAILED");
-                    e.printStackTrace();
+                    Log.d(TAG, "FAILED", e);
                 }
             }
         });
@@ -88,8 +79,7 @@ public class ParseTripModel {
                             Log.d(TAG, "SUCCESS");
                             trip.setId(parseTrip.getObjectId());
                         } else {
-                            Log.d(TAG, "FAILED");
-                            e.printStackTrace();
+                            Log.d(TAG, "FAILED", e);
                         }
                     }
                 });
@@ -131,15 +121,6 @@ public class ParseTripModel {
     }
 
     /**
-     * Gt the Parse object ID for the current user
-     *
-     * @return User ID of the current user
-     */
-    public static String getUser() {
-        return ParseUser.getCurrentUser().getObjectId();
-    }
-
-    /**
      * Save the invitees to Parse
      *
      * @param tripId   Parse Obj id of the trip
@@ -159,7 +140,6 @@ public class ParseTripModel {
             }
         });
     }
-
 
     /**
      * Gets all current invitees of a trip from Parse
@@ -228,7 +208,8 @@ public class ParseTripModel {
         });
     }
 
-    public static void removeUserFromRelation(final String tripId, String userId, final String relation, final TripASyncTaskCallback callback) {
+    public static void removeUserFromRelation(final String tripId, String userId,
+                                              final String relation, final TripASyncTaskCallback callback) {
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.getInBackground(userId, new GetCallback<ParseUser>() {
             @Override
@@ -335,6 +316,7 @@ public class ParseTripModel {
      */
     private static void getAllMyTrips(final List<ParseObject> trips, final ParseTripCallback callback) {
         final ArrayList<Trip> allMyTrips = new ArrayList<>();
+
         if (trips == null) {
             Log.d(TAG, "0 Trips received");
             return;
@@ -357,7 +339,9 @@ public class ParseTripModel {
 
             trip.setDateFrom(parseTrip.getDate("dateFrom"));
             trip.setDateTo(parseTrip.getDate("dateTo"));
+
             allMyTrips.add(trip);
+
             setAllMembers(parseTrip, trip, new SavedMembersCallback() {
                 @Override
                 public void onMemSaved() {
@@ -465,6 +449,20 @@ public class ParseTripModel {
                 callback.onSuccess(parseTrip);
             }
         });
+    }
+
+    private static ParseObject getParseObjectFromTrip(Trip trip) {
+        final ParseObject parseTrip = new ParseObject("Trip");
+        parseTrip.put("name", trip.getName());
+        parseTrip.put("creatorId", trip.getCreatorId());
+        parseTrip.put("origin", trip.getOrigin());
+        parseTrip.put("destination", trip.getDestination());
+        parseTrip.put("private", trip.isPrivate());
+        parseTrip.put("dateFrom", trip.getDateFrom());
+        parseTrip.put("dateTo", trip.getDateTo());
+        parseTrip.put("transportation", trip.getTransportation());
+
+        return parseTrip;
     }
 
     private static String getParseErrorString(int code) {

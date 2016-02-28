@@ -9,6 +9,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.parse.ParseUser;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -251,7 +253,7 @@ public class CreateTripController {
      * Attempts to save a Trip with the information in the views
      */
     public void attemptSaveTrip() {
-        String creatorId = ParseTripModel.getUser();
+        String creatorId = ParseUser.getCurrentUser().getObjectId();
 
         // Get all the information from the views
         String tripName = activity.getTripNameView().getText().toString();

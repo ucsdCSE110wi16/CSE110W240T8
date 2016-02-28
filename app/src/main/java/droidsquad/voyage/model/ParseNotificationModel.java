@@ -21,6 +21,7 @@ public class ParseNotificationModel {
 
     public static void sendRequestNotifications(ParseObject parseTrip, List<ParseUser> parseUsers) {
         List<String> ids = new ArrayList<>();
+        ids.add(ParseUser.getCurrentUser().getObjectId());
 
         for (ParseUser user : parseUsers) {
             ids.add(user.getObjectId());
@@ -28,6 +29,7 @@ public class ParseNotificationModel {
 
         ParseUser currentUser = ParseUser.getCurrentUser();
         JSONObject data = new JSONObject();
+
         try {
             data.put("title", currentUser.get("firstName") + " " + currentUser.get("lastName"));
             data.put("alert", "invited you to join " + parseTrip.get("name"));

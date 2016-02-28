@@ -56,7 +56,7 @@ public class AddFriendsController {
     /**
      * Get all the facebook friends of the current user and store
      * it in the member variable friends
-     * <p/>
+     *
      * Fields retrieved are ID, Name and Picture
      */
     private void getFBFriends() {

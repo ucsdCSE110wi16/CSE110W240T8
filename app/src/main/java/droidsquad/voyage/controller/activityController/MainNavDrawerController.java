@@ -28,7 +28,6 @@ public class MainNavDrawerController {
         fragmentManager = activity.getSupportFragmentManager();
         this.user = new VoyageUser();
 
-
         // Open appropriate fragment based on intent
         String fragmentToOpen = activity.getIntent().getStringExtra(Constants.KEY_FRAGMENT_MAIN_ACTIVITY);
 
@@ -36,15 +35,15 @@ public class MainNavDrawerController {
             tripsPressed();
         } else {
             switch (fragmentToOpen) {
-                case Constants.FRAGMENT_REQUESTS :
+                case Constants.FRAGMENT_REQUESTS:
                     requestsPressed();
                     break;
 
-                case Constants.FRAGMENT_SETTINGS :
+                case Constants.FRAGMENT_SETTINGS:
                     settingsPressed();
                     break;
 
-                case Constants.FRAGMENT_FEED :
+                case Constants.FRAGMENT_FEED:
                     feedPressed();
                     break;
 
@@ -66,7 +65,6 @@ public class MainNavDrawerController {
         Fragment fragment = TripListFragment.newInstance();
         changeFragment(fragment, activity.getString(R.string.label_trip_list_fragment));
     }
-
 
 
     /**
@@ -103,13 +101,14 @@ public class MainNavDrawerController {
 
     /**
      * Logic used to do the actual fragment changing
-     * @param fragment  created from newInstance()
-     * @param fragmentLabel     string label describing the fragment
+     *
+     * @param fragment      created from newInstance()
+     * @param fragmentLabel string label describing the fragment
      */
     private void changeFragment(Fragment fragment, String fragmentLabel) {
         Fragment currentFragment = activity.getSupportFragmentManager().
                 findFragmentByTag(fragmentLabel);
-        if(currentFragment == null || !currentFragment.isVisible()) {
+        if (currentFragment == null || !currentFragment.isVisible()) {
             fragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, fragment, fragmentLabel)
                     .commit();

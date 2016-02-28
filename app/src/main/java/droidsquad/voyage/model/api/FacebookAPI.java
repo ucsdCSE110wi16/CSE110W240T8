@@ -71,23 +71,27 @@ public class FacebookAPI {
         request.executeAsync();
     }
 
-    public static void getProfilePic(final String id,
-                                     final String type, final ProfilePicCallback callback) {
+    public static Bitmap getProfilePic(String id, String type) {
+        Bitmap bitmap = null;
+
+        try {
+            URL imageURL = new URL(GRAPH_URL + id + "/picture?type=" + type);
+            bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+        } catch (MalformedURLException e) {
+            Log.d(TAG, "Malformed Exception occurred: " + e.getMessage());
+        } catch (IOException e) {
+            Log.e(TAG, "IOException occurred: " + e.getMessage());
+        }
+
+        return bitmap;
+    }
+
+    public static void getProfilePicAsync(final String id,
+                                          final String type, final ProfilePicCallback callback) {
         new AsyncTask<Void, Void, Bitmap>() {
             @Override
             protected Bitmap doInBackground(Void... params) {
-                Bitmap bitmap = null;
-
-                try {
-                    URL imageURL = new URL(GRAPH_URL + id + "/picture?type=" + type);
-                    bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
-                } catch (MalformedURLException e) {
-                    Log.d(TAG, "Malformed Exception occurred: " + e.getMessage());
-                } catch (IOException e) {
-                    Log.e(TAG, "IOException occurred: " + e.getMessage());
-                }
-
-                return bitmap;
+                return getProfilePic(id, type);
             }
 
             @Override
@@ -107,7 +111,7 @@ public class FacebookAPI {
      */
     public static void loadProfilePicIntoView(final ImageView imageView,
                                               final String id, final String type) {
-        getProfilePic(id, type, new ProfilePicCallback() {
+        getProfilePicAsync(id, type, new ProfilePicCallback() {
             @Override
             public void onCompleted(Bitmap bitmap) {
                 imageView.setImageBitmap(bitmap);

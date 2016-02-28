@@ -139,6 +139,7 @@ public class VoyageUser {
                     // TODO: maybe add a loading animation
                     Log.d(TAG, "User successfully logged out.");
                     ParseInstallation.getCurrentInstallation().remove("userId");
+                    ParseInstallation.getCurrentInstallation().saveInBackground();
                 } else {
                     // TODO: handle if logout fails (error message)
                     Log.d(TAG, "ParseException occurred. Code: "
