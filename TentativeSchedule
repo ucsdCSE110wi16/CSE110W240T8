@@ -49,11 +49,11 @@ Editing a trip
 Features Done by WEEK 9:
 Work on FB Feed activity
 -get all public trips from friends
-View Own Trip History
--user can see list of past trips
-Trip search 
--be able to search for a trip in a user's list of trips
-(Also spend time to clean up code & fix bugs during week)
+Finish up push notifications
+-push notifications on events such as trip deleted, trip approaching, etc
+Look into hotel/airplane API for a trip, if there is time
+-user can obtain cost of trip
+(Also spend time to refactor/clean up code & fix bugs during week)
 
 Features Done by WEEK 10: FINAL MILESTONE
 Polishing up/last-min bug fixes
