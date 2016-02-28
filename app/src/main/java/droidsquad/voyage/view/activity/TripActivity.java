@@ -11,9 +11,11 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,7 +27,12 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.controller.AutoWrappingLinearLayoutManager;
 import droidsquad.voyage.controller.activityController.TripController;
+import droidsquad.voyage.model.adapters.FBFriendsAdapter;
+import droidsquad.voyage.model.objects.FacebookUser;
+import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.util.Constants;
 
 public class TripActivity extends AppCompatActivity {
     private CollapsingToolbarLayout mCollapsingToolbar;
@@ -34,6 +41,8 @@ public class TripActivity extends AppCompatActivity {
     private TextView mTripLocTextView;
     private TextView mTripDatesTextView;
     private TripController mController;
+    private RecyclerView mMembersRecyclerView;
+    private RecyclerView mInviteesRecyclerView;
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
 
@@ -54,7 +63,47 @@ public class TripActivity extends AppCompatActivity {
         });
 
         mController = new TripController(this);
+        populateData();
+    }
+
+    private void populateData() {
+        // Set the dates
+        String dates = getString(R.string.trip_dates,
+                dateFormat.format(mController.getDateFrom()),
+                dateFormat.format(mController.getDateTo()));
+        mTripDatesTextView.setText(dates);
+
+        // Set the locations
+        String transportation = getString(R.string.trip_locations,
+                mController.getOrigin(), mController.getDestination());
+        mTripLocTextView.setText(transportation);
+        mTripLocTextView.setCompoundDrawablesWithIntrinsicBounds(mController.getDrawableId(), 0, 0, 0);
+
+        mCollapsingToolbar.setTitle(mController.getTitle());
+
         mController.setGooglePlacePhoto(mHeaderImageView);
+
+        // set and populate members and invitees list
+        mMembersRecyclerView.setAdapter(mController.mMemAdapter);
+        mController.updateMembersAdapter();
+
+        mInviteesRecyclerView.setAdapter(mController.mInviteesAdapter);
+        mController.updateInviteesAdapter();
+
+        if (mController.isCreator()) {
+            mController.mMemAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
+                @Override
+                public void onClick(FacebookUser user) {
+                    showKickMemberDialog(user);
+                }
+            });
+            mController.mInviteesAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
+                @Override
+                public void onClick(FacebookUser user) {
+                    showKickInviteeDialog(user);
+                }
+            });
+        }
     }
 
     @Override
@@ -81,6 +130,8 @@ public class TripActivity extends AppCompatActivity {
             case R.id.trip_action_leave_trip:
                 showLeaveTripDialog();
                 return true;
+            case R.id.trip_action_edit:
+                mController.editTrip();
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -121,6 +172,42 @@ public class TripActivity extends AppCompatActivity {
         deleteAlert.show();
     }
 
+    private void showKickMemberDialog(final FacebookUser user) {
+        AlertDialog.Builder deleteAlert = new AlertDialog.Builder(this);
+        deleteAlert.setMessage(getString(R.string.kick_friend_alert, user.name,
+                mController.trip.getName()));
+
+        deleteAlert.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                mController.kickMember(user);
+            }
+        });
+        deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        deleteAlert.show();
+    }
+
+    private void showKickInviteeDialog(final FacebookUser user) {
+        AlertDialog.Builder deleteAlert = new AlertDialog.Builder(this);
+        deleteAlert.setMessage(getString(R.string.kick_friend_alert, user.name,
+                mController.trip.getName()));
+
+        deleteAlert.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                mController.kickInvitee(user);
+            }
+        });
+        deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        deleteAlert.show();
+    }
+
     /**
      * Initialize all the UI elements of this Activity
      */
@@ -131,30 +218,28 @@ public class TripActivity extends AppCompatActivity {
         mTripLocTextView = (TextView) findViewById(R.id.trip_locations);
         mTripDatesTextView = (TextView) findViewById(R.id.trip_dates);
 
-        // Set the dates
-        String dates = getString(R.string.trip_dates,
-                dateFormat.format(mController.getDateFrom()),
-                dateFormat.format(mController.getDateTo()));
-        mTripDatesTextView.setText(dates);
+        mMembersRecyclerView = (RecyclerView) findViewById(R.id.members_recycler_view);
+        mMembersRecyclerView.setLayoutManager(new AutoWrappingLinearLayoutManager(this));
+        mMembersRecyclerView.setNestedScrollingEnabled(false);
+        mMembersRecyclerView.setHasFixedSize(false);
 
-        // Set the locations
-        String transportation = getString(R.string.trip_locations,
-                mController.getOrigin(), mController.getDestination());
-        mTripLocTextView.setText(transportation);
-        mTripLocTextView.setCompoundDrawablesWithIntrinsicBounds(mController.getDrawableId(), 0, 0, 0);
+        mInviteesRecyclerView = (RecyclerView) findViewById(R.id.invitees_recycler_view);
+        mInviteesRecyclerView.setLayoutManager(new AutoWrappingLinearLayoutManager(this));
+        mInviteesRecyclerView.setNestedScrollingEnabled(false);
+        mInviteesRecyclerView.setHasFixedSize(false);
 
         // Set up toolbar and action bar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         mCollapsingToolbar.setExpandedTitleTypeface(Typeface.create("sans-serif", Typeface.BOLD));
-        mCollapsingToolbar.setTitle(mController.getTitle());
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     private void setUIForCreator(boolean isCreator, Menu menu) {
+        // TODO: add if clause for if just spectator (not actually in trip)
         if (isCreator) {
             menu.findItem(R.id.trip_action_leave_trip).setVisible(false);
         } else {
@@ -167,6 +252,9 @@ public class TripActivity extends AppCompatActivity {
             params.setAnchorId(View.NO_ID);
             mFAB.setLayoutParams(params);
             mFAB.setVisibility(View.GONE);
+
+            // Shouldn't be able to edit trip
+            menu.findItem(R.id.trip_action_edit).setVisible(false);
         }
     }
 
@@ -209,5 +297,34 @@ public class TripActivity extends AppCompatActivity {
         sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Share"));
+    }
+
+    /**
+     * Called to start the intent for editing the trip via CreateTripActivity with an extra boolean
+     * to indicate the trip is being edited
+     * @param trip  current trip, needed to populate the CreateTripActivity fields
+     */
+    public void editTripIntent(Trip trip) {
+        Intent intent = new Intent(this, CreateTripActivity.class);
+        intent.putExtra(this.getString(R.string.intent_key_trip), trip);
+        intent.putExtra(getString(R.string.edit_trip), true);
+        startActivityForResult(intent, Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY);
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+
+            case Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY :
+                if (resultCode == Constants.RESULT_CODE_TRIP_UPDATED) {
+                    mController.trip = data.getParcelableExtra(getString(R.string.intent_key_trip));
+                    populateData();
+                    Snackbar snackbar = Snackbar.make(mMembersRecyclerView,
+                            R.string.snackbar_trip_updated, Snackbar.LENGTH_SHORT);
+                    snackbar.show();
+                }
+                break;
+        }
     }
 }

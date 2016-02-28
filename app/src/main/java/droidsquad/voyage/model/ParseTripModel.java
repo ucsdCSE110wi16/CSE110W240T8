@@ -24,6 +24,10 @@ public class ParseTripModel {
     private static final String TAG = ParseUser.class.getSimpleName();
     // TODO: add more key/value final Strings
 
+    /***************************************************************************************
+     *                         PUBLIC METHODS (To be used in other files)
+     ***************************************************************************************/
+
     /**
      * Save this trip to the database
      *
@@ -60,6 +64,43 @@ public class ParseTripModel {
         });
     }
 
+    public static void updateTrip(final Trip trip) {
+        Log.d(TAG, "Attempting to update trip to parse.\nTrip: " + trip.toString());
+        String oldTripId = trip.getId();
+
+        getParseTrip(oldTripId, new ParseTripReceivedCallback() {
+            @Override
+            public void onSuccess(final ParseObject parseTrip) {
+                Log.d(TAG, "Trip queried");
+                parseTrip.put("name", trip.getName());
+                parseTrip.put("creatorId", trip.getCreatorId());
+                parseTrip.put("origin", trip.getOrigin());
+                parseTrip.put("destination", trip.getDestination());
+                parseTrip.put("private", trip.isPrivate());
+                parseTrip.put("dateFrom", trip.getDateFrom());
+                parseTrip.put("dateTo", trip.getDateTo());
+                parseTrip.put("transportation", trip.getTransportation());
+
+                parseTrip.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            Log.d(TAG, "SUCCESS");
+                            trip.setId(parseTrip.getObjectId());
+                        } else {
+                            Log.d(TAG, "FAILED");
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+            }
+        });
+    }
+
     /**
      * Gets all the trips from the database that this user is part of
      *
@@ -77,19 +118,229 @@ public class ParseTripModel {
         });
     }
 
+    public static void searchAllPublicTrips(final ParseTripCallback callback) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
+        query.whereEqualTo("private", false);
+
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                getAllMyTrips(objects, callback);
+            }
+        });
+    }
+
+    /**
+     * Gt the Parse object ID for the current user
+     * @return User ID of the current user
+     */
+    public static String getUser() {
+        return ParseUser.getCurrentUser().getObjectId();
+    }
+
+    /**
+     * Save the invitees to Parse
+     * @param tripId Parse Obj id of the trip
+     * @param fbIDs ArrayList of Facebook IDs
+     * @param callback Callback that defines success and failure
+     */
+    public static void saveInvitees(String tripId, final ArrayList<String> fbIDs, final TripASyncTaskCallback callback) {
+        getParseTrip(tripId, new ParseTripReceivedCallback() {
+            @Override
+            public void onSuccess(ParseObject trip) {
+                getFBUsers(trip, fbIDs, callback);
+            }
+
+            @Override
+            public void onFailure(String error) {
+                callback.onFailure(error);
+            }
+        });
+    }
+
+
+
+    /**
+     * Gets all current invitees of a trip from Parse
+     * @param trip Trip object to set the members in
+     * @param callback Callback that defines success and failure
+     */
+    public static void setAllInvitees(final Trip trip, final TripASyncTaskCallback callback) {
+        getParseTrip(trip.getId(), new ParseTripReceivedCallback() {
+            @Override
+            public void onSuccess(ParseObject parseTrip) {
+                ParseRelation<ParseUser> memberRelation = parseTrip.getRelation("invitees");
+                memberRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(List<ParseUser> tripMembers, ParseException e) {
+                        if (e != null) {
+                            Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                                    + " Message: " + e.getMessage());
+                            callback.onFailure(getParseErrorString(e.getCode()));
+                            return;
+                        }
+
+                        for (ParseUser member : tripMembers) {
+                            String name = member.get("firstName") + " " + member.get("lastName");
+                            String objectId = member.getObjectId();
+                            String fbId = (String) member.get("fbId");
+
+                            trip.addInvitee(name, objectId, fbId);
+                        }
+
+                        callback.onSuccess();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                callback.onFailure(error);
+            }
+        });
+    }
+    public static void deleteTrip(String tripId, final TripASyncTaskCallback callback) {
+        getParseTrip(tripId, new ParseTripReceivedCallback() {
+            @Override
+            public void onSuccess(ParseObject trip) {
+                trip.deleteInBackground(new DeleteCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                                    + " Message: " + e.getMessage());
+                            callback.onFailure(getParseErrorString(e.getCode()));
+                            return;
+                        }
+
+                        callback.onSuccess();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                callback.onFailure(error);
+            }
+        });
+    }
+
+    public static void removeUserFromRelation(final String tripId, String userId, final String relation, final TripASyncTaskCallback callback) {
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.getInBackground(userId, new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser parseUser, ParseException e) {
+                if (e != null) {
+                    Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                            + " Message: " + e.getMessage());
+                    callback.onFailure(getParseErrorString(e.getCode()));
+                    return;
+                }
+
+                removeUserFromRelation(tripId, parseUser, relation, callback);
+            }
+        });
+    }
+
+    public static void removeUserFromRelation(String tripId, final ParseUser parseUser,
+                                              final String relation, final TripASyncTaskCallback callback) {
+        getParseTrip(tripId, new ParseTripReceivedCallback() {
+            @Override
+            public void onSuccess(ParseObject trip) {
+                ParseRelation<ParseUser> membersRelation = trip.getRelation(relation);
+                membersRelation.remove(parseUser);
+
+                trip.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                                    + " Message: " + e.getMessage());
+                            callback.onFailure(getParseErrorString(e.getCode()));
+                            return;
+                        }
+
+                        callback.onSuccess();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                callback.onFailure(error);
+            }
+        });
+    }
+
+    public static void addUserToRelation(final String tripId, String userId,
+                                         final String relation, final TripASyncTaskCallback callback) {
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.getInBackground(userId, new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser parseUser, ParseException e) {
+                if (e != null) {
+                    Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                            + " Message: " + e.getMessage());
+                    callback.onFailure(getParseErrorString(e.getCode()));
+                    return;
+                }
+
+                addUserToRelation(tripId, parseUser, relation, callback);
+            }
+        });
+    }
+
+    public static void addUserToRelation(String tripId, final ParseUser parseUser,
+                                         final String relation, final TripASyncTaskCallback callback) {
+        getParseTrip(tripId, new ParseTripReceivedCallback() {
+            @Override
+            public void onSuccess(ParseObject trip) {
+                ParseRelation<ParseUser> membersRelation = trip.getRelation(relation);
+                membersRelation.add(parseUser);
+
+                trip.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
+                                    + " Message: " + e.getMessage());
+                            callback.onFailure(getParseErrorString(e.getCode()));
+                            return;
+                        }
+
+                        callback.onSuccess();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                callback.onFailure(error);
+            }
+        });
+    }
+
+    /***************************************************************************************
+     *                         PRIVATE METHODS (Helper methods)
+     ***************************************************************************************/
+
     /**
      * Helper method for getting all the trips from the database
      *
      * @param trips List to put the trips inside
      * @param callback Called when all trips are retrieved from the database
      */
-    private static void getAllMyTrips(List<ParseObject> trips, ParseTripCallback callback) {
-        ArrayList<Trip> allMyTrips = new ArrayList<>();
-        if (trips == null)
+    private static void getAllMyTrips(final List<ParseObject> trips, final ParseTripCallback callback) {
+        final ArrayList<Trip> allMyTrips = new ArrayList<>();
+        if (trips == null) {
+            Log.d(TAG, "0 Trips received");
             return;
+        }
+
+        final int[] tripMembersSet = {0};
 
         for (ParseObject parseTrip : trips) {
-            Trip trip = new Trip();
+            final Trip trip = new Trip();
 
             trip.setId(parseTrip.getObjectId());
             trip.setCreatorId(parseTrip.getString("creatorId"));
@@ -104,41 +355,55 @@ public class ParseTripModel {
             trip.setDateFrom(parseTrip.getDate("dateFrom"));
             trip.setDateTo(parseTrip.getDate("dateTo"));
             allMyTrips.add(trip);
-        }
+            setAllMembers(parseTrip, trip, new SavedMembersCallback() {
+                @Override
+                public void onMemSaved() {
+                    tripMembersSet[0]++;
 
-        callback.onCompleted(allMyTrips);
-    }
-
-    /**
-     * Gt the Parse object ID for the current user
-     * @return User ID of the current user
-     */
-    public static String getUser() {
-        return ParseUser.getCurrentUser().getObjectId();
-    }
-
-    /**
-     * Save the invitees to Parse
-     * @param tripObjId Parse Obj id of the trip
-     * @param fbIDs ArrayList of Facebook IDs
-     * @param callback Callback that defines success and failure
-     */
-    public static void saveInvitees(String tripObjId, final ArrayList<String> fbIDs, final TripASyncTaskCallback callback) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
-        query.getInBackground(tripObjId, new GetCallback<ParseObject>() {
-            @Override
-            public void done(final ParseObject parseTrip, ParseException e) {
-                if (e == null) {
-                    getFBUsers(parseTrip, fbIDs, callback);
-                } else {
-                    Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
-                            + " Message: " + e.getMessage());
-
-                    callback.onFailure(getParseErrorString(e.getCode()));
+                    if (tripMembersSet[0] == trips.size()) {
+                        Log.d(TAG, trips.size() + " trips successfully retrieved");
+                        callback.onCompleted(allMyTrips);
+                    }
                 }
+            });
+        }
+    }
+
+
+    private static void setAllMembers(final ParseObject parseTrip, final Trip trip, final SavedMembersCallback callback) {
+        ParseRelation<ParseUser> memRelation = parseTrip.getRelation("members");
+        memRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> members, ParseException e) {
+                if (e != null || members == null) {
+                    return;
+                }
+
+                for (ParseUser member : members) {
+                    trip.addMember(member.get("firstName") + " " + member.get("lastName"),
+                            member.getObjectId(), (String) member.get("fbId"));
+                }
+
+                ParseRelation<ParseUser> inviteesRelation = parseTrip.getRelation("invitees");
+                inviteesRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(List<ParseUser> invitees, ParseException e) {
+                        if (e != null || invitees == null) {
+                            return;
+                        }
+
+                        for (ParseUser invitee : invitees) {
+                            trip.addInvitee(invitee.get("firstName") + " " + invitee.get("lastName"),
+                                    invitee.getObjectId(), (String) invitee.get("fbId"));
+                        }
+
+                        callback.onMemSaved();
+                    }
+                });
             }
         });
     }
+
 
     private static void getFBUsers(final ParseObject parseTrip, ArrayList<String> fbIDs, final TripASyncTaskCallback callback) {
         ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
@@ -177,23 +442,11 @@ public class ParseTripModel {
         });
     }
 
-    private static String getParseErrorString(int code) {
-        switch (code) {
-            case 100:
-                return Constants.ERROR_NO_INTERNET_CONNECTION;
-            default:
-                return Constants.ERROR_UNKNOWN;
-        }
-    }
 
-    /**
-     * Gets all current members of a trip from Parse
-     * @param trip Trip object to set the members in
-     * @param callback Callback that defines success and failure
-     */
-    public static void setAllMembers(final Trip trip, final TripASyncTaskCallback callback) {
+
+    private static void getParseTrip(String tripId, final ParseTripReceivedCallback callback) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
-        query.getInBackground(trip.getId(), new GetCallback<ParseObject>() {
+        query.getInBackground(tripId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseTrip, ParseException e) {
                 if (e != null) {
@@ -203,90 +456,20 @@ public class ParseTripModel {
                     return;
                 }
 
-                ParseRelation<ParseUser> memberRelation = parseTrip.getRelation("members");
-                memberRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {
-                    @Override
-                    public void done(List<ParseUser> tripMembers, ParseException e) {
-                        if (e != null) {
-                            Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
-                                    + " Message: " + e.getMessage());
-                            callback.onFailure(getParseErrorString(e.getCode()));
-                            return;
-                        }
-
-                        for (ParseUser member : tripMembers) {
-                            String name = member.get("firstName") + " " + member.get("lastName");
-                            String objectId = member.getObjectId();
-                            String fbId = (String) member.get("fbId");
-
-                            trip.addMember(name, objectId, fbId);
-                        }
-
-                        callback.onSuccess();
-                    }
-                });
+                callback.onSuccess(parseTrip);
             }
         });
     }
 
-    public static void deleteTrip(Trip trip, final TripASyncTaskCallback callback) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
-        query.getInBackground(trip.getId(), new GetCallback<ParseObject>() {
-            public void done(ParseObject trip, ParseException e) {
-                if (e != null) {
-                    Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
-                            + " Message: " + e.getMessage());
-                    callback.onFailure(getParseErrorString(e.getCode()));
-                    return;
-                }
-
-                trip.deleteInBackground(new DeleteCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e != null) {
-                            Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
-                                    + " Message: " + e.getMessage());
-                            callback.onFailure(getParseErrorString(e.getCode()));
-                            return;
-                        }
-
-                        callback.onSuccess();
-                    }
-                });
-            }
-        });
+    private static String getParseErrorString(int code) {
+        switch (code) {
+            case 100:
+                return Constants.ERROR_NO_INTERNET_CONNECTION;
+            default:
+                return Constants.ERROR_UNKNOWN;
+        }
     }
 
-    public static void leaveTrip(Trip trip, final TripASyncTaskCallback callback) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
-        query.getInBackground(trip.getId(), new GetCallback<ParseObject>() {
-            public void done(ParseObject trip, ParseException e) {
-                if (e != null) {
-                    Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
-                            + " Message: " + e.getMessage());
-                    callback.onFailure(getParseErrorString(e.getCode()));
-                    return;
-                }
-
-                ParseRelation<ParseUser> membersRelation = trip.getRelation("members");
-                membersRelation.remove(ParseUser.getCurrentUser());
-
-                trip.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e != null) {
-                            Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
-                                    + " Message: " + e.getMessage());
-                            callback.onFailure(getParseErrorString(e.getCode()));
-                            return;
-                        }
-
-                        callback.onSuccess();
-                    }
-                });
-            }
-        });
-    }
 
     /**
      * Interface to implement a callback that is accepted in methods of this class
@@ -298,5 +481,14 @@ public class ParseTripModel {
     public interface TripASyncTaskCallback {
         void onSuccess ();
         void onFailure(String error);
+    }
+
+    private interface ParseTripReceivedCallback {
+        void onSuccess(ParseObject trip);
+        void onFailure(String error);
+    }
+
+    private interface SavedMembersCallback {
+        void onMemSaved();
     }
 }

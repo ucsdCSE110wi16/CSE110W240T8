@@ -11,11 +11,14 @@ import com.parse.ParseUser;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.ParseTripModel;
+import droidsquad.voyage.model.adapters.FBFriendsAdapter;
 import droidsquad.voyage.model.api.GooglePlacesAPI;
+import droidsquad.voyage.model.objects.FacebookUser;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.AddFriendsActivity;
@@ -23,15 +26,20 @@ import droidsquad.voyage.view.activity.TripActivity;
 
 public class TripController {
     private TripActivity mActivity;
-    private Trip trip;
+    public Trip trip;
 
     private static final String TAG = TripController.class.getSimpleName();
+    public FBFriendsAdapter mMemAdapter;
+    public FBFriendsAdapter mInviteesAdapter;
 
     public TripController(TripActivity instance) {
         this.mActivity = instance;
 
         trip = mActivity.getIntent().getParcelableExtra(
                 mActivity.getString(R.string.intent_key_trip));
+
+        mMemAdapter = new FBFriendsAdapter(mActivity, isCreator());
+        mInviteesAdapter = new FBFriendsAdapter(mActivity, isCreator());
     }
 
     public void setGooglePlacePhoto(final ImageView imageView) {
@@ -61,6 +69,9 @@ public class TripController {
         }
     }
 
+    public void editTrip() {
+        mActivity.editTripIntent(this.trip);
+    }
     /**
      * @return The id of the icon corresponding to the type of transportation
      */
@@ -121,7 +132,7 @@ public class TripController {
 
     public void deleteTrip() {
         Log.d(TAG, "Deleting trip: " + trip.getName());
-        ParseTripModel.deleteTrip(trip, new ParseTripModel.TripASyncTaskCallback() {
+        ParseTripModel.deleteTrip(trip.getId(), new ParseTripModel.TripASyncTaskCallback() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Successfully deleted");
@@ -143,23 +154,90 @@ public class TripController {
 
     public void leaveTrip() {
         Log.d(TAG, "Leaving trip: " + trip.getName());
-        ParseTripModel.leaveTrip(trip, new ParseTripModel.TripASyncTaskCallback() {
-            @Override
-            public void onSuccess() {
-                Log.d(TAG, "Successfully Left trip");
-                mActivity.setResult(Constants.RESULT_CODE_TRIP_LEFT);
-                mActivity.finish();
-            }
+        ParseTripModel.removeUserFromRelation(trip.getId(), ParseUser.getCurrentUser(),
+                Constants.PARSE_RELATION_INVITEES, new ParseTripModel.TripASyncTaskCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, "Successfully Left trip");
+                        mActivity.setResult(Constants.RESULT_CODE_TRIP_LEFT);
+                        mActivity.finish();
+                    }
 
-            @Override
-            public void onFailure(String error) {
-                Log.d(TAG, "Couldn\'t leave the trip. Error: " + error);
-                Snackbar snackbar = Snackbar.make(
-                        mActivity.findViewById(android.R.id.content), error,
-                        Snackbar.LENGTH_SHORT);
+                    @Override
+                    public void onFailure(String error) {
+                        Log.d(TAG, "Couldn\'t leave the trip. Error: " + error);
+                        Snackbar snackbar = Snackbar.make(
+                                mActivity.findViewById(android.R.id.content), error,
+                                Snackbar.LENGTH_SHORT);
 
-                snackbar.show();
-            }
-        });
+                        snackbar.show();
+                    }
+                });
     }
+
+    public void updateMembersAdapter() {
+        updateFBFriendsAdapter(trip.getAllMembers(), mMemAdapter);
+    }
+
+    public void updateInviteesAdapter() {
+        updateFBFriendsAdapter(trip.getAllInvitees(), mInviteesAdapter);
+    }
+
+    private void updateFBFriendsAdapter(ArrayList<Trip.TripMember> users, FBFriendsAdapter adapter) {
+        ArrayList<FacebookUser> fbUsers = new ArrayList<>();
+        String currentUserId = ParseUser.getCurrentUser().getObjectId();
+
+        for (Trip.TripMember member : users) {
+            // Shouldn't show the option to remove myself
+            if (isCreator() && member.objectId.equals(currentUserId)) {
+                continue;
+            }
+            fbUsers.add(new FacebookUser(member.fbId, member.name,
+                    String.format(Constants.FB_PICTURE_URL, member.fbId, "normal")));
+        }
+
+        adapter.updateResults(fbUsers);
+    }
+
+
+    public void kickMember(final FacebookUser fbUser) {
+        kickUser(fbUser, trip.getAllMembers(), mMemAdapter, Constants.PARSE_RELATION_MEMBERS,
+                mActivity.getString(R.string.snackbar_member_removed));
+    }
+
+    public void kickInvitee(final FacebookUser fbUser) {
+        kickUser(fbUser, trip.getAllInvitees(), mInviteesAdapter, Constants.PARSE_RELATION_INVITEES,
+                mActivity.getString(R.string.snackbar_invitee_removed));
+    }
+
+    public void kickUser(final FacebookUser fbUser, ArrayList<Trip.TripMember> users, final FBFriendsAdapter adapter,
+                         String relation, final String snackBarMessage) {
+        String userId = "";
+        for (Trip.TripMember member : users) {
+            if (member.fbId.endsWith(fbUser.id)) {
+                userId = member.objectId;
+                break;
+            }
+        }
+
+        // Remove user from member
+        ParseTripModel.removeUserFromRelation(trip.getId(), userId, relation,
+                new ParseTripModel.TripASyncTaskCallback() {
+                    @Override
+                    public void onSuccess() {
+                        adapter.removeFriend(fbUser);
+                        Snackbar snackbar = Snackbar.make(mActivity.findViewById(android.R.id.content),
+                                snackBarMessage, Snackbar.LENGTH_SHORT);
+                        snackbar.show();
+                    }
+
+                    @Override
+                    public void onFailure(String error) {
+                        Snackbar snackbar = Snackbar.make(mActivity.findViewById(android.R.id.content),
+                                error, Snackbar.LENGTH_SHORT);
+                        snackbar.show();
+                    }
+                });
+    }
+
 }

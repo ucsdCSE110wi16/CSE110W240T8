@@ -8,6 +8,7 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.view.activity.LoginActivity;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
+import droidsquad.voyage.view.fragment.FeedFragment;
 import droidsquad.voyage.view.fragment.RequestsFragment;
 import droidsquad.voyage.view.fragment.TripListFragment;
 
@@ -45,10 +46,8 @@ public class MainNavDrawerController {
      * Called when the Feed option is selected from the navigation drawer
      */
     public void feedPressed() {
-        Toast.makeText(activity, "Feed Fragment", Toast.LENGTH_SHORT).show();
-        // TODO: create feed fragment
-        // Fragment fragment = FeedFragment.newInstance();
-        // changeFragment(fragment, "Feed");
+        Fragment fragment = FeedFragment.newInstance();
+        changeFragment(fragment, "Feed");
     }
 
     /**

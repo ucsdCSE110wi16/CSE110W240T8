@@ -25,10 +25,12 @@ public class Trip implements Parcelable {
     private boolean isPrivate;
 
     private ArrayList<TripMember> allParticipants;
+    private ArrayList<TripMember> allInvitees;
 
     public Trip() {
         // No Arguments Constructor
         this.allParticipants = new ArrayList<>();
+        this.allInvitees = new ArrayList<>();
     }
 
     public Trip(String name, String creatorId, String transportation, JSONObject origin,
@@ -42,6 +44,7 @@ public class Trip implements Parcelable {
         this.isPrivate = isPrivate;
         this.creatorId = creatorId;
         this.allParticipants = new ArrayList<>();
+        this.allInvitees = new ArrayList<>();
     }
 
     protected Trip(Parcel in) {
@@ -63,13 +66,21 @@ public class Trip implements Parcelable {
         dateFrom = new Date(in.readLong());
         dateTo = new Date(in.readLong());
         isPrivate = in.readByte() != 0;
-        int numOfParticipants = in.readInt();
 
-        for (int i = 0; i < numOfParticipants; i++) {
+        int numOfMembers = in.readInt();
+        for (int i = 0; i < numOfMembers; i++) {
             String name = in.readString();
             String objectId = in.readString();
             String fbId = in.readString();
             addMember(name, objectId, fbId);
+        }
+
+        int numOfInvitees = in.readInt();
+        for (int i = 0; i < numOfInvitees; i++) {
+            String name = in.readString();
+            String objectId = in.readString();
+            String fbId = in.readString();
+            addInvitee(name, objectId, fbId);
         }
     }
 
@@ -101,13 +112,21 @@ public class Trip implements Parcelable {
         dest.writeLong(dateFrom.getTime());
         dest.writeLong(dateTo.getTime());
         dest.writeByte((byte) (isPrivate ? 1 : 0));
-        dest.writeInt(allParticipants.size());
 
+        dest.writeInt(allParticipants.size());
         for (TripMember participant : allParticipants) {
             dest.writeString(participant.name);
             dest.writeString(participant.objectId);
             dest.writeString(participant.fbId);
         }
+
+        dest.writeInt(allInvitees.size());
+        for (TripMember invitees : allInvitees) {
+            dest.writeString(invitees.name);
+            dest.writeString(invitees.objectId);
+            dest.writeString(invitees.fbId);
+        }
+
     }
 
     @Override
@@ -130,15 +149,24 @@ public class Trip implements Parcelable {
     public boolean overlaps(Trip other) {
         return (other.getDateFrom().before(this.dateTo) && other.getDateFrom().after(this.dateFrom))
                 || (other.getDateTo().before(this.dateTo) && other.getDateTo().after(this.dateFrom))
-                || (other.getDateTo().equals(this.dateTo) && other.getDateFrom().equals(this.dateFrom));
+                || (other.getDateTo().equals(this.dateTo)
+                || other.getDateFrom().equals(this.dateFrom));
     }
 
-    public ArrayList<TripMember> getAllParticipants() {
+    public ArrayList<TripMember> getAllMembers() {
         return allParticipants;
+    }
+
+    public ArrayList<TripMember> getAllInvitees() {
+        return allInvitees;
     }
 
     public void addMember(String name, String objectId, String fbId) {
         allParticipants.add(new TripMember(name, objectId, fbId));
+    }
+
+    public void addInvitee(String name, String objectId, String fbId) {
+        allInvitees.add(new TripMember(name, objectId, fbId));
     }
 
     public String getName() {
@@ -221,5 +249,17 @@ public class Trip implements Parcelable {
             this.objectId = objectId;
             this.fbId = fbId;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof Trip))
+            return false;
+        Trip trip = (Trip) o;
+        return name.equals(trip.getName()) && creatorId.equals(trip.getCreatorId()) &&
+                transportation.equals(trip.getTransportation()) && isPrivate == trip.isPrivate()
+                && dateFrom.equals(trip.getDateFrom()) && dateTo.equals(trip.getDateTo())
+                && destination.toString().equals(trip.getDestination().toString())
+                && origin.toString().equals(trip.getOrigin().toString());
     }
 }

@@ -32,7 +32,7 @@ public class AddFriendsController {
         mTrip = activity.getIntent().getParcelableExtra(
                 activity.getString(R.string.intent_key_trip));
 
-        mResultsAdapter = new FBFriendsAdapter(activity);
+        mResultsAdapter = new FBFriendsAdapter(activity, false);
         mSelectedFriendsAdapter = new SelectedFBFriendsAdapter(activity);
 
         mResultsAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
