@@ -56,7 +56,7 @@ public class AddFriendsController {
     /**
      * Get all the facebook friends of the current user and store
      * it in the member variable friends
-     *
+     * <p/>
      * Fields retrieved are ID, Name and Picture
      */
     private void getFBFriends() {
@@ -113,6 +113,7 @@ public class AddFriendsController {
         Log.d(TAG, "Adding " + mSelectedFriendsAdapter.mSelectedUsers.size() + " friends to Trip.");
         mActivity.showProgress(true);
         ArrayList<String> fbIDs = new ArrayList<>();
+
         for (FacebookUser user : mSelectedFriendsAdapter.mSelectedUsers) {
             fbIDs.add(user.id);
         }

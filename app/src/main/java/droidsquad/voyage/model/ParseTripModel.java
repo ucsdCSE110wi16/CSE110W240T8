@@ -132,6 +132,7 @@ public class ParseTripModel {
 
     /**
      * Gt the Parse object ID for the current user
+     *
      * @return User ID of the current user
      */
     public static String getUser() {
@@ -140,8 +141,9 @@ public class ParseTripModel {
 
     /**
      * Save the invitees to Parse
-     * @param tripId Parse Obj id of the trip
-     * @param fbIDs ArrayList of Facebook IDs
+     *
+     * @param tripId   Parse Obj id of the trip
+     * @param fbIDs    ArrayList of Facebook IDs
      * @param callback Callback that defines success and failure
      */
     public static void saveInvitees(String tripId, final ArrayList<String> fbIDs, final TripASyncTaskCallback callback) {
@@ -159,10 +161,10 @@ public class ParseTripModel {
     }
 
 
-
     /**
      * Gets all current invitees of a trip from Parse
-     * @param trip Trip object to set the members in
+     *
+     * @param trip     Trip object to set the members in
      * @param callback Callback that defines success and failure
      */
     public static void setAllInvitees(final Trip trip, final TripASyncTaskCallback callback) {
@@ -199,6 +201,7 @@ public class ParseTripModel {
             }
         });
     }
+
     public static void deleteTrip(String tripId, final TripASyncTaskCallback callback) {
         getParseTrip(tripId, new ParseTripReceivedCallback() {
             @Override
@@ -327,7 +330,7 @@ public class ParseTripModel {
     /**
      * Helper method for getting all the trips from the database
      *
-     * @param trips List to put the trips inside
+     * @param trips    List to put the trips inside
      * @param callback Called when all trips are retrieved from the database
      */
     private static void getAllMyTrips(final List<ParseObject> trips, final ParseTripCallback callback) {
@@ -408,6 +411,7 @@ public class ParseTripModel {
     private static void getFBUsers(final ParseObject parseTrip, ArrayList<String> fbIDs, final TripASyncTaskCallback callback) {
         ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
         userQuery.whereContainedIn("fbId", fbIDs);
+
         userQuery.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> objects, ParseException e) {
@@ -423,15 +427,18 @@ public class ParseTripModel {
     }
 
 
-    private static void setUpInviteeRelations(List<ParseUser> objects, ParseObject parseTrip, final TripASyncTaskCallback callback) {
+    private static void setUpInviteeRelations(final List<ParseUser> objects, final ParseObject parseTrip, final TripASyncTaskCallback callback) {
         ParseRelation<ParseUser> relation = parseTrip.getRelation("invitees");
-        for (ParseUser user: objects) {
+
+        for (ParseUser user : objects) {
             relation.add(user);
         }
+
         parseTrip.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
+                    ParseNotificationModel.sendRequestNotifications(parseTrip, objects);
                     callback.onSuccess();
                 } else {
                     Log.d(TAG, "ParseExceptionOccurred. Code: " + e.getCode()
@@ -441,7 +448,6 @@ public class ParseTripModel {
             }
         });
     }
-
 
 
     private static void getParseTrip(String tripId, final ParseTripReceivedCallback callback) {
@@ -479,12 +485,14 @@ public class ParseTripModel {
     }
 
     public interface TripASyncTaskCallback {
-        void onSuccess ();
+        void onSuccess();
+
         void onFailure(String error);
     }
 
     private interface ParseTripReceivedCallback {
         void onSuccess(ParseObject trip);
+
         void onFailure(String error);
     }
 
