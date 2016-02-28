@@ -2,7 +2,6 @@ package droidsquad.voyage.controller.activityController;
 
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -174,27 +173,9 @@ public class TripController {
                 });
     }
 
-    public void setMembers(final RecyclerView recyclerView) {
-        recyclerView.setAdapter(mMemAdapter);
-
-        if (trip.membersAreSet) {
-            updateMembersAdapter();
-        } else {
-            ParseTripModel.setAllMembers(trip, new ParseTripModel.TripASyncTaskCallback() {
-                @Override
-                public void onSuccess() {
-                    updateMembersAdapter();
-                }
-
-                @Override
-                public void onFailure(String error) {}
-            });
-        }
-    }
-
-    private void updateMembersAdapter() {
+    public void updateMembersAdapter() {
         ArrayList<FacebookUser> fbUsers = new ArrayList<>();
-        ArrayList<Trip.TripMember> members = trip.getAllParticipants();
+        ArrayList<Trip.TripMember> members = trip.getAllMembers();
         String currentUserId = ParseUser.getCurrentUser().getObjectId();
 
         for (Trip.TripMember member : members) {
@@ -210,7 +191,7 @@ public class TripController {
     }
 
     public void kickMember(final FacebookUser fbUser) {
-        ArrayList<Trip.TripMember> tripMembers = trip.getAllParticipants();
+        ArrayList<Trip.TripMember> tripMembers = trip.getAllMembers();
         String userId = "";
         for (Trip.TripMember member : tripMembers) {
             if (member.fbId.endsWith(fbUser.id)) {

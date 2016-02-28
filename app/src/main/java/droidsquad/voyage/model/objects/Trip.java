@@ -23,14 +23,14 @@ public class Trip implements Parcelable {
     private Date dateFrom;
     private Date dateTo;
     private boolean isPrivate;
-    public boolean membersAreSet;
 
     private ArrayList<TripMember> allParticipants;
+    private ArrayList<TripMember> allInvitees;
 
     public Trip() {
         // No Arguments Constructor
         this.allParticipants = new ArrayList<>();
-        membersAreSet = false;
+        this.allInvitees = new ArrayList<>();
     }
 
     public Trip(String name, String creatorId, String transportation, JSONObject origin,
@@ -44,7 +44,7 @@ public class Trip implements Parcelable {
         this.isPrivate = isPrivate;
         this.creatorId = creatorId;
         this.allParticipants = new ArrayList<>();
-        membersAreSet = false;
+        this.allInvitees = new ArrayList<>();
     }
 
     protected Trip(Parcel in) {
@@ -66,15 +66,22 @@ public class Trip implements Parcelable {
         dateFrom = new Date(in.readLong());
         dateTo = new Date(in.readLong());
         isPrivate = in.readByte() != 0;
-        int numOfParticipants = in.readInt();
 
-        for (int i = 0; i < numOfParticipants; i++) {
+        int numOfMembers = in.readInt();
+        for (int i = 0; i < numOfMembers; i++) {
             String name = in.readString();
             String objectId = in.readString();
             String fbId = in.readString();
             addMember(name, objectId, fbId);
         }
-        membersAreSet = in.readByte() != 0;
+
+        int numOfInvitees = in.readInt();
+        for (int i = 0; i < numOfInvitees; i++) {
+            String name = in.readString();
+            String objectId = in.readString();
+            String fbId = in.readString();
+            addInvitee(name, objectId, fbId);
+        }
     }
 
     public static final Creator<Trip> CREATOR = new Creator<Trip>() {
@@ -105,15 +112,21 @@ public class Trip implements Parcelable {
         dest.writeLong(dateFrom.getTime());
         dest.writeLong(dateTo.getTime());
         dest.writeByte((byte) (isPrivate ? 1 : 0));
-        dest.writeInt(allParticipants.size());
 
+        dest.writeInt(allParticipants.size());
         for (TripMember participant : allParticipants) {
             dest.writeString(participant.name);
             dest.writeString(participant.objectId);
             dest.writeString(participant.fbId);
         }
 
-        dest.writeByte((byte) (membersAreSet ? 1 : 0));
+        dest.writeInt(allInvitees.size());
+        for (TripMember invitees : allInvitees) {
+            dest.writeString(invitees.name);
+            dest.writeString(invitees.objectId);
+            dest.writeString(invitees.fbId);
+        }
+
     }
 
     @Override
@@ -140,12 +153,20 @@ public class Trip implements Parcelable {
                 || other.getDateFrom().equals(this.dateFrom));
     }
 
-    public ArrayList<TripMember> getAllParticipants() {
+    public ArrayList<TripMember> getAllMembers() {
         return allParticipants;
+    }
+
+    public ArrayList<TripMember> getAllInvitees() {
+        return allInvitees;
     }
 
     public void addMember(String name, String objectId, String fbId) {
         allParticipants.add(new TripMember(name, objectId, fbId));
+    }
+
+    public void addInvitee(String name, String objectId, String fbId) {
+        allInvitees.add(new TripMember(name, objectId, fbId));
     }
 
     public String getName() {

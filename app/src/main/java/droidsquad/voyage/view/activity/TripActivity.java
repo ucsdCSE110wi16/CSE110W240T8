@@ -81,7 +81,9 @@ public class TripActivity extends AppCompatActivity {
         mCollapsingToolbar.setTitle(mController.getTitle());
 
         mController.setGooglePlacePhoto(mHeaderImageView);
-        mController.setMembers(mMembersRecyclerView);
+
+        mMembersRecyclerView.setAdapter(mController.mMemAdapter);
+        mController.updateMembersAdapter();
 
         if (mController.isCreator()) {
             mController.mMemAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {

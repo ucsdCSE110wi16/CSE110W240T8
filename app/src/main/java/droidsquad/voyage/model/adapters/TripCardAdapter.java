@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.TripActivity;
@@ -101,15 +100,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         holder.mPrivateIcon.setVisibility(
                 (trip.isPrivate()) ? View.VISIBLE : View.GONE);
 
-        ParseTripModel.setAllMembers(trip, new ParseTripModel.TripASyncTaskCallback() {
-            @Override
-            public void onSuccess() {
-                setMemberPics(trip, holder);
-            }
-
-            @Override
-            public void onFailure(String error) {}
-        });
+        setMemberPics(trip, holder);
 
         switch (trip.getTransportation()) {
             case "Car":
@@ -139,8 +130,8 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
 
     private void setMemberPics(Trip trip, ViewHolder holder) {
         int numMembers = 0;
-        if (trip.getAllParticipants() != null)
-            numMembers = trip.getAllParticipants().size();
+        if (trip.getAllMembers() != null)
+            numMembers = trip.getAllMembers().size();
 
         switch (4 - numMembers) {
             case 4:
@@ -161,7 +152,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                 break;
         }
 
-        if (trip.getAllParticipants() == null) {
+        if (trip.getAllMembers() == null) {
             Log.d(TAG, "SOMETHING IS WRONG HERE!!");
             return;
         }
@@ -197,7 +188,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     }
 
     public ArrayList<String> setUpPicURLs(Trip trip) {
-        ArrayList<Trip.TripMember> members = trip.getAllParticipants();
+        ArrayList<Trip.TripMember> members = trip.getAllMembers();
         ArrayList<String> picURLs = new ArrayList<>();
         if(members == null) {
             Log.d(TAG, "ERROR with fbIds");
