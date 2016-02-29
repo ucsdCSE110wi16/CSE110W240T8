@@ -30,10 +30,12 @@ import droidsquad.voyage.view.activity.CreateTripActivity;
 public class CreateTripController {
     private CreateTripActivity activity;
     private Trip trip;
-    private boolean edit = false;
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
     private Calendar calendarFrom;
     private Calendar calendarTo;
+    private boolean isEditMode;
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
+    private static final SimpleDateFormat overlapDateFormat = new SimpleDateFormat("MMM dd", Locale.US);
     private static final String TAG = CreateTripController.class.getSimpleName();
 
     // Old fields to check for changes
@@ -47,9 +49,8 @@ public class CreateTripController {
 
     public CreateTripController(CreateTripActivity activity) {
         this.activity = activity;
-        trip = activity.getIntent().getParcelableExtra(
-                activity.getString(R.string.intent_key_trip));
-        edit = activity.getIntent().getBooleanExtra(activity.getString(R.string.edit_trip), edit);
+        trip = activity.getIntent().getParcelableExtra(activity.getString(R.string.intent_key_trip));
+        isEditMode = activity.getIntent().getBooleanExtra(activity.getString(R.string.edit_trip), false);
     }
 
     public void populateUI() {
@@ -67,8 +68,7 @@ public class CreateTripController {
     }
 
     private void getOldFields() {
-        if (edit) {
-
+        if (isEditMode) {
             oldTripName = trip.getName();
             oldIsPrivate = trip.isPrivate();
 
@@ -94,8 +94,8 @@ public class CreateTripController {
     }
 
     private void initTextFields() {
-        if (edit) {     // only populate text fields if editing a trip
-
+        // only populate text fields if editing a trip
+        if (isEditMode) {
             changeCreateButtonText();
 
             activity.getTripNameView().setText(trip.getName());
@@ -109,6 +109,7 @@ public class CreateTripController {
                     break;
                 }
             }
+
             activity.getTransportation().setSelection(pos);
 
             try {
@@ -164,11 +165,10 @@ public class CreateTripController {
      * Set up default dates on the date pickers
      */
     private void initDatePickers() {
-
         calendarFrom = Calendar.getInstance();
         calendarTo = Calendar.getInstance();
 
-        if (edit) {
+        if (isEditMode) {
             calendarFrom.setTimeInMillis(trip.getDateFrom().getTime());
             calendarTo.setTimeInMillis(trip.getDateTo().getTime());
         } else {
@@ -184,6 +184,7 @@ public class CreateTripController {
                 showDateDialog(calendarFrom);
             }
         });
+
         activity.getDateToView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -200,14 +201,11 @@ public class CreateTripController {
     public void showDateDialog(final Calendar calendar) {
 
         activity.showDatePickerDialog(new DatePickerDialog.OnDateSetListener() {
-
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
                 Calendar calendarFrom = activity.getCalendarFrom();
                 Calendar calendarTo = activity.getCalendarTo();
 
-                // Calendar FROM selected
                 if (calendar == calendarFrom) {
                     long previousDateTime = calendarFrom.getTimeInMillis();
 
@@ -217,15 +215,13 @@ public class CreateTripController {
 
                     // set to calendar
                     calendarTo.setTimeInMillis(calendarTo.getTimeInMillis() + diff);
-
-                    // Calendar TO selected
                 } else {
+                    // Calendar TO selected
                     calendar.set(year, monthOfYear, dayOfMonth);
                 }
 
                 updateDateViews();
                 updateCalendars(calendarFrom, calendarTo);
-
             }
         }, calendar);
     }
@@ -255,8 +251,8 @@ public class CreateTripController {
         // Get all the information from the views
         String tripName = activity.getTripNameView().getText().toString();
         String transportation = activity.getTransportation().getSelectedItem().toString();
-
         boolean isPrivate = activity.getPrivateView().isChecked();
+
         boolean hasError = false;
 
         /* Check for errors */
@@ -266,12 +262,12 @@ public class CreateTripController {
             hasError = true;
         }
 
-        if (activity.getOriginPlace() == null && !edit) {
+        if (activity.getOriginPlace() == null && !isEditMode) {
             displayError(activity.getLeavingFromView(), activity.getString(R.string.error_trip_location));
             hasError = true;
         }
 
-        if (activity.getDestinationPlace() == null && !edit) {
+        if (activity.getDestinationPlace() == null && !isEditMode) {
             displayError(activity.getDestinationView(), activity.getString(R.string.error_trip_location));
             hasError = true;
         }
@@ -300,7 +296,6 @@ public class CreateTripController {
                 destination, isPrivate, dateFrom, dateTo);
 
         finalizeTripCheck(newTrip);
-
     }
 
     /**
@@ -349,9 +344,7 @@ public class CreateTripController {
      * @return true if user has made changes to the forms
      */
     public boolean hasChanges() {
-
-        if (!edit) {
-
+        if (!isEditMode) {
             return activity.getTripNameView().getText().length() > 0 ||
                     activity.getPrivateView().isChecked() != oldIsPrivate ||
                     activity.getDestinationPlace() != null ||
@@ -360,7 +353,6 @@ public class CreateTripController {
                     !activity.getCalendarTo().getTime().equals(oldDateTo) ||
                     !activity.getTransportation().getSelectedItem().toString().equals(oldTransportation);
         } else {
-
             return !activity.getTripNameView().getText().toString().equals(oldTripName) ||
                     activity.getPrivateView().isChecked() != oldIsPrivate ||
                     activity.getOriginPlace() != null ||
@@ -369,7 +361,6 @@ public class CreateTripController {
                     !activity.getCalendarTo().getTime().equals(oldDateTo) ||
                     !activity.getTransportation().getSelectedItem().toString().equals(oldTransportation);
         }
-
     }
 
     /**
@@ -378,7 +369,7 @@ public class CreateTripController {
      */
     public void finalizeTripCheck(final Trip newTrip) {
 
-        if (edit) newTrip.setId(trip.getId());
+        if (isEditMode) newTrip.setId(trip.getId());
 
         ParseTripModel.searchForAllTrips(new ParseTripModel.ParseTripCallback() {
             @Override
@@ -390,58 +381,22 @@ public class CreateTripController {
         });
     }
 
-    // Helper method to format JSON objects
-    private String intToMonth(int month) {
-        switch (month) {
-            case 0:
-                return "Jan ";
-            case 1:
-                return "Feb ";
-            case 2:
-                return "Mar ";
-            case 3:
-                return "Apr ";
-            case 4:
-                return "May ";
-            case 5:
-                return "Jun ";
-            case 6:
-                return "Jul ";
-            case 7:
-                return "Aug ";
-            case 8:
-                return "Sep ";
-            case 9:
-                return "Oct ";
-            case 10:
-                return "Nov ";
-            case 11:
-                return "Dec ";
-            default:
-                return " ";
-        }
-    }
-
     /**
      * Check for trip overlaps between existing trips for a user, and a newly created one
      *
-     * @param newTrip
-     * @param trips
-     * @return
+     * @param newTrip The new trip to be created
+     * @param trips All the trips this user is currently part off
+     * @return True if
      */
     public boolean compareForOverlaps(final Trip newTrip, ArrayList<Trip> trips) {
         for (Trip t : trips) {
-
-            if (edit && trip.equals(t)) continue;
+            if (isEditMode && trip.equals(t)) continue;
 
             if (newTrip.overlaps(t)) {
-                String message = activity.getString(R.string.error_overlap) +
-                        t.getName() +
-                        Constants.OVERLAP_FROM + intToMonth(t.getDateFrom().getMonth()) +
-                        t.getDateFrom().getDate() +
-                        Constants.OVERLAP_TO + intToMonth(t.getDateTo().getMonth()) +
-                        t.getDateTo().getDate() +
-                        activity.getString(R.string.error_overlap_continue);
+                String message = activity.getString(R.string.error_overlap,
+                        t.getName(),
+                        overlapDateFormat.format(t.getDateFrom()),
+                        overlapDateFormat.format(t.getDateTo()));
 
                 activity.showAlertDialog(new DialogInterface.OnClickListener() {
                     @Override
@@ -466,7 +421,7 @@ public class CreateTripController {
      * @param newTrip Trip object to save to the backend
      */
     public void completeSave(Trip newTrip) {
-        if (edit) {
+        if (isEditMode) {
             newTrip.setId(trip.getId());
             ParseTripModel.updateTrip(newTrip);
             Intent intent = new Intent();

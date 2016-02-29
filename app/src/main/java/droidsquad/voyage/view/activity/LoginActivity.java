@@ -38,6 +38,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mLoginWithFBButton = (Button) findViewById(R.id.login_with_facebook_button);
+
+        // TODO: Might not need this anymore
         mLoginWithFBButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

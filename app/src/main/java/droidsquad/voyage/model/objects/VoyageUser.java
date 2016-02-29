@@ -1,12 +1,15 @@
 package droidsquad.voyage.model.objects;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -15,7 +18,6 @@ import com.parse.LogOutCallback;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
-import com.parse.interceptors.ParseLogInterceptor;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,6 +27,7 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import droidsquad.voyage.R;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 
@@ -36,12 +39,11 @@ public class VoyageUser {
         final ParseUser currentUser = ParseUser.getCurrentUser();
         AccessToken token = AccessToken.getCurrentAccessToken();
 
-        GraphRequest request = GraphRequest.newMeRequest(
-                token,
+        GraphRequest request = GraphRequest.newMeRequest(token,
                 new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
-                        Log.d(TAG, "Info recevied from FB: " + object.toString());
+                        Log.d(TAG, "Info received from FB: " + object.toString());
 
                         try {
                             // Public profile. These fields are guaranteed to be in the JSON
@@ -70,6 +72,7 @@ public class VoyageUser {
         Collection<String> permissions = new ArrayList<>();
         permissions.add("public_profile");
         permissions.add("user_friends");
+
         ParseFacebookUtils.logInWithReadPermissionsInBackground(activity, permissions, new LogInCallback() {
             @Override
             public void done(ParseUser user, com.parse.ParseException err) {
@@ -147,5 +150,36 @@ public class VoyageUser {
                 }
             }
         });
+    }
+
+    /**
+     * @return The current user's full name
+     */
+    public static String getFullName() {
+        ParseUser user = ParseUser.getCurrentUser();
+        return user.get("firstName") + " " + user.get("lastName");
+    }
+
+    /**
+     * @return The current user's profile picture URL
+     */
+    public static String getProfilePicURL() {
+        ParseUser user = ParseUser.getCurrentUser();
+        return String.format(Constants.FB_PICTURE_URL, user.get("fbId"), "square");
+    }
+
+    /**
+     * Load this user's profile picture into the View provided
+     *
+     * @param context
+     * @param profilePic
+     */
+    public static void loadProfilePicInto(Context context, ImageView profilePic) {
+        Log.d(TAG, "Loading profile picture into imageview");
+        Glide.with(context)
+                .load(getProfilePicURL())
+                .asBitmap()
+                .placeholder(R.drawable.ic_account_circle_gray)
+                .into(profilePic);
     }
 }

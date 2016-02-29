@@ -8,6 +8,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 import droidsquad.voyage.R;
@@ -46,29 +47,28 @@ public class AddFriendsController {
             }
         });
 
-        mSelectedFriendsAdapter.setOnItemRemovedListener(new SelectedFBFriendsAdapter.OnItemRemovedListener() {
-            @Override
-            public void onRemoved() {
-                updateAdapter(mActivity.getQuery());
-            }
-        });
+        mSelectedFriendsAdapter.setOnItemRemovedListener(
+                new SelectedFBFriendsAdapter.OnItemRemovedListener() {
+                    @Override
+                    public void onRemoved() {
+                        updateAdapter(mActivity.getQuery());
+                    }
+                });
 
-        getFBFriends();
+        loadFBFriends();
     }
 
     /**
-     * Get all the facebook friends of the current user and store
-     * it in the member variable friends
-     *
+     * Load all the facebook friends of the current user in the member variable friends
      * Fields retrieved are ID, Name and Picture
      */
-    private void getFBFriends() {
+    private void loadFBFriends() {
         FacebookAPI.requestFBFriends(new FacebookAPI.FBFriendsArrayCallback() {
             @Override
             public void onCompleted(List<FacebookUser> queriedFriends) {
-                Log.d(TAG, "Friends Arrays received with size: " + queriedFriends.size());
+                Log.d(TAG, "Friends Array received with size: " + queriedFriends.size());
 
-                // Sort the entries alphabetically by name and store in a member variable
+                // Sort the entries alphabetically and store in the member variable
                 Collections.sort(queriedFriends, new Comparator<FacebookUser>() {
                     @Override
                     public int compare(FacebookUser lhs, FacebookUser rhs) {
@@ -77,14 +77,19 @@ public class AddFriendsController {
                 });
 
                 // Get rid of current members and invitees
-                List<Trip.TripMember> allMembersAndInvitees = new ArrayList<>();
-                allMembersAndInvitees.addAll(mTrip.getAllMembers());
-                allMembersAndInvitees.addAll(mTrip.getAllInvitees());
-                for (Trip.TripMember member : allMembersAndInvitees) {
-                    for (int i = 0; i < queriedFriends.size(); i++) {
-                        if (queriedFriends.get(i).id.equals(member.fbId)) {
-                            queriedFriends.remove(i);
-                        }
+                HashSet<String> allMembersAndInviteesIds = new HashSet<>();
+
+                for (Trip.TripMember tripMember : mTrip.getAllMembers()) {
+                    allMembersAndInviteesIds.add(tripMember.fbId);
+                }
+
+                for (Trip.TripMember tripMember : mTrip.getInvitees()) {
+                    allMembersAndInviteesIds.add(tripMember.fbId);
+                }
+
+                for (int i = 0; i < queriedFriends.size(); i++) {
+                    if (allMembersAndInviteesIds.contains(queriedFriends.get(i).id)) {
+                        queriedFriends.remove(i);
                     }
                 }
 
@@ -110,11 +115,12 @@ public class AddFriendsController {
      */
     private void updateAdapter(String query) {
         // Get the friends according to the query
+        query = query.toLowerCase();
         ArrayList<FacebookUser> queriedFriends = new ArrayList<>();
 
         if (!query.isEmpty()) {
             for (FacebookUser friend : friends) {
-                if (friend.name.toLowerCase().contains(query.toLowerCase())
+                if (friend.name.toLowerCase().contains(query)
                         && !mSelectedFriendsAdapter.mSelectedUsers.contains(friend)) {
                     queriedFriends.add(friend);
                 }
@@ -127,6 +133,7 @@ public class AddFriendsController {
     public void addFriendsToTrip() {
         Log.d(TAG, "Adding " + mSelectedFriendsAdapter.mSelectedUsers.size() + " friends to Trip.");
         mActivity.showProgress(true);
+
         final ArrayList<String> fbIDs = new ArrayList<>();
         for (FacebookUser user : mSelectedFriendsAdapter.mSelectedUsers) {
             fbIDs.add(user.id);
@@ -150,9 +157,8 @@ public class AddFriendsController {
             @Override
             public void onFailure(String error) {
                 mActivity.showProgress(false);
-                Snackbar snackbar = Snackbar.make(mActivity.findViewById(R.id.selected_friends_card_view),
-                        error, Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                Snackbar.make(mActivity.findViewById(R.id.selected_friends_card_view),
+                        error, Snackbar.LENGTH_SHORT).show();
             }
         });
     }

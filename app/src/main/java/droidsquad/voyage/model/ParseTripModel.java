@@ -22,7 +22,6 @@ public class ParseTripModel {
     public static final String USER_OBJECT = "User";
     public static final String TRIP_OBJECT = "Trip";
     private static final String TAG = ParseUser.class.getSimpleName();
-    // TODO: add more key/value final Strings
 
     /***************************************************************************************
      *                         PUBLIC METHODS (To be used in other files)
@@ -38,7 +37,6 @@ public class ParseTripModel {
 
         final ParseObject parseTrip = getParseObjectFromTrip(trip);
 
-        //TODO: Initialize UserGroup stuff for new trips?
         ParseRelation<ParseUser> relation = parseTrip.getRelation("members");
         relation.add(ParseUser.getCurrentUser());
 

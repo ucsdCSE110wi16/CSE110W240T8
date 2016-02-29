@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 
 import droidsquad.voyage.R;
@@ -29,18 +27,13 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.selected_fb_friend_item, parent, false);
-
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         FacebookUser friend = mSelectedUsers.get(position);
-
-        Picasso.with(mActivity)
-                .load(friend.pictureURL)
-                .placeholder(R.drawable.ic_account_circle_gray)
-                .into(holder.mProfilePic);
+        friend.loadProfilePicInto(mActivity, holder.mProfilePic);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,11 +51,21 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
         return mSelectedUsers.size();
     }
 
+    /**
+     * Add a friend to this adapter
+     *
+     * @param friend Friend to be added
+     */
     public void addFriend(FacebookUser friend) {
         mSelectedUsers.add(friend);
         notifyItemInserted(mSelectedUsers.size() - 1);
     }
 
+    /**
+     * Removes the friend on the given position from the adapter
+     *
+     * @param position Position of friend to be removed
+     */
     private void removeFriend(int position) {
         mSelectedUsers.remove(position);
         notifyItemRemoved(position);

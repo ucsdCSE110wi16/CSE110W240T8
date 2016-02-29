@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.parse.ParseAnalytics;
 import com.parse.ParsePushBroadcastReceiver;
-import com.parse.ParseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,9 +39,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String intentAction = intent.getAction();
-
-        switch (intentAction) {
+        switch (intent.getAction()) {
             case ACTION_REQUEST_ACCEPT:
                 onAcceptTripInvitation(context, intent);
                 break;
@@ -165,7 +162,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
                 @Override
                 public void onCompleted(Bitmap bitmap) {
                     bitmap = BitmapManipulator.getScaledBitmap(context, bitmap);
-                    bitmap = BitmapManipulator.getRoundBitmap(bitmap);
+                    bitmap = BitmapManipulator.getRoundedBitmap(bitmap);
                     builder.setLargeIcon(bitmap);
                     fireNotification(context, builder.build(), notificationId);
                 }

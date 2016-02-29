@@ -17,10 +17,8 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         // check if the user is logged in
-        ParseUser currentUser = ParseUser.getCurrentUser();
         final Intent intent;
-
-        if (currentUser == null) {
+        if (ParseUser.getCurrentUser() == null) {
             intent = new Intent(this, LoginActivity.class);
         } else {
             intent = new Intent(this, MainNavDrawerActivity.class);

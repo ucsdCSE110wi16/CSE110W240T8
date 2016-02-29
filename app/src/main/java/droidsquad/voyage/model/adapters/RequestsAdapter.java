@@ -1,16 +1,13 @@
 package droidsquad.voyage.model.adapters;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +18,15 @@ import droidsquad.voyage.model.objects.Request;
 
 public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHolder> {
     private static final String TAG = RequestsAdapter.class.getSimpleName();
+
     private Context context;
     private List<Request> mRequests;
     private OnButtonClickedCallback mCallback;
     private OnDataEmptyListener mEmptyListener;
 
     public RequestsAdapter(Context context) {
-        mRequests = new ArrayList<>();
         this.context = context;
+        mRequests = new ArrayList<>();
     }
 
     @Override
@@ -43,7 +41,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final Request request = mRequests.get(position);
 
-        Picasso.with(context)
+        Glide.with(context)
                 .load(request.hostPicURL)
                 .placeholder(R.drawable.ic_account_circle_gray)
                 .into(holder.imageView);

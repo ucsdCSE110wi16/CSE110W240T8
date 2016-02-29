@@ -29,6 +29,7 @@ public class TripController {
     private static final String TAG = TripController.class.getSimpleName();
     public FBFriendsAdapter mMemAdapter;
     public FBFriendsAdapter mInviteesAdapter;
+    private int datesStringRepresentation;
 
     public TripController(TripActivity instance) {
         this.mActivity = instance;
@@ -69,49 +70,6 @@ public class TripController {
 
     public void editTrip() {
         mActivity.editTripIntent(this.trip);
-    }
-    /**
-     * @return The id of the icon corresponding to the type of transportation
-     */
-    public int getDrawableId() {
-        switch (trip.getTransportation()) {
-            case "Bus":
-                return R.drawable.ic_bus;
-            case "Car":
-                return R.drawable.ic_car;
-            default:
-                return R.drawable.ic_flight;
-        }
-    }
-
-    public Date getDateFrom() {
-        return trip.getDateFrom();
-    }
-
-    public Date getDateTo() {
-        return trip.getDateTo();
-    }
-
-    public String getOrigin() {
-        String origin = "";
-        try {
-            origin = trip.getOrigin().get("city").toString();
-        } catch (JSONException e) {
-            Log.d(TAG, "JSON exception occurred: " + e.getMessage());
-        }
-
-        return origin;
-    }
-
-    public String getDestination() {
-        String destination = "";
-        try {
-            destination = trip.getDestination().get("city").toString();
-        } catch (JSONException e) {
-            Log.d(TAG, "JSON exception occurred: " + e.getMessage());
-        }
-
-        return destination;
     }
 
     public CharSequence getTitle() {
@@ -172,7 +130,7 @@ public class TripController {
     }
 
     public void updateInviteesAdapter() {
-        updateFBFriendsAdapter(trip.getAllInvitees(), mInviteesAdapter);
+        updateFBFriendsAdapter(trip.getInvitees(), mInviteesAdapter);
     }
 
     private void updateFBFriendsAdapter(ArrayList<Trip.TripMember> users, FBFriendsAdapter adapter) {
@@ -198,7 +156,7 @@ public class TripController {
     }
 
     public void kickInvitee(final FacebookUser fbUser) {
-        kickUser(fbUser, trip.getAllInvitees(), mInviteesAdapter, Constants.PARSE_RELATION_INVITEES,
+        kickUser(fbUser, trip.getInvitees(), mInviteesAdapter, Constants.PARSE_RELATION_INVITEES,
                 mActivity.getString(R.string.snackbar_invitee_removed));
     }
 
@@ -241,4 +199,23 @@ public class TripController {
                 });
     }
 
+    public String getTransportationStringRepresentation() {
+        return trip.getSimpleCitiesStringRepresentation();
+    }
+
+    public String getDatesStringRepresentation() {
+        return trip.getSimpleDatesStringRepresentation();
+    }
+
+    public int getTransportationIcon() {
+        return trip.getTransportationIcon();
+    }
+
+    public Date getDateFrom() {
+        return trip.getDateFrom();
+    }
+
+    public Date getDateTo() {
+        return trip.getDateTo();
+    }
 }

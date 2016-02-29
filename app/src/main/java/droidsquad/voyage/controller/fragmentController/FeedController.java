@@ -36,7 +36,6 @@ public class FeedController {
 
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
-        // TODO: create a method in ParseModel, or another model class if necessary to retrieve data and call updateAdapter() below
         ParseTripModel.searchAllPublicTrips(new ParseTripModel.ParseTripCallback() {
             @Override
             public void onCompleted(ArrayList<Trip> trips) {

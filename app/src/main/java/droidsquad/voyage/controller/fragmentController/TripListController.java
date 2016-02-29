@@ -5,6 +5,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.adapters.TripCardAdapter;
@@ -36,31 +38,19 @@ public class TripListController {
 
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
-        // TODO: create a method in ParseModel, or another model class if necessary to retrieve data and call updateAdapter() below
         ParseTripModel.searchForAllTrips(new ParseTripModel.ParseTripCallback() {
             @Override
             public void onCompleted(ArrayList<Trip> trips) {
-                updateAdapter(trips);
+                // Sort the trips
+                Collections.sort(trips, new Comparator<Trip>() {
+                    public int compare(Trip m1, Trip m2) {
+                        return m1.getDateTo().compareTo(m2.getDateTo());
+                    }
+                });
+
+                adapter.updateData(trips);
             }
         });
-    }
-
-    /**
-     * Update the content of the adapter
-     *
-     * @param trips New trips to update the adapter with
-     */
-    public void updateAdapter(ArrayList<Trip> trips) {
-        adapter.sortTrips(trips);
-        adapter.updateData(trips);
-        refreshData();
-    }
-
-    /**
-     * Refreshes the data within the adapter
-     */
-    private void refreshData() {
-        adapter.notifyDataSetChanged();
     }
 
     public void createTripButtonPressed() {

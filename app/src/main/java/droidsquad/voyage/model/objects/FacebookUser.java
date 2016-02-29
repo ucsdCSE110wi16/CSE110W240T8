@@ -1,9 +1,15 @@
 package droidsquad.voyage.model.objects;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
 
 import java.net.URL;
+
+import droidsquad.voyage.R;
 
 /**
  * This class represents a Facebook User. It contains member variables for storing
@@ -18,6 +24,20 @@ public class FacebookUser {
         this.id = id;
         this.name = name;
         this.pictureURL = pictureURL;
+    }
+
+    /**
+     * Loads this user's profile picture into the ImageView
+     *
+     * @param context
+     * @param imageView
+     */
+    public void loadProfilePicInto(Context context, ImageView imageView) {
+        Glide.with(context)
+                .load(pictureURL)
+                .asBitmap()
+                .placeholder(R.drawable.ic_account_circle_gray)
+                .into(imageView);
     }
 
     /**

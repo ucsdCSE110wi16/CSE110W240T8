@@ -28,8 +28,8 @@ import droidsquad.voyage.model.objects.FacebookUser;
  * through Facebook Graph API.
  */
 public class FacebookAPI {
-    private static final String GRAPH_URL = "https://graph.facebook.com/";
     private static final String TAG = FacebookAPI.class.getSimpleName();
+    private static final String GRAPH_URL = "https://graph.facebook.com/";
 
     /**
      * Get the facebook friends of the current user asynchronously
