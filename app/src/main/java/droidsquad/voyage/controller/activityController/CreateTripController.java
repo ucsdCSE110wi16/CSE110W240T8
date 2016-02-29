@@ -62,7 +62,7 @@ public class CreateTripController {
     /**
      * Changes button text from Create to Update
      */
-    private void changeCreateButtonText(){
+    private void changeCreateButtonText() {
         activity.getCreateTripButton().setText(Constants.UPDATE_TRIP);
     }
 
@@ -85,8 +85,7 @@ public class CreateTripController {
             oldDateTo = calendarTo.getTime();
             oldTransportation = trip.getTransportation();
 
-        }
-        else {
+        } else {
             oldIsPrivate = activity.getPrivateView().isChecked();
             oldDateFrom = calendarFrom.getTime();
             oldDateTo = calendarTo.getTime();
@@ -156,7 +155,7 @@ public class CreateTripController {
     /**
      * Update activity's calendars
      */
-    private void updateCalendars(Calendar calendarFrom, Calendar calendarTo){
+    private void updateCalendars(Calendar calendarFrom, Calendar calendarTo) {
         activity.setCalendarFrom(calendarFrom);
         activity.setCalendarTo(calendarTo);
     }
@@ -169,11 +168,10 @@ public class CreateTripController {
         calendarFrom = Calendar.getInstance();
         calendarTo = Calendar.getInstance();
 
-        if(edit) {
+        if (edit) {
             calendarFrom.setTimeInMillis(trip.getDateFrom().getTime());
             calendarTo.setTimeInMillis(trip.getDateTo().getTime());
-        }
-        else {
+        } else {
             calendarTo.add(Calendar.DAY_OF_WEEK, Constants.DEFAULT_TRIP_LENGTH);
         }
 
@@ -239,11 +237,10 @@ public class CreateTripController {
      * @return {long} The minimum date allowed in Millis
      */
     public long getMinDateAllowed(Calendar calendar) {
-        if (calendar == activity.getCalendarFrom()){
+        if (calendar == activity.getCalendarFrom()) {
             Log.d(TAG, "getMinDate of TODAY");
             return System.currentTimeMillis() - 1000;
-        }
-        else {
+        } else {
             Log.d(TAG, "getMinDate of FROM");
             return calendarFrom.getTimeInMillis() - 1000;
         }
@@ -286,15 +283,13 @@ public class CreateTripController {
 
         if (activity.getOriginPlace() != null) {
             leavingFrom = GooglePlacesAPI.getJSONFromPlace(activity.getOriginPlace());
-        }
-        else {
+        } else {
             leavingFrom = trip.getOrigin();
         }
 
         if (activity.getDestinationPlace() != null) {
             destination = GooglePlacesAPI.getJSONFromPlace(activity.getDestinationPlace());
-        }
-        else {
+        } else {
             destination = trip.getDestination();
         }
 
@@ -302,7 +297,7 @@ public class CreateTripController {
         Date dateTo = calendarTo.getTime();
 
         Trip newTrip = new Trip(tripName, creatorId, transportation, leavingFrom,
-                    destination, isPrivate, dateFrom, dateTo);
+                destination, isPrivate, dateFrom, dateTo);
 
         finalizeTripCheck(newTrip);
 
@@ -316,7 +311,7 @@ public class CreateTripController {
      */
     public void displayError(View view, String error) {
         if (view == activity.getTripNameErrorView()) {
-            ((TextView)view).setText(error);
+            ((TextView) view).setText(error);
             view.setVisibility(View.VISIBLE);
         } else {
             ((EditText) view).setError(error);
@@ -326,7 +321,7 @@ public class CreateTripController {
     /**
      * Hides the error on the given view
      *
-     * @param view  View to display the error on
+     * @param view View to display the error on
      */
     public void hideError(View view) {
         if (view == activity.getTripNameView()) {
@@ -340,11 +335,11 @@ public class CreateTripController {
     /**
      * Sets focus on the given view
      *
-     * @param view  View to display the error on
+     * @param view View to display the error on
      */
     public void setFocus(View view) {
         if (view == activity.getTripNameView()) {
-            if (view.requestFocus()){
+            if (view.requestFocus()) {
                 activity.showKeyBoard(activity.getTripNameView());
             }
         }
@@ -355,7 +350,7 @@ public class CreateTripController {
      */
     public boolean hasChanges() {
 
-        if (!edit){
+        if (!edit) {
 
             return activity.getTripNameView().getText().length() > 0 ||
                     activity.getPrivateView().isChecked() != oldIsPrivate ||
@@ -364,8 +359,7 @@ public class CreateTripController {
                     !activity.getCalendarFrom().getTime().equals(oldDateFrom) ||
                     !activity.getCalendarTo().getTime().equals(oldDateTo) ||
                     !activity.getTransportation().getSelectedItem().toString().equals(oldTransportation);
-        }
-        else {
+        } else {
 
             return !activity.getTripNameView().getText().toString().equals(oldTripName) ||
                     activity.getPrivateView().isChecked() != oldIsPrivate ||
@@ -397,36 +391,50 @@ public class CreateTripController {
     }
 
     // Helper method to format JSON objects
-    private String intToMonth(int month){
-        switch (month){
-            case 0: return "Jan ";
-            case 1: return "Feb ";
-            case 2: return "Mar ";
-            case 3: return "Apr ";
-            case 4: return "May ";
-            case 5: return "Jun ";
-            case 6: return "Jul ";
-            case 7: return "Aug ";
-            case 8: return "Sep ";
-            case 9: return "Oct ";
-            case 10: return "Nov ";
-            case 11: return "Dec ";
-            default: return " ";
+    private String intToMonth(int month) {
+        switch (month) {
+            case 0:
+                return "Jan ";
+            case 1:
+                return "Feb ";
+            case 2:
+                return "Mar ";
+            case 3:
+                return "Apr ";
+            case 4:
+                return "May ";
+            case 5:
+                return "Jun ";
+            case 6:
+                return "Jul ";
+            case 7:
+                return "Aug ";
+            case 8:
+                return "Sep ";
+            case 9:
+                return "Oct ";
+            case 10:
+                return "Nov ";
+            case 11:
+                return "Dec ";
+            default:
+                return " ";
         }
     }
 
     /**
      * Check for trip overlaps between existing trips for a user, and a newly created one
+     *
      * @param newTrip
      * @param trips
      * @return
      */
     public boolean compareForOverlaps(final Trip newTrip, ArrayList<Trip> trips) {
-        for(Trip t: trips) {
+        for (Trip t : trips) {
 
             if (edit && trip.equals(t)) continue;
 
-            if(newTrip.overlaps(t)) {
+            if (newTrip.overlaps(t)) {
                 String message = activity.getString(R.string.error_overlap) +
                         t.getName() +
                         Constants.OVERLAP_FROM + intToMonth(t.getDateFrom().getMonth()) +
@@ -454,6 +462,7 @@ public class CreateTripController {
 
     /**
      * Completes the save process after we know adding a new trip is a valid action
+     *
      * @param newTrip Trip object to save to the backend
      */
     public void completeSave(Trip newTrip) {
@@ -464,8 +473,7 @@ public class CreateTripController {
             intent.putExtra(activity.getString(R.string.intent_key_trip), newTrip);
             activity.setResult(Constants.RESULT_CODE_TRIP_UPDATED, intent);
             activity.finish();
-        }
-        else {
+        } else {
             // TODO show progress spinning thingy and wait till the trip has been saved to parse
             ParseTripModel.saveTrip(newTrip);
             activity.setResult(Constants.RESULT_CODE_TRIP_CREATED);

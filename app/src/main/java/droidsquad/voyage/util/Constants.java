@@ -11,7 +11,6 @@ public class Constants {
     // Intent Keys
     public static final String KEY_FRAGMENT_MAIN_ACTIVITY = "FRAGMENT_MAIN_ACTIVITY";
 
-
     public static final String FRAGMENT_REQUESTS = "FRAGMENT_REQUESTS";
     public static final String FRAGMENT_SETTINGS = "FRAGMENT_SETTINGS";
     public static final String FRAGMENT_FEED = "FRAGMENT_FEED";
@@ -26,10 +25,14 @@ public class Constants {
     public static final int RESULT_CODE_TRIP_UPDATED = 5003;
 
     public static final int RESULT_CODE_TRIP_CREATED = 5003;
+
     // Parse Related constants
     public static final String PARSE_RELATION_MEMBERS = "members";
     public static final String PARSE_RELATION_INVITEES = "invitees";
 
     public static final String OVERLAP_FROM = " from ";
     public static final String OVERLAP_TO = " to ";
+
+    // Notification types
+    public static final String NOTIFICATION_INVITATION = "NOTIFICATION_INVITATION";
 }

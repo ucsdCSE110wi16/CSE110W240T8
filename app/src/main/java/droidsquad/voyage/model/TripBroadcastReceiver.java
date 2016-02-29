@@ -1,18 +1,21 @@
 package droidsquad.voyage.model;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.parse.ParseAnalytics;
 import com.parse.ParsePushBroadcastReceiver;
+import com.parse.ParseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,85 +23,199 @@ import org.json.JSONObject;
 import java.util.Locale;
 import java.util.Random;
 
+import droidsquad.voyage.R;
 import droidsquad.voyage.model.api.FacebookAPI;
+import droidsquad.voyage.util.BitmapManipulator;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 
 public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
-    private JSONObject data;
-
     private final static String TAG = TripBroadcastReceiver.class.getSimpleName();
+    private static final String ACTION_REQUEST_ACCEPT = "droidsquad.voyage.intent.ACCEPT_INVITATION";
+    private static final String ACTION_REQUEST_DECLINE = "droidsquad.voyage.intent.DECLINE_INVITATION";
+
+    private static JSONObject data;
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String intentAction = intent.getAction();
+
+        switch (intentAction) {
+            case ACTION_REQUEST_ACCEPT:
+                onAcceptTripInvitation();
+                break;
+            case ACTION_REQUEST_DECLINE:
+                onDeclineTripInvitation();
+                break;
+            default:
+                super.onReceive(context, intent);
+        }
+    }
 
     @Override
     public void onPushReceive(Context context, Intent intent) {
         try {
-            data = new JSONObject(intent.getStringExtra("com.parse.Data"));
+            data = new JSONObject(intent.getStringExtra(KEY_PUSH_DATA));
             Log.d(TAG, "Notification received with data: " + data);
+            sendNotification(context, intent);
         } catch (JSONException e) {
             Log.d(TAG, "JSONException occurred while parsing notification's data: ", e);
         }
+    }
 
-        sendNotification(context, intent);
+    @Override
+    protected void onPushOpen(Context context, Intent intent) {
+        Log.d(TAG, "Notification clicked");
+        // Send a Parse Analytics "push opened" event
+        ParseAnalytics.trackAppOpenedInBackground(intent);
+        startActivities(context, intent);
+    }
+
+    private void onAcceptTripInvitation() {
+        ParseRequestModel.acceptRequest(data.optString("tripId"), new ParseRequestModel.OnResultCallback() {
+            @Override
+            public void onSuccess() {
+                Log.i(TAG, "Accepted trip from notification");
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.i(TAG, "Error while accepting trip from notification: " + error);
+            }
+        });
+    }
+
+    private void onDeclineTripInvitation() {
+        ParseRequestModel.declineRequest(data.optString("tripId"), new ParseRequestModel.OnResultCallback() {
+            @Override
+            public void onSuccess() {
+                Log.i(TAG, "Declined trip from notification");
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.i(TAG, "Error while declining trip from notification: " + error);
+            }
+        });
+    }
+
+    /**
+     * Starts the activities given the type of this notification
+     */
+    private void startActivities(Context context, Intent intent) {
+        Class<? extends Activity> activity;
+        Bundle extras = intent.getExtras();
+
+        switch (data.optString("type")) {
+            case Constants.NOTIFICATION_INVITATION:
+                activity = MainNavDrawerActivity.class;
+                extras.putString(Constants.KEY_FRAGMENT_MAIN_ACTIVITY, Constants.FRAGMENT_REQUESTS);
+                break;
+
+            default:
+                activity = super.getActivity(context, intent);
+        }
+
+        Intent activityIntent = new Intent(context, activity);
+        activityIntent.putExtras(extras);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(activity);
+        stackBuilder.addNextIntent(activityIntent);
+        stackBuilder.startActivities();
     }
 
     /**
      * Send the notification to the user
      */
-    protected Notification sendNotification(final Context context, Intent intent) {
+    private void sendNotification(final Context context, Intent intent) {
         String title = data.optString("title");
         String alert = data.optString("alert");
         String fbId = data.optString("fbId");
         String tickerText = String.format(Locale.getDefault(), "%s: %s", title, alert);
 
         Bundle extras = intent.getExtras();
-        String packageName = context.getPackageName();
-
-        Random random = new Random();
-        int contentIntentRequestCode = random.nextInt();
-        int deleteIntentRequestCode = random.nextInt();
-
-        Intent contentIntent = new Intent(context, MainNavDrawerActivity.class);
-        contentIntent.putExtras(extras);
-        contentIntent.putExtra(Constants.KEY_FRAGMENT_MAIN_ACTIVITY, Constants.FRAGMENT_REQUESTS);
-        contentIntent.setPackage(packageName);
-
-        Intent deleteIntent = new Intent("com.parse.push.intent.DELETE");
-        deleteIntent.putExtras(extras);
-        deleteIntent.setPackage(packageName);
-
-        PendingIntent pContentIntent = PendingIntent.getBroadcast(context, contentIntentRequestCode,
-                contentIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent pDeleteIntent = PendingIntent.getBroadcast(context, deleteIntentRequestCode,
-                deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle(title)
                 .setContentText(alert)
                 .setTicker(tickerText)
                 .setSmallIcon(super.getSmallIconId(context, intent))
-                .setContentIntent(pContentIntent)
-                .setDeleteIntent(pDeleteIntent)
+                .setContentIntent(getPendingIntent(context, ACTION_PUSH_OPEN, extras))
+                .setDeleteIntent(getPendingIntent(context, ACTION_PUSH_DELETE, extras))
+                .addAction(getAction(context, ACTION_REQUEST_ACCEPT))
+                .addAction(getAction(context, ACTION_REQUEST_DECLINE))
                 .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_SOCIAL)
                 .setDefaults(Notification.DEFAULT_ALL);
 
         if (fbId != null) {
             FacebookAPI.getProfilePicAsync(fbId, "normal", new FacebookAPI.ProfilePicCallback() {
                 @Override
                 public void onCompleted(Bitmap bitmap) {
-                    float multiplier = getImageFactor(context.getResources());
-
-                    builder.setLargeIcon(Bitmap.createScaledBitmap(
-                            bitmap,
-                            (int)(bitmap.getWidth() * multiplier),
-                            (int)(bitmap.getHeight() * multiplier),
-                            false));
-
+                    bitmap = BitmapManipulator.getScaledBitmap(context, bitmap);
+                    bitmap = BitmapManipulator.getRoundBitmap(bitmap);
+                    builder.setLargeIcon(bitmap);
                     fireNotification(context, builder.build());
                 }
             });
+        } else {
+            fireNotification(context, builder.build());
+        }
+    }
+
+    private NotificationCompat.Action getAction(Context context, String actionType) {
+        PendingIntent actionIntent = getPendingIntent(context, actionType, null);
+        return new NotificationCompat.Action.Builder(
+                getActionIcon(actionType), getActionText(actionType), actionIntent).build();
+    }
+
+    private String getActionText(String actionType) {
+        switch (actionType) {
+            case ACTION_REQUEST_ACCEPT:
+                return "Accept";
+            case ACTION_REQUEST_DECLINE:
+                return "Decline";
+            default:
+                return "";
+        }
+    }
+
+    private int getActionIcon(String actionType) {
+        switch (actionType) {
+            case ACTION_REQUEST_ACCEPT:
+                return R.drawable.ic_check;
+            case ACTION_REQUEST_DECLINE:
+                return R.drawable.ic_close_black;
+            default:
+                return 0;
+        }
+    }
+
+    /**
+     * Return the pending intent corresponding to the given context and intentCode
+     *
+     * @param context    Context to get set on the intent
+     * @param actionType Action type to be launched by the intent
+     * @param extras     The extras to put on this intent @Nullable
+     * @return A pending intent with the intent from the intent code
+     */
+    private PendingIntent getPendingIntent(Context context, String actionType, @Nullable Bundle extras) {
+        String packageName = context.getPackageName();
+
+        Random random = new Random();
+        int intentRequestCode = random.nextInt();
+
+        Intent intent = new Intent(actionType);
+        intent.setPackage(packageName);
+
+        if (extras != null) {
+            intent.putExtras(extras);
         }
 
-        return null;
+        return PendingIntent.getBroadcast(context, intentRequestCode,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     /**
@@ -122,10 +239,5 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
             notification.defaults = Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND;
             nm.notify(notificationId, notification);
         }
-    }
-
-    private static float getImageFactor(Resources r) {
-        DisplayMetrics metrics = r.getDisplayMetrics();
-        return metrics.density / 3f;
     }
 }

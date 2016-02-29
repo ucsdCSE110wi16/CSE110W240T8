@@ -16,12 +16,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import droidsquad.voyage.util.Constants;
+
 public class ParseNotificationModel {
     private final static String TAG = ParseNotificationModel.class.getSimpleName();
 
     public static void sendRequestNotifications(ParseObject parseTrip, List<ParseUser> parseUsers) {
         List<String> ids = new ArrayList<>();
-        ids.add(ParseUser.getCurrentUser().getObjectId());
 
         for (ParseUser user : parseUsers) {
             ids.add(user.getObjectId());
@@ -34,7 +35,8 @@ public class ParseNotificationModel {
             data.put("title", currentUser.get("firstName") + " " + currentUser.get("lastName"));
             data.put("alert", "invited you to join " + parseTrip.get("name"));
             data.put("fbId", currentUser.get("fbId"));
-            data.put("type", "tripInvitation");
+            data.put("tripId", parseTrip.getObjectId());
+            data.put("type", Constants.NOTIFICATION_INVITATION);
         } catch (JSONException e) {
             e.printStackTrace();
         }
