@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.parse.ParseAnalytics;
 import com.parse.ParsePushBroadcastReceiver;
@@ -33,6 +34,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
     private final static String TAG = TripBroadcastReceiver.class.getSimpleName();
     private static final String ACTION_REQUEST_ACCEPT = "droidsquad.voyage.intent.ACCEPT_INVITATION";
     private static final String ACTION_REQUEST_DECLINE = "droidsquad.voyage.intent.DECLINE_INVITATION";
+    private static final String NOTIFICATION_ID = "notificationId";
 
     private static JSONObject data;
 
@@ -42,10 +44,10 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
 
         switch (intentAction) {
             case ACTION_REQUEST_ACCEPT:
-                onAcceptTripInvitation();
+                onAcceptTripInvitation(context, intent);
                 break;
             case ACTION_REQUEST_DECLINE:
-                onDeclineTripInvitation();
+                onDeclineTripInvitation(context, intent);
                 break;
             default:
                 super.onReceive(context, intent);
@@ -71,30 +73,34 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
         startActivities(context, intent);
     }
 
-    private void onAcceptTripInvitation() {
+    private void onAcceptTripInvitation(final Context context, final Intent intent) {
         ParseRequestModel.acceptRequest(data.optString("tripId"), new ParseRequestModel.OnResultCallback() {
             @Override
             public void onSuccess() {
                 Log.i(TAG, "Accepted trip from notification");
+                dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
             }
 
             @Override
             public void onFailure(String error) {
                 Log.i(TAG, "Error while accepting trip from notification: " + error);
+                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void onDeclineTripInvitation() {
+    private void onDeclineTripInvitation(final Context context, final Intent intent) {
         ParseRequestModel.declineRequest(data.optString("tripId"), new ParseRequestModel.OnResultCallback() {
             @Override
             public void onSuccess() {
                 Log.i(TAG, "Declined trip from notification");
+                dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
             }
 
             @Override
             public void onFailure(String error) {
                 Log.i(TAG, "Error while declining trip from notification: " + error);
+                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -134,7 +140,11 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
         String fbId = data.optString("fbId");
         String tickerText = String.format(Locale.getDefault(), "%s: %s", title, alert);
 
+        // Pick an id that probably won't overlap anything
+        final int notificationId = (int) System.currentTimeMillis();
+
         Bundle extras = intent.getExtras();
+        extras.putInt(NOTIFICATION_ID, notificationId);
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle(title)
@@ -143,8 +153,8 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
                 .setSmallIcon(super.getSmallIconId(context, intent))
                 .setContentIntent(getPendingIntent(context, ACTION_PUSH_OPEN, extras))
                 .setDeleteIntent(getPendingIntent(context, ACTION_PUSH_DELETE, extras))
-                .addAction(getAction(context, ACTION_REQUEST_ACCEPT))
-                .addAction(getAction(context, ACTION_REQUEST_DECLINE))
+                .addAction(getAction(context, ACTION_REQUEST_ACCEPT, extras))
+                .addAction(getAction(context, ACTION_REQUEST_DECLINE, extras))
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_SOCIAL)
@@ -157,16 +167,16 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
                     bitmap = BitmapManipulator.getScaledBitmap(context, bitmap);
                     bitmap = BitmapManipulator.getRoundBitmap(bitmap);
                     builder.setLargeIcon(bitmap);
-                    fireNotification(context, builder.build());
+                    fireNotification(context, builder.build(), notificationId);
                 }
             });
         } else {
-            fireNotification(context, builder.build());
+            fireNotification(context, builder.build(), notificationId);
         }
     }
 
-    private NotificationCompat.Action getAction(Context context, String actionType) {
-        PendingIntent actionIntent = getPendingIntent(context, actionType, null);
+    private NotificationCompat.Action getAction(Context context, String actionType, Bundle extras) {
+        PendingIntent actionIntent = getPendingIntent(context, actionType, extras);
         return new NotificationCompat.Action.Builder(
                 getActionIcon(actionType), getActionText(actionType), actionIntent).build();
     }
@@ -224,13 +234,10 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
      * @param context      The context in which to send the notification
      * @param notification The notification to be sent
      */
-    private void fireNotification(Context context, Notification notification) {
+    private void fireNotification(Context context, Notification notification, int notificationId) {
         // Fire off the notification
         NotificationManager nm =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // Pick an id that probably won't overlap anything
-        int notificationId = (int) System.currentTimeMillis();
 
         try {
             nm.notify(notificationId, notification);
@@ -239,5 +246,17 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
             notification.defaults = Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND;
             nm.notify(notificationId, notification);
         }
+    }
+
+    /**
+     * Dismiss the notification with the given id
+     *
+     * @param context The context in which the notification lives
+     * @param id The id of the notification to be dismissed
+     */
+    private void dismissNotification(Context context, int id) {
+        NotificationManager nm =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(id);
     }
 }

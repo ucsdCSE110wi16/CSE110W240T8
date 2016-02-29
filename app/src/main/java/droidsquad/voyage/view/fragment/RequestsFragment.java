@@ -1,5 +1,7 @@
 package droidsquad.voyage.view.fragment;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -26,6 +28,9 @@ public class RequestsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        NotificationManager nm =
+                (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancelAll();
     }
 
     @Override
