@@ -16,13 +16,9 @@ import android.widget.Button;
 import com.parse.ParseFacebookUtils;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.activityController.LoginController;
 import droidsquad.voyage.model.objects.VoyageUser;
 
 public class LoginActivity extends AppCompatActivity {
-
-    private LoginController controller;
-
     private boolean currentlyLoggingIn = false;
 
     /**
@@ -40,8 +36,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        controller = new LoginController(this);
 
         mLoginWithFBButton = (Button) findViewById(R.id.login_with_facebook_button);
         mLoginWithFBButton.setOnClickListener(new OnClickListener() {

@@ -35,9 +35,6 @@ public class MainNavDrawerActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         controller = new MainNavDrawerController(this);
-
-        // default start with TripList fragment
-        controller.tripsPressed();
         initUI();
     }
 

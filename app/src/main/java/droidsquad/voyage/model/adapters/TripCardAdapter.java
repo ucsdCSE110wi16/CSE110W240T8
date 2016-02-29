@@ -1,6 +1,7 @@
 package droidsquad.voyage.model.adapters;
 
 import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -23,24 +23,20 @@ import java.util.Date;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.activityController.TripController;
-import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.TripActivity;
-import droidsquad.voyage.view.fragment.TripListFragment;
 
 public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHolder> {
     private static final String TAG = TripCardAdapter.class.getSimpleName();
     private ArrayList<Trip> trips = new ArrayList<>();
-    private TripListFragment mFragment;
+    private Fragment mFragment;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mName;
         public TextView mCities;
         public TextView mDates;
         public TextView mOtherMembers;
-        public TextView mAdmin;
         public ImageView mPrivateIcon;
         public ImageView mTransportationIcon;
         public ImageView mMember1;
@@ -56,7 +52,6 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             mCities = (TextView) view.findViewById(R.id.trip_card_cities);
             mDates = (TextView) view.findViewById(R.id.trip_card_date_range);
             mOtherMembers = (TextView) view.findViewById(R.id.trip_card_other_members);
-            mAdmin = (TextView) view.findViewById(R.id.trip_card_admin);
             mPrivateIcon = (ImageView) view.findViewById(R.id.trip_card_private_icon);
             mTransportationIcon = (ImageView) view.findViewById(R.id.trip_card_transportation_icon);
             mMember1 = (ImageView) view.findViewById(R.id.trip_card_member_profile_pic1);
@@ -67,9 +62,9 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         }
     }
 
-    public TripCardAdapter(TripListFragment context) {
+    public TripCardAdapter(Fragment fragment) {
         this.trips = new ArrayList<>();
-        this.mFragment = context;
+        this.mFragment = fragment;
     }
 
     public void updateData(ArrayList<Trip> trips) {
@@ -119,21 +114,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         holder.mPrivateIcon.setVisibility(
                 (trip.isPrivate()) ? View.VISIBLE : View.GONE);
 
-        holder.mAdmin.setVisibility(
-                (isAdmin(trip)) ? View.VISIBLE : View.GONE);
-
-        ParseTripModel.setAllMembers(trip, new ParseTripModel.TripASyncTaskCallback() {
-            @Override
-            public void onSuccess() {
-                setMemberPics(trip, holder);
-            }
-
-            @Override
-            public void onFailure(String error) {
-            }
-        });
-
-
+        setMemberPics(trip, holder);
 
         switch (trip.getTransportation()) {
             case "Car":
@@ -162,41 +143,21 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     }
 
     private void setMemberPics(Trip trip, ViewHolder holder) {
-        if (trip.getAllParticipants() == null) {
-            Log.d(TAG, "Error getting all participants");
-        }
-        int numMembers = trip.getAllParticipants().size();
+        int numMembers = 0;
+        if (trip.getAllMembers() != null)
+            numMembers = trip.getAllMembers().size();
 
         switch (4 - numMembers) {
             case 4:
                 holder.mMember1.setVisibility(View.GONE);
-                holder.mMember2.setVisibility(View.GONE);
-                holder.mMember3.setVisibility(View.GONE);
-                holder.mMember4.setVisibility(View.GONE);
-                break;
             case 3:
-                holder.mMember1.setVisibility(View.VISIBLE);
                 holder.mMember2.setVisibility(View.GONE);
-                holder.mMember3.setVisibility(View.GONE);
-                holder.mMember4.setVisibility(View.GONE);
-                break;
             case 2:
-                holder.mMember1.setVisibility(View.VISIBLE);
-                holder.mMember2.setVisibility(View.VISIBLE);
                 holder.mMember3.setVisibility(View.GONE);
-                holder.mMember4.setVisibility(View.GONE);
-                break;
             case 1:
-                holder.mMember1.setVisibility(View.VISIBLE);
-                holder.mMember2.setVisibility(View.VISIBLE);
-                holder.mMember3.setVisibility(View.VISIBLE);
                 holder.mMember4.setVisibility(View.GONE);
                 break;
             case 0:
-                holder.mMember1.setVisibility(View.VISIBLE);
-                holder.mMember2.setVisibility(View.VISIBLE);
-                holder.mMember3.setVisibility(View.VISIBLE);
-                holder.mMember4.setVisibility(View.VISIBLE);
                 break;
             default:
                 holder.mOtherMembers.setVisibility(View.VISIBLE);
@@ -205,10 +166,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                 break;
         }
 
-        if(4 - numMembers >= 0)
-            holder.mOtherMembers.setVisibility(View.GONE);
-
-        if (trip.getAllParticipants() == null) {
+        if (trip.getAllMembers() == null) {
             Log.d(TAG, "SOMETHING IS WRONG HERE!!");
             return;
         }
@@ -244,7 +202,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     }
 
     public ArrayList<String> setUpPicURLs(Trip trip) {
-        ArrayList<Trip.TripMember> members = trip.getAllParticipants();
+        ArrayList<Trip.TripMember> members = trip.getAllMembers();
         ArrayList<String> picURLs = new ArrayList<>();
         if(members == null) {
             Log.d(TAG, "ERROR with fbIds");
@@ -265,10 +223,6 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     @Override
     public int getItemCount() {
         return trips.size();
-    }
-
-    public boolean isAdmin(Trip trip){
-        return trip.getCreatorId().equals(ParseUser.getCurrentUser().getObjectId());
     }
 
 }

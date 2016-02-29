@@ -14,8 +14,8 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -58,6 +58,8 @@ public class CreateTripActivity extends AppCompatActivity {
 
     private Place mOriginPlace;
     private Place mDestinationPlace;
+
+    private Button mCreateTripButton;
 
     private static final int DEFAULT_TRIP_LENGTH = 7;
     private static final int FROM_PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
@@ -126,14 +128,19 @@ public class CreateTripActivity extends AppCompatActivity {
         mPrivateView = (CheckBox) findViewById(R.id.private_check);
         mTransportation = (Spinner) findViewById(R.id.transportation);
 
+        mCreateTripButton = (Button) findViewById(R.id.create_trip_button);
+
         // Set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.trip_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_close);
         toolbar.setTitle("");
 
         setSupportActionBar(toolbar);
-        initDatePickers();
         setOnClickListeners();
+
+        // initialize the UI for either creating or editing a trip
+        controller.populateUI();
+        hideKeyboard();
     }
 
     /**
@@ -152,7 +159,7 @@ public class CreateTripActivity extends AppCompatActivity {
         mTripNameView.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                hideError(mTripNameView);
+                controller.hideError(mTripNameView);
             }
 
             @Override
@@ -169,7 +176,23 @@ public class CreateTripActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startPlaceAutocompleteIntent(FROM_PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                hideError(mLeavingFromView);
+            }
+        });
+
+        mLeavingFromView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                controller.hideError(mLeavingFromView);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
 
@@ -177,36 +200,28 @@ public class CreateTripActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startPlaceAutocompleteIntent(TO_PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                hideError(mDestinationView);
+            }
+        });
+
+        mDestinationView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                controller.hideError(mDestinationView);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
 
     }
 
-    /**
-     * Set up default dates on the date pickers
-     */
-    private void initDatePickers() {
-        mCalendarFrom = Calendar.getInstance();
-        mCalendarTo = Calendar.getInstance();
-        mCalendarTo.add(Calendar.DAY_OF_WEEK, DEFAULT_TRIP_LENGTH);
-        mDateFromView.setText(dateFormat.format(mCalendarFrom.getTime()));
-        mDateToView.setText(dateFormat.format(mCalendarTo.getTime()));
-
-        mDateFromView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                controller.showDateDialog(mCalendarFrom);
-            }
-        });
-
-        mDateToView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                controller.showDateDialog(mCalendarTo);
-            }
-        });
-    }
 
     /**
      * Start the PlaceAutocomplete Intent for the user to selecte a google place
@@ -307,71 +322,18 @@ public class CreateTripActivity extends AppCompatActivity {
     }
 
     /**
-     * Update the dates views to display current state of calendars
-     */
-    public void updateDateViews() {
-        mDateFromView.setText(dateFormat.format(mCalendarFrom.getTime()));
-        mDateToView.setText(dateFormat.format(mCalendarTo.getTime()));
-    }
-
-    /**
      * Called when the user presses the create trip button
      */
     public void createTripButtonPressed(View view) {
-        controller.attemptCreateTrip();
+        controller.attemptSaveTrip();
     }
 
     /**
-     * Displays the error on the given view
-     *
-     * @param view  View to display the error on
-     * @param error The error to be displayed
+     * Called to show soft keyboard
      */
-    public void displayError(View view, String error) {
-        if (view == mTripNameView) {
-            mTripNameErrorView.setText(error);
-            mTripNameErrorView.setVisibility(View.VISIBLE);
-        } else {
-            ((EditText) view).setError(error);
-        }
-    }
-
-    /**
-     * Hides the error on the given view
-     *
-     * @param view  View to display the error on
-     */
-    public void hideError(View view) {
-        if (view == mTripNameView) {
-            mTripNameErrorView.setVisibility(View.GONE);
-        } else {
-            ((EditText) view).setError(null);
-        }
-    }
-
-    /**
-     * Sets focus on the given view
-     *
-     * @param view  View to display the error on
-     */
-    public void setFocus(View view) {
-        if (view == mTripNameView) {
-            if (mTripNameView.requestFocus()){
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(mTripNameView, InputMethodManager.SHOW_IMPLICIT);
-            }
-        } else {
-            System.out.println("HERE: " + ((EditText) view).getId());
-        }
-    }
-
-    /**
-     * @return true if user has made changes to the forms
-     */
-    public boolean hasChanges() {
-        return mTripNameView.getText().length() > 0 ||
-                mLeavingFromView.getText().length() > 0 ||
-                mDestinationView.getText().length() > 0;
+    public void showKeyBoard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
     }
 
     /**
@@ -380,13 +342,16 @@ public class CreateTripActivity extends AppCompatActivity {
     public void exitActivity() {
         finish();
         // tell the parent activity it has been updated
-
     }
 
     /* GETTERS */
 
     public EditText getTripNameView() {
         return mTripNameView;
+    }
+
+    public TextView getTripNameErrorView() {
+        return mTripNameErrorView;
     }
 
     public CheckBox getPrivateView() {
@@ -403,6 +368,14 @@ public class CreateTripActivity extends AppCompatActivity {
 
     public Calendar getCalendarFrom() {
         return mCalendarFrom;
+    }
+
+    public void setCalendarFrom(Calendar calendarFrom){
+        mCalendarFrom = calendarFrom;
+    }
+
+    public void setCalendarTo(Calendar calendarTo){
+        mCalendarTo = calendarTo;
     }
 
     public Calendar getCalendarTo() {
@@ -436,4 +409,9 @@ public class CreateTripActivity extends AppCompatActivity {
     public Place getDestinationPlace() {
         return mDestinationPlace;
     }
+
+    public Button getCreateTripButton(){
+        return mCreateTripButton;
+    }
+
 }

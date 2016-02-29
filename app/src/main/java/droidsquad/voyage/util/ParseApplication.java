@@ -20,7 +20,6 @@ public class ParseApplication extends Application {
     private void initSingletons() {
         Parse.enableLocalDatastore(this);
         Parse.initialize(this);
-        ParseInstallation.getCurrentInstallation().saveInBackground();
         FacebookSdk.sdkInitialize(getApplicationContext());
         ParseFacebookUtils.initialize(getApplicationContext());
     }

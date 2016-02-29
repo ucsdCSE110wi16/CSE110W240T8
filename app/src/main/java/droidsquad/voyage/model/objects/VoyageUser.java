@@ -13,7 +13,9 @@ import com.facebook.GraphResponse;
 import com.parse.LogInCallback;
 import com.parse.LogOutCallback;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
+import com.parse.interceptors.ParseLogInterceptor;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,7 +40,7 @@ public class VoyageUser {
                 token,
                 new GraphRequest.GraphJSONObjectCallback() {
                     @Override
-                    public void onCompleted( JSONObject object, GraphResponse response) {
+                    public void onCompleted(JSONObject object, GraphResponse response) {
                         Log.d(TAG, "Info recevied from FB: " + object.toString());
 
                         try {
@@ -89,14 +91,14 @@ public class VoyageUser {
                                 });
                         snackbar.show();
                     }
-                } else if (user.isNew()) {
-                    Log.d(TAG, "Signing up new user.");
-                    VoyageUser.refreshInfoFromFB();
-                    Intent intent = new Intent(activity, MainNavDrawerActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    activity.startActivity(intent);
                 } else {
-                    Log.d(TAG, "User logged in through Facebook!");
+                    Log.d(TAG, (user.isNew()) ? "Signing up new user." : "User logged in through Facebook!");
+
+                    // Setup installation object for push notifications
+                    ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                    installation.put("userId", user.getObjectId());
+                    installation.saveInBackground();
+
                     VoyageUser.refreshInfoFromFB();
                     Intent intent = new Intent(activity, MainNavDrawerActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -125,6 +127,7 @@ public class VoyageUser {
 
     public void logOut() {
         Log.d(TAG, "Logging user out.");
+
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser == null)
             return;
@@ -135,6 +138,8 @@ public class VoyageUser {
                 if (e == null) {
                     // TODO: maybe add a loading animation
                     Log.d(TAG, "User successfully logged out.");
+                    ParseInstallation.getCurrentInstallation().remove("userId");
+                    ParseInstallation.getCurrentInstallation().saveInBackground();
                 } else {
                     // TODO: handle if logout fails (error message)
                     Log.d(TAG, "ParseException occurred. Code: "

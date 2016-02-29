@@ -18,6 +18,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import droidsquad.voyage.model.objects.FacebookUser;
 
@@ -40,7 +42,7 @@ public class FacebookAPI {
                 new GraphRequest.GraphJSONArrayCallback() {
                     @Override
                     public void onCompleted(JSONArray objects, GraphResponse response) {
-                        FacebookUser friends[] = new FacebookUser[objects.length()];
+                        List<FacebookUser> friends = new ArrayList<>();
 
                         // Parse the JSONObjects into FacebookUser objects
                         try {
@@ -51,10 +53,10 @@ public class FacebookAPI {
                                         .getJSONObject("data")
                                         .getString("url");
 
-                                friends[i] = new FacebookUser(
+                                friends.add(new FacebookUser(
                                         (String) friend.get("id"),
                                         (String) friend.get("name"),
-                                        pictureURL);
+                                        pictureURL));
                             }
                         } catch (JSONException e) {
                             Log.d(TAG, "Exception occurred while parsing friends JSON response");
@@ -71,6 +73,37 @@ public class FacebookAPI {
         request.executeAsync();
     }
 
+    public static Bitmap getProfilePic(String id, String type) {
+        Bitmap bitmap = null;
+
+        try {
+            URL imageURL = new URL(GRAPH_URL + id + "/picture?type=" + type);
+            bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+        } catch (MalformedURLException e) {
+            Log.d(TAG, "Malformed Exception occurred: " + e.getMessage());
+        } catch (IOException e) {
+            Log.e(TAG, "IOException occurred: " + e.getMessage());
+        }
+
+        return bitmap;
+    }
+
+    public static void getProfilePicAsync(final String id,
+                                          final String type, final ProfilePicCallback callback) {
+        new AsyncTask<Void, Void, Bitmap>() {
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                return getProfilePic(id, type);
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                if (bitmap != null)
+                    callback.onCompleted(bitmap);
+            }
+        }.execute();
+    }
+
     /**
      * Loads the facebook profile picture of the user with the given id into the given view
      *
@@ -80,32 +113,19 @@ public class FacebookAPI {
      */
     public static void loadProfilePicIntoView(final ImageView imageView,
                                               final String id, final String type) {
-        new AsyncTask<Void, Void, Bitmap>() {
+        getProfilePicAsync(id, type, new ProfilePicCallback() {
             @Override
-            protected Bitmap doInBackground(Void... params) {
-                Bitmap bitmap = null;
-
-                try {
-                    URL imageURL = new URL(GRAPH_URL + id + "/picture?type=" + type);
-                    bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
-                } catch (MalformedURLException e) {
-                    Log.d(TAG, "Malformed Exception occurred: " + e.getMessage());
-                } catch (IOException e) {
-                    Log.e(TAG, "IOException occurred: " + e.getMessage());
-                }
-
-                return bitmap;
+            public void onCompleted(Bitmap bitmap) {
+                imageView.setImageBitmap(bitmap);
             }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                if (bitmap != null)
-                    imageView.setImageBitmap(bitmap);
-            }
-        }.execute();
+        });
     }
 
     public interface FBFriendsArrayCallback {
-        void onCompleted(FacebookUser[] friends);
+        void onCompleted(List<FacebookUser> friends);
+    }
+
+    public interface ProfilePicCallback {
+        void onCompleted(Bitmap bitmap);
     }
 }

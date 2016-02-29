@@ -1,12 +1,14 @@
 package droidsquad.voyage.controller.activityController;
 
+import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.ParseTripModel;
@@ -15,13 +17,14 @@ import droidsquad.voyage.model.adapters.SelectedFBFriendsAdapter;
 import droidsquad.voyage.model.api.FacebookAPI;
 import droidsquad.voyage.model.objects.FacebookUser;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.AddFriendsActivity;
 
 public class AddFriendsController {
     private AddFriendsActivity mActivity;
     private FBFriendsAdapter mResultsAdapter;
     private SelectedFBFriendsAdapter mSelectedFriendsAdapter;
-    private FacebookUser[] friends;
+    private List<FacebookUser> friends;
     private Trip mTrip;
 
     public static final String TAG = AddFriendsController.class.getSimpleName();
@@ -32,7 +35,7 @@ public class AddFriendsController {
         mTrip = activity.getIntent().getParcelableExtra(
                 activity.getString(R.string.intent_key_trip));
 
-        mResultsAdapter = new FBFriendsAdapter(activity);
+        mResultsAdapter = new FBFriendsAdapter(activity, false);
         mSelectedFriendsAdapter = new SelectedFBFriendsAdapter(activity);
 
         mResultsAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
@@ -62,16 +65,28 @@ public class AddFriendsController {
     private void getFBFriends() {
         FacebookAPI.requestFBFriends(new FacebookAPI.FBFriendsArrayCallback() {
             @Override
-            public void onCompleted(FacebookUser[] queriedFriends) {
-                Log.d(TAG, "Friends Arrays received with size: " + queriedFriends.length);
+            public void onCompleted(List<FacebookUser> queriedFriends) {
+                Log.d(TAG, "Friends Arrays received with size: " + queriedFriends.size());
 
                 // Sort the entries alphabetically by name and store in a member variable
-                Arrays.sort(queriedFriends, new Comparator<FacebookUser>() {
+                Collections.sort(queriedFriends, new Comparator<FacebookUser>() {
                     @Override
                     public int compare(FacebookUser lhs, FacebookUser rhs) {
                         return lhs.name.compareTo(rhs.name);
                     }
                 });
+
+                // Get rid of current members and invitees
+                List<Trip.TripMember> allMembersAndInvitees = new ArrayList<>();
+                allMembersAndInvitees.addAll(mTrip.getAllMembers());
+                allMembersAndInvitees.addAll(mTrip.getAllInvitees());
+                for (Trip.TripMember member : allMembersAndInvitees) {
+                    for (int i = 0; i < queriedFriends.size(); i++) {
+                        if (queriedFriends.get(i).id.equals(member.fbId)) {
+                            queriedFriends.remove(i);
+                        }
+                    }
+                }
 
                 friends = queriedFriends;
                 updateAdapter(mActivity.getQuery());
@@ -112,15 +127,23 @@ public class AddFriendsController {
     public void addFriendsToTrip() {
         Log.d(TAG, "Adding " + mSelectedFriendsAdapter.mSelectedUsers.size() + " friends to Trip.");
         mActivity.showProgress(true);
-        ArrayList<String> fbIDs = new ArrayList<>();
+        final ArrayList<String> fbIDs = new ArrayList<>();
         for (FacebookUser user : mSelectedFriendsAdapter.mSelectedUsers) {
             fbIDs.add(user.id);
         }
 
-        ParseTripModel.saveInvitees(mTrip.getId(), fbIDs, new ParseTripModel.TripASyncTaskCallback() {
+        // No invitees to add
+        if (fbIDs.isEmpty()) {
+            mActivity.finish();
+        }
+
+        ParseTripModel.saveInvitees(mTrip, fbIDs, new ParseTripModel.TripASyncTaskCallback() {
             @Override
             public void onSuccess() {
-                Log.d(TAG, "Successfully added friends");
+                Log.d(TAG, "Successfully added " + fbIDs.size() + " friends");
+                Intent intent = new Intent();
+                intent.putExtra(mActivity.getString(R.string.intent_key_trip), mTrip);
+                mActivity.setResult(Constants.RESULT_CODE_INVITEES_ADDED, intent);
                 mActivity.finish();
             }
 
