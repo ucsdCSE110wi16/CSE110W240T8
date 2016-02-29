@@ -26,7 +26,6 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.TripActivity;
-import droidsquad.voyage.view.fragment.TripListFragment;
 
 public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHolder> {
     private static final String TAG = TripCardAdapter.class.getSimpleName();

@@ -1,6 +1,5 @@
 package droidsquad.voyage.controller.activityController;
 
-import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.ImageView;
@@ -21,7 +20,6 @@ import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.objects.FacebookUser;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
-import droidsquad.voyage.view.activity.AddFriendsActivity;
 import droidsquad.voyage.view.activity.TripActivity;
 
 public class TripController {
@@ -116,12 +114,6 @@ public class TripController {
         return destination;
     }
 
-    public void launchAddFriends() {
-        Intent intent = new Intent(mActivity, AddFriendsActivity.class);
-        intent.putExtra(mActivity.getString(R.string.intent_key_trip), trip);
-        mActivity.startActivity(intent);
-    }
-
     public CharSequence getTitle() {
         return trip.getName();
     }
@@ -210,7 +202,7 @@ public class TripController {
                 mActivity.getString(R.string.snackbar_invitee_removed));
     }
 
-    public void kickUser(final FacebookUser fbUser, ArrayList<Trip.TripMember> users, final FBFriendsAdapter adapter,
+    public void kickUser(final FacebookUser fbUser, final ArrayList<Trip.TripMember> users, final FBFriendsAdapter adapter,
                          String relation, final String snackBarMessage) {
         String userId = "";
         for (Trip.TripMember member : users) {
@@ -226,6 +218,15 @@ public class TripController {
                     @Override
                     public void onSuccess() {
                         adapter.removeFriend(fbUser);
+
+                        // Successfully remove the user from the trip object now
+                        for (int i = 0; i < users.size(); i++) {
+                            if (users.get(i).fbId.endsWith(fbUser.id)) {
+                                users.remove(i);
+                                break;
+                            }
+                        }
+
                         Snackbar snackbar = Snackbar.make(mActivity.findViewById(android.R.id.content),
                                 snackBarMessage, Snackbar.LENGTH_SHORT);
                         snackbar.show();

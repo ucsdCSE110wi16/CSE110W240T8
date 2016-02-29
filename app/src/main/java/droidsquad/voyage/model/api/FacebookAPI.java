@@ -18,6 +18,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import droidsquad.voyage.model.objects.FacebookUser;
 
@@ -40,7 +42,7 @@ public class FacebookAPI {
                 new GraphRequest.GraphJSONArrayCallback() {
                     @Override
                     public void onCompleted(JSONArray objects, GraphResponse response) {
-                        FacebookUser friends[] = new FacebookUser[objects.length()];
+                        List<FacebookUser> friends = new ArrayList<>();
 
                         // Parse the JSONObjects into FacebookUser objects
                         try {
@@ -51,10 +53,10 @@ public class FacebookAPI {
                                         .getJSONObject("data")
                                         .getString("url");
 
-                                friends[i] = new FacebookUser(
+                                friends.add(new FacebookUser(
                                         (String) friend.get("id"),
                                         (String) friend.get("name"),
-                                        pictureURL);
+                                        pictureURL));
                             }
                         } catch (JSONException e) {
                             Log.d(TAG, "Exception occurred while parsing friends JSON response");
@@ -120,7 +122,7 @@ public class FacebookAPI {
     }
 
     public interface FBFriendsArrayCallback {
-        void onCompleted(FacebookUser[] friends);
+        void onCompleted(List<FacebookUser> friends);
     }
 
     public interface ProfilePicCallback {
