@@ -18,15 +18,12 @@ import droidsquad.voyage.view.fragment.TripListFragment;
  * most notably selecting options within the navigation drawer
  */
 public class MainNavDrawerController {
-
     private MainNavDrawerActivity activity;
-    private VoyageUser user;
     private android.support.v4.app.FragmentManager fragmentManager;
 
     public MainNavDrawerController(MainNavDrawerActivity activity) {
         this.activity = activity;
         fragmentManager = activity.getSupportFragmentManager();
-        this.user = new VoyageUser();
 
         // Open appropriate fragment based on intent
         String fragmentToOpen = activity.getIntent().getStringExtra(Constants.KEY_FRAGMENT_MAIN_ACTIVITY);
@@ -93,7 +90,7 @@ public class MainNavDrawerController {
      * Called when the Logout option is selected from the navigation drawer
      */
     public void logOutUser() {
-        user.logOut();
+        VoyageUser.logOut();
         Intent intent = new Intent(activity, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         activity.startActivity(intent);

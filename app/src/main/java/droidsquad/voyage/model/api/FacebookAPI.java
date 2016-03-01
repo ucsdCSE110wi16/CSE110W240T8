@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +22,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import droidsquad.voyage.model.objects.FacebookUser;
+import droidsquad.voyage.model.objects.User;
 
 /**
  * This class contains static methods for retrieving data asynchronously from Facebook
@@ -29,12 +30,43 @@ import droidsquad.voyage.model.objects.FacebookUser;
  */
 public class FacebookAPI {
     private static final String TAG = FacebookAPI.class.getSimpleName();
-    private static final String GRAPH_URL = "https://graph.facebook.com/";
+    public static final String PICTURE_URL_FORMAT = "https://graph.facebook.com/%s/picture?type=%s";
+
+    /**
+     * Get the latest information about the currently logged in user on facebook
+     *
+     * @param callback Called with the information on success
+     */
+    public static void requestFBInfo(final FBUserInfoCallback callback) {
+        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        Log.d(TAG, "Info received from FB: " + object.toString());
+
+                        try {
+                            User user = new User();
+                            user.firstName = object.getString("first_name");
+                            user.lastName = object.getString("last_name");
+                            user.gender = object.getString("gender");
+                            user.fbId = object.getString("id");
+
+                            callback.onCompleted(user);
+                        } catch (JSONException e) {
+                            Log.d(TAG, "JSONException occurred: " + e.getMessage());
+                        }
+                    }
+                });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "first_name,last_name,gender,id");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
 
     /**
      * Get the facebook friends of the current user asynchronously
      *
-     * @param callback Called with an array containing all the friends as FacebookUser
+     * @param callback Called with an array containing all the friends as User
      */
     public static void requestFBFriends(final FBFriendsArrayCallback callback) {
         GraphRequest request = GraphRequest.newMyFriendsRequest(
@@ -42,25 +74,21 @@ public class FacebookAPI {
                 new GraphRequest.GraphJSONArrayCallback() {
                     @Override
                     public void onCompleted(JSONArray objects, GraphResponse response) {
-                        List<FacebookUser> friends = new ArrayList<>();
+                        List<User> friends = new ArrayList<>();
 
-                        // Parse the JSONObjects into FacebookUser objects
+                        // Parse the JSONObjects into User objects
                         try {
                             for (int i = 0; i < objects.length(); i++) {
                                 JSONObject friend = objects.getJSONObject(i);
-                                String pictureURL = friend
-                                        .getJSONObject("picture")
-                                        .getJSONObject("data")
-                                        .getString("url");
-
-                                friends.add(new FacebookUser(
-                                        (String) friend.get("id"),
-                                        (String) friend.get("name"),
-                                        pictureURL));
+                                User user = new User();
+                                user.firstName = friend.getString("first_name");
+                                user.lastName = friend.getString("last_name");
+                                user.gender = friend.getString("gender");
+                                user.fbId = friend.getString("id");
+                                friends.add(user);
                             }
                         } catch (JSONException e) {
-                            Log.d(TAG, "Exception occurred while parsing friends JSON response");
-                            e.printStackTrace();
+                            Log.d(TAG, "Exception occurred while parsing friends JSON response", e);
                         }
 
                         // Call the callback with the results
@@ -77,7 +105,7 @@ public class FacebookAPI {
         Bitmap bitmap = null;
 
         try {
-            URL imageURL = new URL(GRAPH_URL + id + "/picture?type=" + type);
+            URL imageURL = new URL(buildProfilePicURL(id, type));
             bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
         } catch (MalformedURLException e) {
             Log.d(TAG, "Malformed Exception occurred: " + e.getMessage());
@@ -121,8 +149,20 @@ public class FacebookAPI {
         });
     }
 
+    public static String buildProfilePicURL(String id, String type) {
+        return String.format(PICTURE_URL_FORMAT, id, type);
+    }
+
+    /**
+     * Interfaces for callback
+     */
+
+    public interface FBUserInfoCallback {
+        void onCompleted(User user);
+    }
+
     public interface FBFriendsArrayCallback {
-        void onCompleted(List<FacebookUser> friends);
+        void onCompleted(List<User> friends);
     }
 
     public interface ProfilePicCallback {

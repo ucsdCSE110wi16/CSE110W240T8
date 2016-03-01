@@ -59,17 +59,13 @@ public class RequestsController {
             public void onSuccess() {
                 Log.d(TAG, "Successfully accepted Trip.");
                 mAdapter.removeRequest(request);
-                Snackbar snackbar = Snackbar.make(mFragment.getView(),
-                        R.string.snackbar_request_accepted, Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                showSnackbar(R.string.snackbar_request_accepted);
             }
 
             @Override
             public void onFailure(String error) {
                 Log.d(TAG, "Couldn't accept trip. Error: " + error);
-                Snackbar snackbar = Snackbar.make(mFragment.getView(),
-                        error, Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                showSnackbar(error);
             }
         });
     }
@@ -81,17 +77,13 @@ public class RequestsController {
             public void onSuccess() {
                 Log.d(TAG, "Successfully declined Trip.");
                 mAdapter.removeRequest(request);
-                Snackbar snackbar = Snackbar.make(mFragment.getView(),
-                        R.string.snackbar_request_declined, Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                showSnackbar(R.string.snackbar_request_declined);
             }
 
             @Override
             public void onFailure(String error) {
                 Log.d(TAG, "Couldn't decline trip. Error: " + error);
-                Snackbar snackbar = Snackbar.make(mFragment.getView(),
-                        error, Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                showSnackbar(error);
             }
         });
     }
@@ -115,6 +107,14 @@ public class RequestsController {
                 mFragment.refreshing(false);
             }
         });
+    }
+
+    private void showSnackbar(String messageId) {
+        Snackbar.make(mFragment.getView(), messageId, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void showSnackbar(int messageId) {
+        showSnackbar(mFragment.getString(messageId));
     }
 
     public RequestsAdapter getAdapter() {

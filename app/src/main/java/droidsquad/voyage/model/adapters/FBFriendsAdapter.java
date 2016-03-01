@@ -13,12 +13,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.objects.FacebookUser;
+import droidsquad.voyage.model.objects.User;
 
 public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.ViewHolder> {
     private Activity mActivity;
     private OnClickListener mListener;
-    private ArrayList<FacebookUser> mResults;
+    private ArrayList<User> mResults;
     private final boolean mClickDeleteInstead;
 
     private static final String TAG = FBFriendsAdapter.class.getSimpleName();
@@ -38,10 +38,10 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final FacebookUser friend = mResults.get(position);
+        final User friend = mResults.get(position);
 
         friend.loadProfilePicInto(mActivity, holder.mProfilePicImageView);
-        holder.mNameTextView.setText(friend.name);
+        holder.mNameTextView.setText(friend.getFullName());
 
         View clickableView;
         if (mClickDeleteInstead) {
@@ -71,12 +71,12 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
         return mResults.size();
     }
 
-    public void updateResults(ArrayList<FacebookUser> friends) {
+    public void updateResults(ArrayList<User> friends) {
         mResults = friends;
         notifyDataSetChanged();
     }
 
-    public void addFriend(FacebookUser friend) {
+    public void addFriend(User friend) {
         mResults.add(friend);
         notifyItemInserted(mResults.size() - 1);
     }
@@ -86,7 +86,7 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
      *
      * @param friend Friend to be removed
      */
-    public void removeFriend(FacebookUser friend) {
+    public void removeFriend(User friend) {
         int position = mResults.indexOf(friend);
         mResults.remove(position);
         notifyItemRemoved(position);
@@ -98,7 +98,7 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
     }
 
     public interface OnClickListener {
-        void onClick(FacebookUser user);
+        void onClick(User user);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

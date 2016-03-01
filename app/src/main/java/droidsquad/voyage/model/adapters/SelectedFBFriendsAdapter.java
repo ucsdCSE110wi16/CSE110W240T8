@@ -11,10 +11,10 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.objects.FacebookUser;
+import droidsquad.voyage.model.objects.User;
 
 public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFriendsAdapter.ViewHolder> {
-    public ArrayList<FacebookUser> mSelectedUsers;
+    public ArrayList<User> mSelectedUsers;
     private Activity mActivity;
     private OnItemRemovedListener mListener;
 
@@ -32,7 +32,7 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        FacebookUser friend = mSelectedUsers.get(position);
+        User friend = mSelectedUsers.get(position);
         friend.loadProfilePicInto(mActivity, holder.mProfilePic);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -56,7 +56,7 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
      *
      * @param friend Friend to be added
      */
-    public void addFriend(FacebookUser friend) {
+    public void addFriend(User friend) {
         mSelectedUsers.add(friend);
         notifyItemInserted(mSelectedUsers.size() - 1);
     }

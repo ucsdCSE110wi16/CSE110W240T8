@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.AutoWrappingLinearLayoutManager;
 import droidsquad.voyage.controller.activityController.AddFriendsController;
 
 public class AddFriendsActivity extends AppCompatActivity {
@@ -94,7 +93,7 @@ public class AddFriendsActivity extends AppCompatActivity {
 
         // Set the layout managers for the recycler views
         mResultsRecyclerView.setLayoutManager(
-                new AutoWrappingLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mSelectedFriendsRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 

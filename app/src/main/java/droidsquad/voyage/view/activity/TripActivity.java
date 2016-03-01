@@ -16,6 +16,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -28,10 +29,9 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.AutoWrappingLinearLayoutManager;
 import droidsquad.voyage.controller.activityController.TripController;
 import droidsquad.voyage.model.adapters.FBFriendsAdapter;
-import droidsquad.voyage.model.objects.FacebookUser;
+import droidsquad.voyage.model.objects.User;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
 
@@ -119,12 +119,12 @@ public class TripActivity extends AppCompatActivity {
         mTripDatesTextView = (TextView) findViewById(R.id.trip_dates);
 
         mMembersRecyclerView = (RecyclerView) findViewById(R.id.members_recycler_view);
-        mMembersRecyclerView.setLayoutManager(new AutoWrappingLinearLayoutManager(this));
+        mMembersRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mMembersRecyclerView.setNestedScrollingEnabled(false);
         mMembersRecyclerView.setHasFixedSize(false);
 
         mInviteesRecyclerView = (RecyclerView) findViewById(R.id.invitees_recycler_view);
-        mInviteesRecyclerView.setLayoutManager(new AutoWrappingLinearLayoutManager(this));
+        mInviteesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mInviteesRecyclerView.setNestedScrollingEnabled(false);
         mInviteesRecyclerView.setHasFixedSize(false);
 
@@ -156,21 +156,21 @@ public class TripActivity extends AppCompatActivity {
         if (mController.isCreator()) {
             mController.mMemAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
                 @Override
-                public void onClick(FacebookUser user) {
+                public void onClick(User user) {
                     showAlertDialog(REMOVE_MEMBER_ALERT, user);
                 }
             });
 
             mController.mInviteesAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
                 @Override
-                public void onClick(FacebookUser user) {
+                public void onClick(User user) {
                     showAlertDialog(REMOVE_INVITEE_ALERT, user);
                 }
             });
         }
     }
 
-    private void showAlertDialog(final String alertType, @Nullable final FacebookUser user) {
+    private void showAlertDialog(final String alertType, @Nullable final User user) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setMessage(getAlertDialogMessage(alertType, user));
 
@@ -190,7 +190,7 @@ public class TripActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void onAlertDialogPositiveClick(String alertType, FacebookUser user) {
+    private void onAlertDialogPositiveClick(String alertType, User user) {
         switch (alertType) {
             case LEAVE_TRIP_ALERT:
                 mController.leaveTrip();
@@ -210,7 +210,7 @@ public class TripActivity extends AppCompatActivity {
         }
     }
 
-    private String getAlertDialogMessage(String alertType, FacebookUser user) {
+    private String getAlertDialogMessage(String alertType, User user) {
         switch (alertType) {
             case LEAVE_TRIP_ALERT:
                 return getString(R.string.leave_trip_alert);
@@ -219,10 +219,10 @@ public class TripActivity extends AppCompatActivity {
                 return getString(R.string.delete_trip_alert);
 
             case REMOVE_MEMBER_ALERT:
-                return getString(R.string.kick_friend_alert, user.name, mController.trip.getName());
+                return getString(R.string.kick_friend_alert, user.getFullName(), mController.trip.getName());
 
             case REMOVE_INVITEE_ALERT:
-                return getString(R.string.kick_friend_alert, user.name, mController.trip.getName());
+                return getString(R.string.kick_friend_alert, user.getFullName(), mController.trip.getName());
 
             default:
                 return "";

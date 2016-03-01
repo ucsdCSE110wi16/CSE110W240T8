@@ -14,8 +14,8 @@ import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.view.fragment.TripListFragment;
 
 public class TripListController {
-    private TripListFragment fragment;
     private Context context;
+    private TripListFragment fragment;
     private TripCardAdapter adapter;
 
     public TripListController(TripListFragment fragment) {
@@ -38,7 +38,7 @@ public class TripListController {
 
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
-        ParseTripModel.searchForAllTrips(new ParseTripModel.ParseTripCallback() {
+        ParseTripModel.getTrips(new ParseTripModel.ParseTripCallback() {
             @Override
             public void onCompleted(ArrayList<Trip> trips) {
                 // Sort the trips

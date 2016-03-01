@@ -9,8 +9,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.parse.ParseUser;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,6 +22,7 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.CreateTripActivity;
 
@@ -246,8 +245,6 @@ public class CreateTripController {
      * Attempts to save a Trip with the information in the views
      */
     public void attemptSaveTrip() {
-        String creatorId = ParseUser.getCurrentUser().getObjectId();
-
         // Get all the information from the views
         String tripName = activity.getTripNameView().getText().toString();
         String transportation = activity.getTransportation().getSelectedItem().toString();
@@ -292,7 +289,7 @@ public class CreateTripController {
         Date dateFrom = calendarFrom.getTime();
         Date dateTo = calendarTo.getTime();
 
-        Trip newTrip = new Trip(tripName, creatorId, transportation, leavingFrom,
+        Trip newTrip = new Trip(tripName, VoyageUser.getId(), transportation, leavingFrom,
                 destination, isPrivate, dateFrom, dateTo);
 
         finalizeTripCheck(newTrip);
@@ -368,10 +365,9 @@ public class CreateTripController {
      * any other trips the user is already enrolled in
      */
     public void finalizeTripCheck(final Trip newTrip) {
-
         if (isEditMode) newTrip.setId(trip.getId());
 
-        ParseTripModel.searchForAllTrips(new ParseTripModel.ParseTripCallback() {
+        ParseTripModel.getTrips(new ParseTripModel.ParseTripCallback() {
             @Override
             public void onCompleted(ArrayList<Trip> trip) {
                 if (!compareForOverlaps(newTrip, trip)) {
@@ -385,12 +381,12 @@ public class CreateTripController {
      * Check for trip overlaps between existing trips for a user, and a newly created one
      *
      * @param newTrip The new trip to be created
-     * @param trips All the trips this user is currently part off
+     * @param trips   All the trips this user is currently part off
      * @return True if
      */
     public boolean compareForOverlaps(final Trip newTrip, ArrayList<Trip> trips) {
         for (Trip t : trips) {
-            if (isEditMode && trip.equals(t)) continue;
+            if (isEditMode && newTrip.equals(t)) continue;
 
             if (newTrip.overlaps(t)) {
                 String message = activity.getString(R.string.error_overlap,
@@ -424,6 +420,7 @@ public class CreateTripController {
         if (isEditMode) {
             newTrip.setId(trip.getId());
             ParseTripModel.updateTrip(newTrip);
+
             Intent intent = new Intent();
             intent.putExtra(activity.getString(R.string.intent_key_trip), newTrip);
             activity.setResult(Constants.RESULT_CODE_TRIP_UPDATED, intent);

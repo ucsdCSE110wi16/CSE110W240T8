@@ -16,7 +16,7 @@ import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.adapters.FBFriendsAdapter;
 import droidsquad.voyage.model.adapters.SelectedFBFriendsAdapter;
 import droidsquad.voyage.model.api.FacebookAPI;
-import droidsquad.voyage.model.objects.FacebookUser;
+import droidsquad.voyage.model.objects.User;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.AddFriendsActivity;
@@ -25,23 +25,20 @@ public class AddFriendsController {
     private AddFriendsActivity mActivity;
     private FBFriendsAdapter mResultsAdapter;
     private SelectedFBFriendsAdapter mSelectedFriendsAdapter;
-    private List<FacebookUser> friends;
+    private List<User> friends;
     private Trip mTrip;
 
     public static final String TAG = AddFriendsController.class.getSimpleName();
 
     public AddFriendsController(AddFriendsActivity activity) {
         mActivity = activity;
-
-        mTrip = activity.getIntent().getParcelableExtra(
-                activity.getString(R.string.intent_key_trip));
-
+        mTrip = activity.getIntent().getParcelableExtra(activity.getString(R.string.intent_key_trip));
         mResultsAdapter = new FBFriendsAdapter(activity, false);
         mSelectedFriendsAdapter = new SelectedFBFriendsAdapter(activity);
 
         mResultsAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
             @Override
-            public void onClick(FacebookUser user) {
+            public void onClick(User user) {
                 mSelectedFriendsAdapter.addFriend(user);
                 updateAdapter(mActivity.getQuery());
             }
@@ -65,30 +62,30 @@ public class AddFriendsController {
     private void loadFBFriends() {
         FacebookAPI.requestFBFriends(new FacebookAPI.FBFriendsArrayCallback() {
             @Override
-            public void onCompleted(List<FacebookUser> queriedFriends) {
+            public void onCompleted(List<User> queriedFriends) {
                 Log.d(TAG, "Friends Array received with size: " + queriedFriends.size());
 
                 // Sort the entries alphabetically and store in the member variable
-                Collections.sort(queriedFriends, new Comparator<FacebookUser>() {
+                Collections.sort(queriedFriends, new Comparator<User>() {
                     @Override
-                    public int compare(FacebookUser lhs, FacebookUser rhs) {
-                        return lhs.name.compareTo(rhs.name);
+                    public int compare(User lhs, User rhs) {
+                        return lhs.getFullName().compareTo(rhs.getFullName());
                     }
                 });
 
                 // Get rid of current members and invitees
-                HashSet<String> allMembersAndInviteesIds = new HashSet<>();
+                HashSet<String> allMembersAndInviteesFbIds = new HashSet<>();
 
-                for (Trip.TripMember tripMember : mTrip.getAllMembers()) {
-                    allMembersAndInviteesIds.add(tripMember.fbId);
+                for (User members : mTrip.getAllMembers()) {
+                    allMembersAndInviteesFbIds.add(members.fbId);
                 }
 
-                for (Trip.TripMember tripMember : mTrip.getInvitees()) {
-                    allMembersAndInviteesIds.add(tripMember.fbId);
+                for (User invitees : mTrip.getInvitees()) {
+                    allMembersAndInviteesFbIds.add(invitees.fbId);
                 }
 
                 for (int i = 0; i < queriedFriends.size(); i++) {
-                    if (allMembersAndInviteesIds.contains(queriedFriends.get(i).id)) {
+                    if (allMembersAndInviteesFbIds.contains(queriedFriends.get(i).fbId)) {
                         queriedFriends.remove(i);
                     }
                 }
@@ -116,11 +113,11 @@ public class AddFriendsController {
     private void updateAdapter(String query) {
         // Get the friends according to the query
         query = query.toLowerCase();
-        ArrayList<FacebookUser> queriedFriends = new ArrayList<>();
+        ArrayList<User> queriedFriends = new ArrayList<>();
 
         if (!query.isEmpty()) {
-            for (FacebookUser friend : friends) {
-                if (friend.name.toLowerCase().contains(query)
+            for (User friend : friends) {
+                if (friend.getFullName().toLowerCase().contains(query)
                         && !mSelectedFriendsAdapter.mSelectedUsers.contains(friend)) {
                     queriedFriends.add(friend);
                 }
@@ -134,20 +131,17 @@ public class AddFriendsController {
         Log.d(TAG, "Adding " + mSelectedFriendsAdapter.mSelectedUsers.size() + " friends to Trip.");
         mActivity.showProgress(true);
 
-        final ArrayList<String> fbIDs = new ArrayList<>();
-        for (FacebookUser user : mSelectedFriendsAdapter.mSelectedUsers) {
-            fbIDs.add(user.id);
-        }
+        final List<User> invitees = mSelectedFriendsAdapter.mSelectedUsers;
 
         // No invitees to add
-        if (fbIDs.isEmpty()) {
+        if (invitees.isEmpty()) {
             mActivity.finish();
         }
 
-        ParseTripModel.saveInvitees(mTrip, fbIDs, new ParseTripModel.TripASyncTaskCallback() {
+        ParseTripModel.saveInvitees(mTrip, invitees, new ParseTripModel.TripASyncTaskCallback() {
             @Override
             public void onSuccess() {
-                Log.d(TAG, "Successfully added " + fbIDs.size() + " friends");
+                Log.d(TAG, "Successfully added " + invitees.size() + " friends");
                 Intent intent = new Intent();
                 intent.putExtra(mActivity.getString(R.string.intent_key_trip), mTrip);
                 mActivity.setResult(Constants.RESULT_CODE_INVITEES_ADDED, intent);

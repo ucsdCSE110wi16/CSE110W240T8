@@ -11,6 +11,7 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import droidsquad.voyage.model.api.FacebookAPI;
 import droidsquad.voyage.model.objects.Request;
 import droidsquad.voyage.util.Constants;
 
@@ -83,8 +84,8 @@ public class ParseRequestModel {
                             request.hostName = user.get("firstName") + " " +
                                     user.get("lastName");
 
-                            request.hostPicURL = String.format(
-                                    Constants.FB_PICTURE_URL, user.get("fbId"), "square");
+                            request.hostPicURL = FacebookAPI.buildProfilePicURL(
+                                    user.getString("fbId"), "normal");
                         }
                     }
                 }

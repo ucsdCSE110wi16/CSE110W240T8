@@ -12,12 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.parse.ParseUser;
-
 import java.util.ArrayList;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.TripActivity;
 
@@ -32,7 +31,6 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         this.mFragment = fragment;
     }
 
-    // Create new views (invoked by the layout manager)
     @Override
     public TripCardAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -49,14 +47,15 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         holder.mCities.setText(trip.getSimpleCitiesStringRepresentation());
         holder.mDates.setText(trip.getSimpleDatesStringRepresentation());
         holder.mPrivateIcon.setVisibility((trip.isPrivate()) ? View.VISIBLE : View.GONE);
-        holder.mTransportationIcon.setImageResource(trip.getTransportationIcon());
-        holder.mMembersAdapter.updateDataset(trip.getAllMembers());
+        holder.mTransportationIcon.setImageResource(trip.getTransportationIconId());
 
-        if (ParseUser.getCurrentUser().getObjectId().equals(trip.getCreatorId())) {
-            holder.mAdmin.setVisibility(View.VISIBLE);
-        } else {
-            holder.mAdmin.setVisibility(View.GONE);
-        }
+        // Handle displaying the Admin information logic
+        trip.getAdmin().loadProfilePicInto(mFragment.getContext(), holder.mAdminProfilePic);
+        holder.mAdmin.setVisibility(
+                (VoyageUser.currentUser().equals(trip.getAdmin())) ? View.VISIBLE : View.GONE);
+
+        // Delegate displaying the members to TripCardMembersAdapter
+        holder.mMembersAdapter.updateDataset(trip.getAllMembers());
         
         holder.mTripCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +84,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         public TextView mAdmin;
         public TextView mCities;
         public TextView mDates;
+        public ImageView mAdminProfilePic;
         public ImageView mPrivateIcon;
         public ImageView mTransportationIcon;
         public CardView mTripCard;
@@ -97,10 +97,14 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             mAdmin = (TextView) view.findViewById(R.id.trip_card_admin);
             mCities = (TextView) view.findViewById(R.id.trip_card_cities);
             mDates = (TextView) view.findViewById(R.id.trip_card_date_range);
+            mAdminProfilePic = (ImageView) view.findViewById(R.id.trip_card_admin_profile_pic);
             mPrivateIcon = (ImageView) view.findViewById(R.id.trip_card_private_icon);
             mTransportationIcon = (ImageView) view.findViewById(R.id.trip_card_transportation_icon);
             mTripCard = (CardView) view.findViewById(R.id.trip_card_view);
-            mMembersAdapter = new TripCardMembersAdapter(view.getContext());
+
+            // Build the recycler view for the Trip members
+            TextView picturesExcess = (TextView) view.findViewById(R.id.trip_card_pictures_excess);
+            mMembersAdapter = new TripCardMembersAdapter(view.getContext(), picturesExcess);
 
             RecyclerView membersRecyclerView = (RecyclerView) view.findViewById(R.id.trip_card_members);
             membersRecyclerView.setAdapter(mMembersAdapter);

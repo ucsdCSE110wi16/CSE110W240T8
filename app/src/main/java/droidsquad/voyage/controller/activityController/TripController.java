@@ -1,5 +1,6 @@
 package droidsquad.voyage.controller.activityController;
 
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.ImageView;
@@ -17,8 +18,9 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.model.ParseTripModel;
 import droidsquad.voyage.model.adapters.FBFriendsAdapter;
 import droidsquad.voyage.model.api.GooglePlacesAPI;
-import droidsquad.voyage.model.objects.FacebookUser;
+import droidsquad.voyage.model.objects.User;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.TripActivity;
 
@@ -29,7 +31,6 @@ public class TripController {
     private static final String TAG = TripController.class.getSimpleName();
     public FBFriendsAdapter mMemAdapter;
     public FBFriendsAdapter mInviteesAdapter;
-    private int datesStringRepresentation;
 
     public TripController(TripActivity instance) {
         this.mActivity = instance;
@@ -51,7 +52,7 @@ public class TripController {
             googlePlacesAPI.getPlaceImage(placeID, imageView.getWidth(), imageView.getHeight(),
                     new ResultCallback<PlacePhotoResult>() {
                         @Override
-                        public void onResult(PlacePhotoResult placePhotoResult) {
+                        public void onResult(@NonNull PlacePhotoResult placePhotoResult) {
                             if (!placePhotoResult.getStatus().isSuccess()) {
                                 Log.d(TAG, "Couldn\'t retrieve the photo successfully.");
                                 return;
@@ -77,7 +78,7 @@ public class TripController {
     }
 
     public boolean isCreator() {
-        return trip.getCreatorId().equals(ParseUser.getCurrentUser().getObjectId());
+        return trip.getCreatorId().equals(VoyageUser.getId());
     }
 
     public void deleteTrip() {
@@ -133,39 +134,38 @@ public class TripController {
         updateFBFriendsAdapter(trip.getInvitees(), mInviteesAdapter);
     }
 
-    private void updateFBFriendsAdapter(ArrayList<Trip.TripMember> users, FBFriendsAdapter adapter) {
-        ArrayList<FacebookUser> fbUsers = new ArrayList<>();
-        String currentUserId = ParseUser.getCurrentUser().getObjectId();
+    private void updateFBFriendsAdapter(ArrayList<User> users, FBFriendsAdapter adapter) {
+        ArrayList<User> friends = new ArrayList<>();
 
-        for (Trip.TripMember member : users) {
+        for (User member : users) {
             // Shouldn't show the option to remove myself
-            if (isCreator() && member.objectId.equals(currentUserId)) {
+            if (isCreator() && member.equals(VoyageUser.currentUser())) {
                 continue;
             }
-            fbUsers.add(new FacebookUser(member.fbId, member.name,
-                    String.format(Constants.FB_PICTURE_URL, member.fbId, "normal")));
+
+            friends.add(member);
         }
 
-        adapter.updateResults(fbUsers);
+        adapter.updateResults(friends);
     }
 
 
-    public void kickMember(final FacebookUser fbUser) {
-        kickUser(fbUser, trip.getAllMembers(), mMemAdapter, Constants.PARSE_RELATION_MEMBERS,
+    public void kickMember(final User user) {
+        kickUser(user, trip.getAllMembers(), mMemAdapter, Constants.PARSE_RELATION_MEMBERS,
                 mActivity.getString(R.string.snackbar_member_removed));
     }
 
-    public void kickInvitee(final FacebookUser fbUser) {
-        kickUser(fbUser, trip.getInvitees(), mInviteesAdapter, Constants.PARSE_RELATION_INVITEES,
+    public void kickInvitee(final User user) {
+        kickUser(user, trip.getInvitees(), mInviteesAdapter, Constants.PARSE_RELATION_INVITEES,
                 mActivity.getString(R.string.snackbar_invitee_removed));
     }
 
-    public void kickUser(final FacebookUser fbUser, final ArrayList<Trip.TripMember> users, final FBFriendsAdapter adapter,
+    public void kickUser(final User user, final ArrayList<User> users, final FBFriendsAdapter adapter,
                          String relation, final String snackBarMessage) {
         String userId = "";
-        for (Trip.TripMember member : users) {
-            if (member.fbId.endsWith(fbUser.id)) {
-                userId = member.objectId;
+        for (User member : users) {
+            if (member.fbId.endsWith(user.id)) {
+                userId = member.id;
                 break;
             }
         }
@@ -175,11 +175,11 @@ public class TripController {
                 new ParseTripModel.TripASyncTaskCallback() {
                     @Override
                     public void onSuccess() {
-                        adapter.removeFriend(fbUser);
+                        adapter.removeFriend(user);
 
                         // Successfully remove the user from the trip object now
                         for (int i = 0; i < users.size(); i++) {
-                            if (users.get(i).fbId.endsWith(fbUser.id)) {
+                            if (users.get(i).fbId.endsWith(user.id)) {
                                 users.remove(i);
                                 break;
                             }
@@ -208,7 +208,7 @@ public class TripController {
     }
 
     public int getTransportationIcon() {
-        return trip.getTransportationIcon();
+        return trip.getTransportationIconId();
     }
 
     public Date getDateFrom() {

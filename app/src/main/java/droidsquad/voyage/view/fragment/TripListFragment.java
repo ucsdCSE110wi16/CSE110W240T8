@@ -35,7 +35,7 @@ public class TripListFragment extends Fragment {
     }
 
     /**
-     * onResume overriden so that upon returning to this fragment when another activity closes
+     * onResume overridden so that upon returning to this fragment when another activity closes
      * (like CreateTripActivity), data is re-polled to reflect newest changes on the Parse server.
      */
     @Override
@@ -101,21 +101,18 @@ public class TripListFragment extends Fragment {
             case Constants.REQUEST_CODE_TRIP_ACTIVITY :
                 switch (resultCode) {
                     case Constants.RESULT_CODE_TRIP_DELETED :
-                        snackbar.setText(R.string.snackbar_trip_deleted);
-                        snackbar.show();
+                        snackbar.setText(R.string.snackbar_trip_deleted).show();
                         break;
 
                     case Constants.RESULT_CODE_TRIP_LEFT :
-                        snackbar.setText(R.string.snackbar_trip_left);
-                        snackbar.show();
+                        snackbar.setText(R.string.snackbar_trip_left).show();
                         break;
                 }
                 break;
 
             case Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY :
                 if (resultCode == Constants.RESULT_CODE_TRIP_CREATED) {
-                    snackbar.setText(R.string.snackbar_trip_created);
-                    snackbar.show();
+                    snackbar.setText(R.string.snackbar_trip_created).show();
                 }
                 break;
         }

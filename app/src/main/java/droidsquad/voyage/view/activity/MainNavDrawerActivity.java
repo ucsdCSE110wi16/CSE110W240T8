@@ -11,8 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-
 import java.io.Serializable;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -21,7 +19,7 @@ import droidsquad.voyage.controller.activityController.MainNavDrawerController;
 import droidsquad.voyage.model.objects.VoyageUser;
 
 /**
- * Main nav bar activity, displays fragments (triplist, feed, etc)
+ * Main nav bar activity, displays fragments (tripList, feed, etc)
  */
 public class MainNavDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Serializable {
