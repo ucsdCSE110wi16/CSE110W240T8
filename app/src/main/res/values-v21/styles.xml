@@ -7,7 +7,7 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="CollapsingToolbarTheme" parent="AppTheme">
+    <style name="TransparentStatusBarTheme" parent="AppTheme">
         <item name="android:windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowTranslucentStatus">true</item>
