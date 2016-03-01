@@ -24,7 +24,7 @@ public class FeedFragment extends Fragment {
     private FloatingActionButton mFab;
 
     public static Fragment newInstance() {
-        return new TripListFragment();
+        return new FeedFragment();
     }
 
     /**

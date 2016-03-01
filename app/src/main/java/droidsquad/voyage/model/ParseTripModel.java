@@ -15,6 +15,8 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import droidsquad.voyage.model.api.FacebookAPI;
+import droidsquad.voyage.model.objects.FacebookUser;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
 
@@ -109,12 +111,48 @@ public class ParseTripModel {
     }
 
     public static void searchAllPublicTrips(final ParseTripCallback callback) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Trip");
-        query.whereEqualTo("private", false);
+        FacebookAPI.requestFBFriends(new FacebookAPI.FBFriendsArrayCallback() {
+            @Override
+            public void onCompleted(List<FacebookUser> friends) {
+                List<ParseQuery<ParseUser>> queries = new ArrayList<>();
+                for(FacebookUser friend: friends) {
+                    ParseQuery query = ParseUser.getQuery();
+                    query.whereEqualTo("fbId", friend.id);
+                    queries.add(query);
+                }
+                if(queries.size() == 0)
+                    return;
+                ParseQuery<ParseUser> mainQuery = ParseQuery.or(queries);
+                mainQuery.findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(List<ParseUser> fbFriends, ParseException e) {
+                        retrieveFriendsTrips(fbFriends, callback);
+                    }
+                });
+            }
+        });
+    }
 
-        query.findInBackground(new FindCallback<ParseObject>() {
+    public static void retrieveFriendsTrips(List<ParseUser> friends, final ParseTripCallback callback) {
+        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+        for (ParseUser friend : friends) {
+            ParseQuery query = ParseQuery.getQuery("Trip");
+            query.whereEqualTo("private", false);
+            query.whereEqualTo("members", friend.getObjectId());
+            queries.add(query);
+        }
+        if(queries.size() == 0)
+            return;
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+        mainQuery.setLimit(10);
+        mainQuery.addAscendingOrder("dateFrom");
+        mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                    return;
+                }
                 getAllMyTrips(objects, callback);
             }
         });
