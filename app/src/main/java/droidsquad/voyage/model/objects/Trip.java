@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
@@ -26,14 +27,12 @@ public class Trip implements Parcelable {
     private Date dateFrom;
     private Date dateTo;
     private boolean isPrivate;
-
     private User admin;
-    private ArrayList<User> participants;
-    private ArrayList<User> invitees;
+    private ArrayList<Member> members;
+    private List<User> membersAsUsersExcludingAdmin;
 
     public Trip() {
-        this.participants = new ArrayList<>();
-        this.invitees = new ArrayList<>();
+        this.members = new ArrayList<>();
     }
 
     public Trip(String tripName, String creatorId, String transportation, JSONObject origin,
@@ -46,8 +45,7 @@ public class Trip implements Parcelable {
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;
         this.isPrivate = isPrivate;
-        this.participants = new ArrayList<>();
-        this.invitees = new ArrayList<>();
+        this.members = new ArrayList<>();
     }
 
     protected Trip(Parcel in) {
@@ -75,12 +73,7 @@ public class Trip implements Parcelable {
 
         int numOfMembers = in.readInt();
         for (int i = 0; i < numOfMembers; i++) {
-            participants.add((User) in.readSerializable());
-        }
-
-        int numOfInvitees = in.readInt();
-        for (int i = 0; i < numOfInvitees; i++) {
-            invitees.add((User) in.readSerializable());
+            members.add((Member) in.readSerializable());
         }
     }
 
@@ -115,14 +108,9 @@ public class Trip implements Parcelable {
         dest.writeSerializable(admin);
         dest.writeString(creatorId);
 
-        dest.writeInt(participants.size());
-        for (User participant : participants) {
-            dest.writeSerializable(participant);
-        }
-
-        dest.writeInt(invitees.size());
-        for (User invitees : this.invitees) {
-            dest.writeSerializable(invitees);
+        dest.writeInt(members.size());
+        for (Member member : members) {
+            dest.writeSerializable(member);
         }
     }
 
@@ -140,13 +128,26 @@ public class Trip implements Parcelable {
 
     @Override
     public String toString() {
-        return "Trip Name: " + name + "\n" +
+        return "Name: " + name + "\n" +
                 "Private: " + isPrivate + "\n" +
                 "Leaving From: " + origin + "\n" +
                 "Destination: " + destination + "\n" +
                 "Date From: " + dateFrom + "\n" +
                 "Date To: " + dateTo + "\n" +
                 "Transportation: " + transportation + "\n";
+    }
+
+    /**
+     * Checks if the current trip overlaps with the other, in terms of departure and arrival
+     *
+     * @param other Trip object to check for overlaps with this trip
+     * @return True if other overlaps with this trip, false otherwise
+     */
+    public boolean overlaps(Trip other) {
+        return (other.getDateFrom().before(this.dateTo) && other.getDateFrom().after(this.dateFrom))
+                || (other.getDateTo().before(this.dateTo) && other.getDateTo().after(this.dateFrom))
+                || (other.getDateTo().equals(this.dateTo)
+                || other.getDateFrom().equals(this.dateFrom));
     }
 
     /**
@@ -182,33 +183,66 @@ public class Trip implements Parcelable {
         return dateFormat.format(dateFrom) + " –> " + dateFormat.format(dateTo);
     }
 
-    /**
-     * Checks if the current trip overlaps with the other, in terms of departure and arrival
-     *
-     * @param other Trip object to check for overlaps with this trip
-     * @return True if other overlaps with this trip, false otherwise
-     */
-    public boolean overlaps(Trip other) {
-        return (other.getDateFrom().before(this.dateTo) && other.getDateFrom().after(this.dateFrom))
-                || (other.getDateTo().before(this.dateTo) && other.getDateTo().after(this.dateFrom))
-                || (other.getDateTo().equals(this.dateTo)
-                || other.getDateFrom().equals(this.dateFrom));
+    public List<User> getMembersAsUsers() {
+        List<User> users = new ArrayList<>();
+
+        for (Member member : members) {
+            if (!member.pendingRequest) {
+                users.add(member.user);
+            }
+        }
+        return users;
     }
 
-    public ArrayList<User> getAllMembers() {
-        return participants;
+    public List<User> getInviteesAsUsers() {
+        List<User> users = new ArrayList<>();
+
+        for (Member member : members) {
+            if (member.pendingRequest) {
+                users.add(member.user);
+            }
+        }
+        return users;
     }
 
-    public ArrayList<User> getInvitees() {
+    public List<Member> getMembers() {
+        List<Member> members = new ArrayList<>();
+
+        for (Member member : members) {
+            if (!member.pendingRequest) {
+                members.add(member);
+            }
+        }
+
+        return members;
+    }
+
+    public List<Member> getInvitees() {
+        List<Member> invitees = new ArrayList<>();
+
+        for (Member invitee : invitees) {
+            if (invitee.pendingRequest) {
+                invitees.add(invitee);
+            }
+        }
+
         return invitees;
     }
 
-    public void addMember(String id, String firstName, String lastName, String fbId) {
-        participants.add(new User(id, fbId, firstName, lastName));
+    /**
+     * Get the members of the Trip excluding the Admin and the Current User
+     *
+     * @return A list of all the members except for the special cases
+     */
+    public List<User> getMembersAsUsersExclusive() {
+        List<User> users = getMembersAsUsers();
+        users.remove(admin);
+        users.remove(VoyageUser.currentUser());
+        return users;
     }
 
-    public void addInvitee(String id, String firstName, String lastName, String fbId) {
-        invitees.add(new User(id, fbId, firstName, lastName));
+    public void addMember(Member member) {
+        members.add(member);
     }
 
     public String getName() {
@@ -269,6 +303,7 @@ public class Trip implements Parcelable {
 
     public void setAdmin(User admin) {
         this.admin = admin;
+        if (creatorId == null) creatorId = admin.id;
     }
 
     public User getAdmin() {

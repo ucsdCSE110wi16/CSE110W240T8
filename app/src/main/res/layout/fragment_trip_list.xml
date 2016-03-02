@@ -25,6 +25,15 @@
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
+        <ProgressBar
+            android:id="@+id/trip_list_progress_bar"
+            style="?android:progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:indeterminate="true"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -34,14 +43,4 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="15dp"
         android:src="@drawable/ic_add" />
-
-    <ProgressBar
-        android:id="@+id/trip_list_progress_bar"
-        style="?android:progressBarStyleLarge"
-        android:indeterminate="true"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
-
 </android.support.design.widget.CoordinatorLayout>

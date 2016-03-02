@@ -1,10 +1,8 @@
 package droidsquad.voyage.model.objects;
 
-import java.sql.Time;
-
 /**
  * Class for storing all the data relevant to trip requests
- * to be displayed int the requests activity
+ * to be displayed in the requests activity
  */
 public class Request {
     public String hostName;
@@ -12,5 +10,6 @@ public class Request {
     public String hostPicURL;
     public String tripName;
     public String tripId;
-    public Time elapsedTime;
+    public String elapsedTime;
+    public String memberId;
 }

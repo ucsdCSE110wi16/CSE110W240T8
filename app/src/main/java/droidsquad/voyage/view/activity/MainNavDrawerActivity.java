@@ -42,7 +42,7 @@ public class MainNavDrawerActivity extends AppCompatActivity
     private void initUI() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
-        CircleImageView profilePic = (CircleImageView) headerView.findViewById(R.id.nav_drawer_profile_pic);
+        CircleImageView profilePicView = (CircleImageView) headerView.findViewById(R.id.nav_drawer_profile_pic);
         TextView userName = (TextView) headerView.findViewById(R.id.nav_drawer_user_name);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -58,7 +58,7 @@ public class MainNavDrawerActivity extends AppCompatActivity
         userName.setText(VoyageUser.getFullName());
 
         // Load the profile picture in the nav drawer
-        VoyageUser.loadProfilePicInto(this, profilePic);
+        VoyageUser.currentUser().loadProfilePicInto(this, profilePicView);
     }
 
     @Override

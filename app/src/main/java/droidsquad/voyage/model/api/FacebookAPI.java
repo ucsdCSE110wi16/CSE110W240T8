@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,8 +68,7 @@ public class FacebookAPI {
      * @param callback Called with an array containing all the friends as User
      */
     public static void requestFBFriends(final FBFriendsArrayCallback callback) {
-        GraphRequest request = GraphRequest.newMyFriendsRequest(
-                AccessToken.getCurrentAccessToken(),
+        GraphRequest request = GraphRequest.newMyFriendsRequest(AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONArrayCallback() {
                     @Override
                     public void onCompleted(JSONArray objects, GraphResponse response) {
@@ -96,11 +94,19 @@ public class FacebookAPI {
                     }
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,picture.type(normal){url}");
+        parameters.putString("fields", "id,first_name,last_name,name,gender");
         request.setParameters(parameters);
         request.executeAsync();
     }
 
+    /**
+     * Get the Facebook profile pic of the user with given id
+     *
+     * @param id Facebook id of the user
+     * @param type Type of the picture to get {small, square, large, ...}
+     * @return The profile picture in Bitmap
+     * @deprecated Use the method of the User object to load picture Async into ImageView
+     */
     public static Bitmap getProfilePic(String id, String type) {
         Bitmap bitmap = null;
 
@@ -116,6 +122,13 @@ public class FacebookAPI {
         return bitmap;
     }
 
+    /**
+     * Get the Facebook profile pic of the user with given id Async
+     *
+     * @param id Facebook id of the user
+     * @param type Type of the picture to get {small, square, large, ...}
+     * @param callback Called with the Bitmap of the profile picture
+     */
     public static void getProfilePicAsync(final String id,
                                           final String type, final ProfilePicCallback callback) {
         new AsyncTask<Void, Void, Bitmap>() {
@@ -149,6 +162,13 @@ public class FacebookAPI {
         });
     }
 
+    /**
+     * Return a URL for the Facebook profile picture of the user
+     *
+     * @param id User id to get the picture from
+     * @param type Type of the picture to get from facebook {small, large, square...}
+     * @return URL of picture
+     */
     public static String buildProfilePicURL(String id, String type) {
         return String.format(PICTURE_URL_FORMAT, id, type);
     }

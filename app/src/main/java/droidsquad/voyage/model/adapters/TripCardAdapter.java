@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.Trip;
@@ -23,7 +24,7 @@ import droidsquad.voyage.view.activity.TripActivity;
 public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHolder> {
     private static final String TAG = TripCardAdapter.class.getSimpleName();
 
-    private ArrayList<Trip> trips = new ArrayList<>();
+    private List<Trip> trips = new ArrayList<>();
     private Fragment mFragment;
 
     public TripCardAdapter(Fragment fragment) {
@@ -55,7 +56,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                 (VoyageUser.currentUser().equals(trip.getAdmin())) ? View.VISIBLE : View.GONE);
 
         // Delegate displaying the members to TripCardMembersAdapter
-        holder.mMembersAdapter.updateDataset(trip.getAllMembers());
+        holder.mMembersAdapter.updateDataset(trip.getMembersAsUsersExclusive());
         
         holder.mTripCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,7 +75,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         return trips.size();
     }
 
-    public void updateData(ArrayList<Trip> trips) {
+    public void updateData(List<Trip> trips) {
         this.trips = trips;
         notifyDataSetChanged();
     }

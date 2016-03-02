@@ -3,6 +3,7 @@ package droidsquad.voyage.controller.activityController;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
@@ -13,13 +14,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.ParseTripModel;
+import droidsquad.voyage.model.parseModels.ParseModel;
+import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.model.objects.VoyageUser;
@@ -366,13 +368,17 @@ public class CreateTripController {
      */
     public void finalizeTripCheck(final Trip newTrip) {
         if (isEditMode) newTrip.setId(trip.getId());
-
-        ParseTripModel.getTrips(new ParseTripModel.ParseTripCallback() {
+        ParseTripModel.getTrips(new ParseTripModel.TripListCallback() {
             @Override
-            public void onCompleted(ArrayList<Trip> trip) {
+            public void onSuccess(List<Trip> trip) {
                 if (!compareForOverlaps(newTrip, trip)) {
                     completeSave(newTrip);
                 }
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.d(TAG, "Failed to save the trip: " + error);
             }
         });
     }
@@ -384,7 +390,7 @@ public class CreateTripController {
      * @param trips   All the trips this user is currently part off
      * @return True if
      */
-    public boolean compareForOverlaps(final Trip newTrip, ArrayList<Trip> trips) {
+    public boolean compareForOverlaps(final Trip newTrip, List<Trip> trips) {
         for (Trip t : trips) {
             if (isEditMode && newTrip.equals(t)) continue;
 
@@ -416,24 +422,42 @@ public class CreateTripController {
      *
      * @param newTrip Trip object to save to the backend
      */
-    public void completeSave(Trip newTrip) {
+    public void completeSave(final Trip newTrip) {
+        // TODO show progress spinning thingy and wait till the trip has been saved to parse
+        // TODO: Change the text on the Snackbars
         if (isEditMode) {
+            Log.i(TAG, "Updating the trip on Parse");
             newTrip.setId(trip.getId());
-            ParseTripModel.updateTrip(newTrip);
+            ParseTripModel.updateTrip(newTrip, new ParseModel.ParseResponseCallback() {
+                @Override
+                public void onSuccess() {
+                    Intent intent = new Intent();
+                    intent.putExtra(activity.getString(R.string.intent_key_trip), newTrip);
+                    activity.setResult(Constants.RESULT_CODE_TRIP_UPDATED, intent);
+                    activity.finish();
+                }
 
-            Intent intent = new Intent();
-            intent.putExtra(activity.getString(R.string.intent_key_trip), newTrip);
-            activity.setResult(Constants.RESULT_CODE_TRIP_UPDATED, intent);
-            activity.finish();
+                @Override
+                public void onFailure(String error) {
+                    Snackbar.make(activity.findViewById(android.R.id.content),
+                            error, Snackbar.LENGTH_SHORT);
+                }
+            });
         } else {
-            // TODO show progress spinning thingy and wait till the trip has been saved to parse
-            ParseTripModel.saveTrip(newTrip);
-            activity.setResult(Constants.RESULT_CODE_TRIP_CREATED);
-            activity.finish();
+            Log.i(TAG, "Saving the trip to Parse");
+            ParseTripModel.saveNewTrip(newTrip, new ParseModel.ParseResponseCallback() {
+                @Override
+                public void onSuccess() {
+                    activity.setResult(Constants.RESULT_CODE_TRIP_CREATED);
+                    activity.finish();
+                }
+
+                @Override
+                public void onFailure(String error) {
+                    Snackbar.make(activity.findViewById(android.R.id.content),
+                            error, Snackbar.LENGTH_SHORT);
+                }
+            });
         }
-
-
-        // TODO else : stay on the same page and show snackBar with error and button to retry.
-        // for reference for snackBar with button you can look at LoginActivity.java
     }
 }

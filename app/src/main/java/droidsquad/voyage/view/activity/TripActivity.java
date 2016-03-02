@@ -45,7 +45,6 @@ public class TripActivity extends AppCompatActivity {
     private RecyclerView mMembersRecyclerView;
     private RecyclerView mInviteesRecyclerView;
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
     private static final String LEAVE_TRIP_ALERT = "LEAVE_TRIP_ALERT";
     private static final String DELETE_TRIP_ALERT = "DELETE_TRIP_ALERT";
     private static final String REMOVE_MEMBER_ALERT = "REMOVE_MEMBER_ALERT";
@@ -144,7 +143,6 @@ public class TripActivity extends AppCompatActivity {
         mTripLocTextView.setCompoundDrawablesWithIntrinsicBounds(mController.getTransportationIcon(), 0, 0, 0);
 
         mCollapsingToolbar.setTitle(mController.getTitle());
-        mController.setGooglePlacePhoto(mHeaderImageView);
 
         // set and populate members and invitees list
         mMembersRecyclerView.setAdapter(mController.mMemAdapter);

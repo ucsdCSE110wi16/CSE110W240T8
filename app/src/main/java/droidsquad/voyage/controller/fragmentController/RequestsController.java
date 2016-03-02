@@ -6,7 +6,7 @@ import android.util.Log;
 import java.util.List;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.ParseRequestModel;
+import droidsquad.voyage.model.parseModels.ParseRequestModel;
 import droidsquad.voyage.model.adapters.RequestsAdapter;
 import droidsquad.voyage.model.objects.Request;
 import droidsquad.voyage.view.fragment.RequestsFragment;
@@ -54,7 +54,7 @@ public class RequestsController {
 
     private void acceptRequest(final Request request) {
         Log.d(TAG, "Accepting request for " + request.tripName);
-        ParseRequestModel.acceptRequest(request.tripId, new ParseRequestModel.OnResultCallback() {
+        ParseRequestModel.acceptRequest(request.memberId, new ParseRequestModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Successfully accepted Trip.");
@@ -72,7 +72,7 @@ public class RequestsController {
 
     private void declineRequest(final Request request) {
         Log.d(TAG, "Declining request for " + request.tripName);
-        ParseRequestModel.declineRequest(request.tripId, new ParseRequestModel.OnResultCallback() {
+        ParseRequestModel.declineRequest(request.tripId, new ParseRequestModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Successfully declined Trip.");
@@ -92,7 +92,7 @@ public class RequestsController {
         ParseRequestModel.fetchRequests(new ParseRequestModel.OnRequestsReceivedCallback() {
             @Override
             public void onSuccess(List<Request> requests) {
-                Log.d(TAG, "Requests received. Got " + requests.size() + " requests.");
+                Log.d(TAG, "Requests received: " + requests.size());
                 mFragment.showProgress(false);
                 mFragment.refreshing(false);
                 mFragment.showNoRequestsView(false);
@@ -102,7 +102,7 @@ public class RequestsController {
             @Override
             public void onFailure(String error) {
                 // TODO
-                Log.d(TAG, "Requests not received. Error: " + error);
+                Log.d(TAG, "Error while receiving requests: " + error);
                 mFragment.showProgress(false);
                 mFragment.refreshing(false);
             }

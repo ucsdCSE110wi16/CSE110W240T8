@@ -3,17 +3,20 @@ package droidsquad.voyage.controller.fragmentController;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
-import droidsquad.voyage.model.ParseTripModel;
+import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.model.adapters.TripCardAdapter;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.view.fragment.TripListFragment;
 
 public class TripListController {
+    private static final String TAG = TripListController.class.getSimpleName();
+
     private Context context;
     private TripListFragment fragment;
     private TripCardAdapter adapter;
@@ -38,9 +41,13 @@ public class TripListController {
 
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
-        ParseTripModel.getTrips(new ParseTripModel.ParseTripCallback() {
+        if (adapter.getItemCount() == 0) {
+            fragment.showProgress(true);
+        }
+
+        ParseTripModel.getTrips(new ParseTripModel.TripListCallback() {
             @Override
-            public void onCompleted(ArrayList<Trip> trips) {
+            public void onSuccess(List<Trip> trips) {
                 // Sort the trips
                 Collections.sort(trips, new Comparator<Trip>() {
                     public int compare(Trip m1, Trip m2) {
@@ -48,7 +55,13 @@ public class TripListController {
                     }
                 });
 
+                fragment.showProgress(false);
                 adapter.updateData(trips);
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.d(TAG, "Failed to retrieved the data for the trips: " + error);
             }
         });
     }

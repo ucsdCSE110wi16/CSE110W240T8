@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.ParseTripModel;
+import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.model.adapters.FBFriendsAdapter;
 import droidsquad.voyage.model.adapters.SelectedFBFriendsAdapter;
 import droidsquad.voyage.model.api.FacebookAPI;
@@ -76,11 +76,11 @@ public class AddFriendsController {
                 // Get rid of current members and invitees
                 HashSet<String> allMembersAndInviteesFbIds = new HashSet<>();
 
-                for (User members : mTrip.getAllMembers()) {
+                for (User members : mTrip.getMembersAsUsers()) {
                     allMembersAndInviteesFbIds.add(members.fbId);
                 }
 
-                for (User invitees : mTrip.getInvitees()) {
+                for (User invitees : mTrip.getInviteesAsUsers()) {
                     allMembersAndInviteesFbIds.add(invitees.fbId);
                 }
 
@@ -138,7 +138,7 @@ public class AddFriendsController {
             mActivity.finish();
         }
 
-        ParseTripModel.saveInvitees(mTrip, invitees, new ParseTripModel.TripASyncTaskCallback() {
+        ParseTripModel.saveInvitees(mTrip, invitees, new ParseTripModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Successfully added " + invitees.size() + " friends");

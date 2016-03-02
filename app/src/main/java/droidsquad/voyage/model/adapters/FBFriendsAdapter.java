@@ -16,12 +16,12 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.User;
 
 public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.ViewHolder> {
+    private static final String TAG = FBFriendsAdapter.class.getSimpleName();
+
     private Activity mActivity;
     private OnClickListener mListener;
     private ArrayList<User> mResults;
     private final boolean mClickDeleteInstead;
-
-    private static final String TAG = FBFriendsAdapter.class.getSimpleName();
 
     public FBFriendsAdapter(Activity activity, boolean clickDeleteInstead) {
         mActivity = activity;

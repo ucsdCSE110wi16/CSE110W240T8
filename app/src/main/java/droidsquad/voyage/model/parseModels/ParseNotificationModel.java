@@ -1,4 +1,4 @@
-package droidsquad.voyage.model;
+package droidsquad.voyage.model.parseModels;
 
 import android.util.Log;
 
@@ -19,7 +19,7 @@ import java.util.List;
 import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.util.Constants;
 
-public class ParseNotificationModel {
+public class ParseNotificationModel extends ParseModel {
     private final static String TAG = ParseNotificationModel.class.getSimpleName();
 
     /**

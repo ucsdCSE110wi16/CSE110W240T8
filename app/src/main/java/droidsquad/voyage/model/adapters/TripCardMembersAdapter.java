@@ -14,7 +14,6 @@ import java.util.List;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.User;
-import droidsquad.voyage.model.objects.VoyageUser;
 
 public class TripCardMembersAdapter extends RecyclerView.Adapter<TripCardMembersAdapter.ViewHolder> {
     private static final String TAG = TripCardMembersAdapter.class.getSimpleName();
@@ -46,7 +45,6 @@ public class TripCardMembersAdapter extends RecyclerView.Adapter<TripCardMembers
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         User member = mMembers.get(position);
-
         member.loadProfilePicInto(mContext, holder.mProfilePic);
 
         // Set a negative margin for overlapping effect on the pictures

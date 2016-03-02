@@ -5,7 +5,6 @@ import android.app.Application;
 import com.facebook.FacebookSdk;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
-import com.parse.ParseInstallation;
 
 public class ParseApplication extends Application {
     @Override

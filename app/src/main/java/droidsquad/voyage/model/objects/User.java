@@ -20,7 +20,6 @@ public class User implements Serializable {
     public String id;
     public String fbId;
     public String gender;
-    public String pictureURL;
 
     public User() {
         // No args constructor
@@ -30,7 +29,6 @@ public class User implements Serializable {
         this.firstName = firstName;
         this.lastName = lastName;
         this.fbId = fbId;
-        this.pictureURL = FacebookAPI.buildProfilePicURL(fbId, "normal");
     }
 
     public User(String id, String fbId, String firstName, String lastName) {
@@ -38,7 +36,6 @@ public class User implements Serializable {
         this.firstName = firstName;
         this.lastName = lastName;
         this.fbId = fbId;
-        this.pictureURL = FacebookAPI.buildProfilePicURL(fbId, "normal");
     }
 
     /**
@@ -49,7 +46,7 @@ public class User implements Serializable {
      */
     public void loadProfilePicInto(Context context, ImageView imageView) {
         Glide.with(context)
-                .load(pictureURL)
+                .load(getPictureURL())
                 .asBitmap()
                 .placeholder(R.drawable.ic_account_circle_gray)
                 .into(imageView);
@@ -57,10 +54,15 @@ public class User implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof User && id.equals(((User) o).id);
+        return ((o instanceof User) &&
+                (id != null)) ? id.equals(((User) o).id) : fbId.equals(((User) o).fbId);
     }
 
     public String getFullName() {
         return firstName + " " + lastName;
+    }
+
+    public String getPictureURL() {
+        return FacebookAPI.buildProfilePicURL(fbId, "normal");
     }
 }

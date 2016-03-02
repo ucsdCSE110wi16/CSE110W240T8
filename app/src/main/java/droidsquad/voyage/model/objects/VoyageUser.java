@@ -1,15 +1,11 @@
 package droidsquad.voyage.model.objects;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.facebook.AccessToken;
 import com.parse.LogInCallback;
 import com.parse.LogOutCallback;
 import com.parse.ParseFacebookUtils;
@@ -18,10 +14,7 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import droidsquad.voyage.R;
 import droidsquad.voyage.model.api.FacebookAPI;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
@@ -113,23 +106,6 @@ public class VoyageUser {
         });
     }
 
-    public static boolean isEmailValid(String email) {
-        Pattern p = Pattern.compile(".+@.+\\.[a-z]+"); // matching email with regex
-        Matcher m = p.matcher(email);
-        return m.matches();
-    }
-
-    public static boolean isMobileNumValid(String mobileNum) {
-        /*
-         *   matching phone number with regex
-         *   Examples: Matches following phone numbers:
-         *   (123)456-7890, 123-456-7890, 1234567890, (123)-456-7890
-         */
-        Pattern p = Pattern.compile("^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$");
-        Matcher m = p.matcher(mobileNum);
-        return m.matches();
-    }
-
     public static void logOut() {
         Log.d(TAG, "Logging user out.");
 
@@ -154,21 +130,6 @@ public class VoyageUser {
         });
     }
 
-    /**
-     * Load this user's profile picture into the View provided
-     *
-     * @param context Just any context
-     * @param imageView The imageView to load pic into
-     */
-    public static void loadProfilePicInto(Context context, ImageView imageView) {
-        Log.d(TAG, "Loading profile picture into imageView");
-        Glide.with(context)
-                .load(getProfilePicURL())
-                .asBitmap()
-                .placeholder(R.drawable.ic_account_circle_gray)
-                .into(imageView);
-    }
-
     public static String getId() {
         return ParseUser.getCurrentUser().getObjectId();
     }
@@ -187,10 +148,6 @@ public class VoyageUser {
 
     public static String getFbId() {
         return ParseUser.getCurrentUser().getString("fbId");
-    }
-
-    public static String getProfilePicURL() {
-        return FacebookAPI.buildProfilePicURL(getId(), "square");
     }
 
     public static boolean isLoggedIn() {
