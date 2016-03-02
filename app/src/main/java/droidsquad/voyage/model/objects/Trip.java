@@ -29,7 +29,6 @@ public class Trip implements Parcelable {
     private boolean isPrivate;
     private User admin;
     private ArrayList<Member> members;
-    private List<User> membersAsUsersExcludingAdmin;
 
     public Trip() {
         this.members = new ArrayList<>();

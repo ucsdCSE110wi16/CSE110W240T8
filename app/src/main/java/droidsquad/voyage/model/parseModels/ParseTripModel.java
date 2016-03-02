@@ -36,7 +36,7 @@ public class ParseTripModel extends ParseModel {
         String TRANSPORTATION = "transportation";
         String PRIVATE = "private";
         String CREATED_BY = "createdBy";
-        String MEMBERS = "membersTEST";
+        String MEMBERS = "members";
         String FB_ID = "fbId";
     }
 
