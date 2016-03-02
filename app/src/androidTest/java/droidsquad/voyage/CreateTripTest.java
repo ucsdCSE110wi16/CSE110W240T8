@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import droidsquad.voyage.view.activity.CreateTripActivity;
-import droidsquad.voyage.model.ParseTripModel;
+import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.model.objects.Trip;
 
 /**
@@ -36,8 +36,8 @@ public class CreateTripTest {
 
     @Test
     public void save(){
-        ParseTripModel.saveTrip(completeTrip);
-        ParseTripModel.saveTrip(simpleTrip);
+        ParseTripModel.saveNewTrip(completeTrip);
+        ParseTripModel.saveNewTrip(simpleTrip);
     }
 
 }

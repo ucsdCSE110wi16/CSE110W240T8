@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.AutoWrappingLinearLayoutManager;
 import droidsquad.voyage.controller.activityController.AddFriendsController;
 
 public class AddFriendsActivity extends AppCompatActivity {
@@ -36,13 +35,11 @@ public class AddFriendsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_friends);
 
         controller = new AddFriendsController(this);
-
         initUI();
 
         mSearchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                onQueryTextChange(query);
                 return false;
             }
 
@@ -86,6 +83,7 @@ public class AddFriendsActivity extends AppCompatActivity {
         mExitBackImage = (ImageView) findViewById(R.id.exit_back_image_view);
         mConfirmAddFriendsButton = (AppCompatImageButton) findViewById(R.id.confirm_add_friends);
         mProgressBar = (ProgressBar) findViewById(R.id.add_friends_progress);
+
         mProgressBar.getIndeterminateDrawable().setColorFilter(ContextCompat
                 .getColor(this, R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
 
@@ -95,7 +93,7 @@ public class AddFriendsActivity extends AppCompatActivity {
 
         // Set the layout managers for the recycler views
         mResultsRecyclerView.setLayoutManager(
-                new AutoWrappingLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mSelectedFriendsRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
@@ -104,19 +102,19 @@ public class AddFriendsActivity extends AppCompatActivity {
         mSelectedFriendsRecyclerView.setAdapter(controller.getSelectedFriendsAdapter());
     }
 
+    /**
+     * Display or hide progress
+     *
+     * @param show True if progress should be displayed
+     */
+    public void showProgress(boolean show) {
+        mConfirmAddFriendsButton.setVisibility(show ? View.GONE : View.VISIBLE);
+        mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
     /* GETTERS */
 
     public String getQuery() {
         return mSearchView.getQuery().toString();
-    }
-
-    public void showProgress(boolean show) {
-        if (show) {
-            mConfirmAddFriendsButton.setVisibility(View.GONE);
-            mProgressBar.setVisibility(View.VISIBLE);
-        } else {
-            mConfirmAddFriendsButton.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.GONE);
-        }
     }
 }

@@ -11,23 +11,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.parse.ParseUser;
-import com.squareup.picasso.Picasso;
-
 import java.io.Serializable;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.activityController.MainNavDrawerController;
-import droidsquad.voyage.util.Constants;
+import droidsquad.voyage.model.objects.VoyageUser;
 
 /**
- * Main nav bar activity, displays fragments (triplist, feed, etc)
+ * Main nav bar activity, displays fragments (tripList, feed, etc)
  */
 public class MainNavDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Serializable {
 
     private MainNavDrawerController controller;
+    private DrawerLayout mDrawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,65 +36,64 @@ public class MainNavDrawerActivity extends AppCompatActivity
         initUI();
     }
 
-
+    /**
+     * Initialize the UI elements
+     */
     private void initUI() {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        CircleImageView profilePicView = (CircleImageView) headerView.findViewById(R.id.nav_drawer_profile_pic);
+        TextView userName = (TextView) headerView.findViewById(R.id.nav_drawer_user_name);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.setDrawerListener(toggle);
         navigationView.setNavigationItemSelectedListener(this);
 
-        View headerView = navigationView.getHeaderView(0);
-        CircleImageView profilePic = (CircleImageView) headerView.findViewById(R.id.nav_drawer_profile_pic);
-        TextView userName = (TextView) headerView.findViewById(R.id.nav_drawer_user_name);
+        toggle.syncState();
+        userName.setText(VoyageUser.getFullName());
 
-        ParseUser user = ParseUser.getCurrentUser();
-
-        userName.setText(user.get("firstName") + " " + user.get("lastName"));
         // Load the profile picture in the nav drawer
-        Picasso.with(this)
-                .load(String.format(
-                        Constants.FB_PICTURE_URL, user.get("fbId"), "square"))
-                .placeholder(R.drawable.ic_account_circle_gray)
-                .into(profilePic);
+        VoyageUser.currentUser().loadProfilePicInto(this, profilePicView);
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.nav_feed:
+                controller.feedPressed();
+                break;
 
-        if (id == R.id.nav_feed) {
-            controller.feedPressed();
+            case R.id.nav_trips:
+                controller.tripsPressed();
+                break;
 
-        } else if (id == R.id.nav_trips) {
-            controller.tripsPressed();
-        } else if (id == R.id.nav_settings) {
-            controller.settingsPressed();
+            case R.id.nav_settings:
+                controller.settingsPressed();
+                break;
 
-        } else if (id == R.id.nav_logout) {
-            controller.logOutUser();
-        } else if (id == R.id.nav_requests) {
-            controller.requestsPressed();
+            case R.id.nav_logout:
+                controller.logOutUser();
+                break;
+
+            case R.id.nav_requests:
+                controller.requestsPressed();
+                break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        mDrawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+            mDrawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }

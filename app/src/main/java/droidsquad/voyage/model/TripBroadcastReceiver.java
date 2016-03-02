@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.parse.ParseAnalytics;
 import com.parse.ParsePushBroadcastReceiver;
-import com.parse.ParseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,6 +25,7 @@ import java.util.Random;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.api.FacebookAPI;
+import droidsquad.voyage.model.parseModels.ParseRequestModel;
 import droidsquad.voyage.util.BitmapManipulator;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
@@ -40,9 +40,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String intentAction = intent.getAction();
-
-        switch (intentAction) {
+        switch (intent.getAction()) {
             case ACTION_REQUEST_ACCEPT:
                 onAcceptTripInvitation(context, intent);
                 break;
@@ -74,7 +72,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private void onAcceptTripInvitation(final Context context, final Intent intent) {
-        ParseRequestModel.acceptRequest(data.optString("tripId"), new ParseRequestModel.OnResultCallback() {
+        ParseRequestModel.acceptRequest(data.optString("tripId"), new ParseRequestModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 Log.i(TAG, "Accepted trip from notification");
@@ -90,7 +88,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private void onDeclineTripInvitation(final Context context, final Intent intent) {
-        ParseRequestModel.declineRequest(data.optString("tripId"), new ParseRequestModel.OnResultCallback() {
+        ParseRequestModel.declineRequest(data.optString("tripId"), new ParseRequestModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 Log.i(TAG, "Declined trip from notification");
@@ -164,8 +162,8 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
             FacebookAPI.getProfilePicAsync(fbId, "normal", new FacebookAPI.ProfilePicCallback() {
                 @Override
                 public void onCompleted(Bitmap bitmap) {
+                    bitmap = BitmapManipulator.getRoundedBitmap(bitmap);
                     bitmap = BitmapManipulator.getScaledBitmap(context, bitmap);
-                    bitmap = BitmapManipulator.getRoundBitmap(bitmap);
                     builder.setLargeIcon(bitmap);
                     fireNotification(context, builder.build(), notificationId);
                 }

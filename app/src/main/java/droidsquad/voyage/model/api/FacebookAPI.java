@@ -21,46 +21,72 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import droidsquad.voyage.model.objects.FacebookUser;
+import droidsquad.voyage.model.objects.User;
 
 /**
  * This class contains static methods for retrieving data asynchronously from Facebook
  * through Facebook Graph API.
  */
 public class FacebookAPI {
-    private static final String GRAPH_URL = "https://graph.facebook.com/";
     private static final String TAG = FacebookAPI.class.getSimpleName();
+    public static final String PICTURE_URL_FORMAT = "https://graph.facebook.com/%s/picture?type=%s";
+
+    /**
+     * Get the latest information about the currently logged in user on facebook
+     *
+     * @param callback Called with the information on success
+     */
+    public static void requestFBInfo(final FBUserInfoCallback callback) {
+        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        Log.d(TAG, "Info received from FB: " + object.toString());
+
+                        try {
+                            User user = new User();
+                            user.firstName = object.getString("first_name");
+                            user.lastName = object.getString("last_name");
+                            user.gender = object.getString("gender");
+                            user.fbId = object.getString("id");
+
+                            callback.onCompleted(user);
+                        } catch (JSONException e) {
+                            Log.d(TAG, "JSONException occurred: " + e.getMessage());
+                        }
+                    }
+                });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "first_name,last_name,gender,id");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
 
     /**
      * Get the facebook friends of the current user asynchronously
      *
-     * @param callback Called with an array containing all the friends as FacebookUser
+     * @param callback Called with an array containing all the friends as User
      */
     public static void requestFBFriends(final FBFriendsArrayCallback callback) {
-        GraphRequest request = GraphRequest.newMyFriendsRequest(
-                AccessToken.getCurrentAccessToken(),
+        GraphRequest request = GraphRequest.newMyFriendsRequest(AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONArrayCallback() {
                     @Override
                     public void onCompleted(JSONArray objects, GraphResponse response) {
-                        List<FacebookUser> friends = new ArrayList<>();
+                        List<User> friends = new ArrayList<>();
 
-                        // Parse the JSONObjects into FacebookUser objects
+                        // Parse the JSONObjects into User objects
                         try {
                             for (int i = 0; i < objects.length(); i++) {
                                 JSONObject friend = objects.getJSONObject(i);
-                                String pictureURL = friend
-                                        .getJSONObject("picture")
-                                        .getJSONObject("data")
-                                        .getString("url");
-
-                                friends.add(new FacebookUser(
-                                        (String) friend.get("id"),
-                                        (String) friend.get("name"),
-                                        pictureURL));
+                                User user = new User();
+                                user.firstName = friend.getString("first_name");
+                                user.lastName = friend.getString("last_name");
+                                user.gender = friend.getString("gender");
+                                user.fbId = friend.getString("id");
+                                friends.add(user);
                             }
                         } catch (JSONException e) {
-                            Log.d(TAG, "Exception occurred while parsing friends JSON response");
-                            e.printStackTrace();
+                            Log.d(TAG, "Exception occurred while parsing friends JSON response", e);
                         }
 
                         // Call the callback with the results
@@ -68,16 +94,24 @@ public class FacebookAPI {
                     }
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,picture.type(normal){url}");
+        parameters.putString("fields", "id,first_name,last_name,name,gender");
         request.setParameters(parameters);
         request.executeAsync();
     }
 
+    /**
+     * Get the Facebook profile pic of the user with given id
+     *
+     * @param id Facebook id of the user
+     * @param type Type of the picture to get {small, square, large, ...}
+     * @return The profile picture in Bitmap
+     * @deprecated Use the method of the User object to load picture Async into ImageView
+     */
     public static Bitmap getProfilePic(String id, String type) {
         Bitmap bitmap = null;
 
         try {
-            URL imageURL = new URL(GRAPH_URL + id + "/picture?type=" + type);
+            URL imageURL = new URL(buildProfilePicURL(id, type));
             bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
         } catch (MalformedURLException e) {
             Log.d(TAG, "Malformed Exception occurred: " + e.getMessage());
@@ -88,6 +122,13 @@ public class FacebookAPI {
         return bitmap;
     }
 
+    /**
+     * Get the Facebook profile pic of the user with given id Async
+     *
+     * @param id Facebook id of the user
+     * @param type Type of the picture to get {small, square, large, ...}
+     * @param callback Called with the Bitmap of the profile picture
+     */
     public static void getProfilePicAsync(final String id,
                                           final String type, final ProfilePicCallback callback) {
         new AsyncTask<Void, Void, Bitmap>() {
@@ -121,8 +162,27 @@ public class FacebookAPI {
         });
     }
 
+    /**
+     * Return a URL for the Facebook profile picture of the user
+     *
+     * @param id User id to get the picture from
+     * @param type Type of the picture to get from facebook {small, large, square...}
+     * @return URL of picture
+     */
+    public static String buildProfilePicURL(String id, String type) {
+        return String.format(PICTURE_URL_FORMAT, id, type);
+    }
+
+    /**
+     * Interfaces for callback
+     */
+
+    public interface FBUserInfoCallback {
+        void onCompleted(User user);
+    }
+
     public interface FBFriendsArrayCallback {
-        void onCompleted(List<FacebookUser> friends);
+        void onCompleted(List<User> friends);
     }
 
     public interface ProfilePicCallback {

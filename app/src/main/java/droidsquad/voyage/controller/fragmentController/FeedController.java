@@ -3,15 +3,18 @@ package droidsquad.voyage.controller.fragmentController;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import droidsquad.voyage.model.ParseTripModel;
+import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.model.adapters.TripCardAdapter;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.view.fragment.FeedFragment;
 
 public class FeedController {
+    private static final String TAG = FeedController.class.getSimpleName();
+
     private FeedFragment fragment;
     private Context context;
     private TripCardAdapter adapter;
@@ -36,11 +39,15 @@ public class FeedController {
 
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
-        // TODO: create a method in ParseModel, or another model class if necessary to retrieve data and call updateAdapter() below
-        ParseTripModel.searchAllPublicTrips(new ParseTripModel.ParseTripCallback() {
+        ParseTripModel.getPublicTrips(new ParseTripModel.TripListCallback() {
             @Override
-            public void onCompleted(ArrayList<Trip> trips) {
+            public void onSuccess(List<Trip> trips) {
                 updateAdapter(trips);
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.d(TAG, "Failed to retrieve data from trips: " + error);
             }
         });
     }
@@ -50,7 +57,7 @@ public class FeedController {
      *
      * @param trips New trips to update the adapter with
      */
-    public void updateAdapter(ArrayList<Trip> trips) {
+    public void updateAdapter(List<Trip> trips) {
         adapter.updateData(trips);
         refreshData();
     }

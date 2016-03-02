@@ -5,9 +5,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
-import com.parse.ParseUser;
-
 import droidsquad.voyage.R;
+import droidsquad.voyage.model.objects.VoyageUser;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -17,10 +16,8 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         // check if the user is logged in
-        ParseUser currentUser = ParseUser.getCurrentUser();
         final Intent intent;
-
-        if (currentUser == null) {
+        if (!VoyageUser.isLoggedIn()) {
             intent = new Intent(this, LoginActivity.class);
         } else {
             intent = new Intent(this, MainNavDrawerActivity.class);

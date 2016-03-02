@@ -6,7 +6,7 @@ import android.util.Log;
 import java.util.List;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.ParseRequestModel;
+import droidsquad.voyage.model.parseModels.ParseRequestModel;
 import droidsquad.voyage.model.adapters.RequestsAdapter;
 import droidsquad.voyage.model.objects.Request;
 import droidsquad.voyage.view.fragment.RequestsFragment;
@@ -54,44 +54,36 @@ public class RequestsController {
 
     private void acceptRequest(final Request request) {
         Log.d(TAG, "Accepting request for " + request.tripName);
-        ParseRequestModel.acceptRequest(request.tripId, new ParseRequestModel.OnResultCallback() {
+        ParseRequestModel.acceptRequest(request.memberId, new ParseRequestModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Successfully accepted Trip.");
                 mAdapter.removeRequest(request);
-                Snackbar snackbar = Snackbar.make(mFragment.getView(),
-                        R.string.snackbar_request_accepted, Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                showSnackbar(R.string.snackbar_request_accepted);
             }
 
             @Override
             public void onFailure(String error) {
                 Log.d(TAG, "Couldn't accept trip. Error: " + error);
-                Snackbar snackbar = Snackbar.make(mFragment.getView(),
-                        error, Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                showSnackbar(error);
             }
         });
     }
 
     private void declineRequest(final Request request) {
         Log.d(TAG, "Declining request for " + request.tripName);
-        ParseRequestModel.declineRequest(request.tripId, new ParseRequestModel.OnResultCallback() {
+        ParseRequestModel.declineRequest(request.tripId, new ParseRequestModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Successfully declined Trip.");
                 mAdapter.removeRequest(request);
-                Snackbar snackbar = Snackbar.make(mFragment.getView(),
-                        R.string.snackbar_request_declined, Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                showSnackbar(R.string.snackbar_request_declined);
             }
 
             @Override
             public void onFailure(String error) {
                 Log.d(TAG, "Couldn't decline trip. Error: " + error);
-                Snackbar snackbar = Snackbar.make(mFragment.getView(),
-                        error, Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                showSnackbar(error);
             }
         });
     }
@@ -100,7 +92,7 @@ public class RequestsController {
         ParseRequestModel.fetchRequests(new ParseRequestModel.OnRequestsReceivedCallback() {
             @Override
             public void onSuccess(List<Request> requests) {
-                Log.d(TAG, "Requests received. Got " + requests.size() + " requests.");
+                Log.d(TAG, "Requests received: " + requests.size());
                 mFragment.showProgress(false);
                 mFragment.refreshing(false);
                 mFragment.showNoRequestsView(false);
@@ -110,11 +102,19 @@ public class RequestsController {
             @Override
             public void onFailure(String error) {
                 // TODO
-                Log.d(TAG, "Requests not received. Error: " + error);
+                Log.d(TAG, "Error while receiving requests: " + error);
                 mFragment.showProgress(false);
                 mFragment.refreshing(false);
             }
         });
+    }
+
+    private void showSnackbar(String messageId) {
+        Snackbar.make(mFragment.getView(), messageId, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void showSnackbar(int messageId) {
+        showSnackbar(mFragment.getString(messageId));
     }
 
     public RequestsAdapter getAdapter() {

@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -15,6 +16,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -27,10 +29,9 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.controller.AutoWrappingLinearLayoutManager;
 import droidsquad.voyage.controller.activityController.TripController;
 import droidsquad.voyage.model.adapters.FBFriendsAdapter;
-import droidsquad.voyage.model.objects.FacebookUser;
+import droidsquad.voyage.model.objects.User;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.util.Constants;
 
@@ -44,7 +45,11 @@ public class TripActivity extends AppCompatActivity {
     private RecyclerView mMembersRecyclerView;
     private RecyclerView mInviteesRecyclerView;
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
+    private static final String LEAVE_TRIP_ALERT = "LEAVE_TRIP_ALERT";
+    private static final String DELETE_TRIP_ALERT = "DELETE_TRIP_ALERT";
+    private static final String REMOVE_MEMBER_ALERT = "REMOVE_MEMBER_ALERT";
+    private static final String REMOVE_INVITEE_ALERT = "REMOVE_INVITEE_ALERT";
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,46 +73,6 @@ public class TripActivity extends AppCompatActivity {
         populateData();
     }
 
-    private void populateData() {
-        // Set the dates
-        String dates = getString(R.string.trip_dates,
-                dateFormat.format(mController.getDateFrom()),
-                dateFormat.format(mController.getDateTo()));
-        mTripDatesTextView.setText(dates);
-
-        // Set the locations
-        String transportation = getString(R.string.trip_locations,
-                mController.getOrigin(), mController.getDestination());
-        mTripLocTextView.setText(transportation);
-        mTripLocTextView.setCompoundDrawablesWithIntrinsicBounds(mController.getDrawableId(), 0, 0, 0);
-
-        mCollapsingToolbar.setTitle(mController.getTitle());
-
-        mController.setGooglePlacePhoto(mHeaderImageView);
-
-        // set and populate members and invitees list
-        mMembersRecyclerView.setAdapter(mController.mMemAdapter);
-        mController.updateMembersAdapter();
-
-        mInviteesRecyclerView.setAdapter(mController.mInviteesAdapter);
-        mController.updateInviteesAdapter();
-
-        if (mController.isCreator()) {
-            mController.mMemAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
-                @Override
-                public void onClick(FacebookUser user) {
-                    showKickMemberDialog(user);
-                }
-            });
-            mController.mInviteesAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
-                @Override
-                public void onClick(FacebookUser user) {
-                    showKickInviteeDialog(user);
-                }
-            });
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.trip_menu, menu);
@@ -121,93 +86,25 @@ public class TripActivity extends AppCompatActivity {
             case android.R.id.home:
                 finish();
                 return true;
+
             case R.id.trip_action_share:
                 startShareIntent();
                 return true;
 
             case R.id.trip_action_delete_trip:
-                showDeleteTripDialog();
+                showAlertDialog(DELETE_TRIP_ALERT, null);
                 return true;
 
             case R.id.trip_action_leave_trip:
-                showLeaveTripDialog();
+                showAlertDialog(LEAVE_TRIP_ALERT, null);
                 return true;
+
             case R.id.trip_action_edit:
                 mController.editTrip();
 
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void showLeaveTripDialog() {
-        AlertDialog.Builder deleteAlert = new AlertDialog.Builder(this);
-        deleteAlert.setMessage(R.string.delete_trip_alert);
-
-        deleteAlert.setPositiveButton("Leave", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                mController.leaveTrip();
-            }
-        });
-        deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        deleteAlert.show();
-    }
-
-    private void showDeleteTripDialog() {
-        AlertDialog.Builder deleteAlert = new AlertDialog.Builder(this);
-        deleteAlert.setMessage(R.string.delete_trip_alert);
-
-        deleteAlert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                mController.deleteTrip();
-            }
-        });
-        deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        deleteAlert.show();
-    }
-
-    private void showKickMemberDialog(final FacebookUser user) {
-        AlertDialog.Builder deleteAlert = new AlertDialog.Builder(this);
-        deleteAlert.setMessage(getString(R.string.kick_friend_alert, user.name,
-                mController.trip.getName()));
-
-        deleteAlert.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                mController.kickMember(user);
-            }
-        });
-        deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        deleteAlert.show();
-    }
-
-    private void showKickInviteeDialog(final FacebookUser user) {
-        AlertDialog.Builder deleteAlert = new AlertDialog.Builder(this);
-        deleteAlert.setMessage(getString(R.string.kick_friend_alert, user.name,
-                mController.trip.getName()));
-
-        deleteAlert.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                mController.kickInvitee(user);
-            }
-        });
-        deleteAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        deleteAlert.show();
     }
 
     /**
@@ -221,12 +118,12 @@ public class TripActivity extends AppCompatActivity {
         mTripDatesTextView = (TextView) findViewById(R.id.trip_dates);
 
         mMembersRecyclerView = (RecyclerView) findViewById(R.id.members_recycler_view);
-        mMembersRecyclerView.setLayoutManager(new AutoWrappingLinearLayoutManager(this));
+        mMembersRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mMembersRecyclerView.setNestedScrollingEnabled(false);
         mMembersRecyclerView.setHasFixedSize(false);
 
         mInviteesRecyclerView = (RecyclerView) findViewById(R.id.invitees_recycler_view);
-        mInviteesRecyclerView.setLayoutManager(new AutoWrappingLinearLayoutManager(this));
+        mInviteesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mInviteesRecyclerView.setNestedScrollingEnabled(false);
         mInviteesRecyclerView.setHasFixedSize(false);
 
@@ -238,6 +135,115 @@ public class TripActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+    private void populateData() {
+        mTripDatesTextView.setText(mController.getDatesStringRepresentation());
+        mTripLocTextView.setText(mController.getTransportationStringRepresentation());
+        mTripLocTextView.setCompoundDrawablesWithIntrinsicBounds(mController.getTransportationIcon(), 0, 0, 0);
+
+        mCollapsingToolbar.setTitle(mController.getTitle());
+
+        // set and populate members and invitees list
+        mMembersRecyclerView.setAdapter(mController.mMemAdapter);
+        mController.updateMembersAdapter();
+
+        mInviteesRecyclerView.setAdapter(mController.mInviteesAdapter);
+        mController.updateInviteesAdapter();
+
+        if (mController.isCreator()) {
+            mController.mMemAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
+                @Override
+                public void onClick(User user) {
+                    showAlertDialog(REMOVE_MEMBER_ALERT, user);
+                }
+            });
+
+            mController.mInviteesAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
+                @Override
+                public void onClick(User user) {
+                    showAlertDialog(REMOVE_INVITEE_ALERT, user);
+                }
+            });
+        }
+    }
+
+    private void showAlertDialog(final String alertType, @Nullable final User user) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setMessage(getAlertDialogMessage(alertType, user));
+
+        alertDialog.setPositiveButton(getAlertPositiveButtonText(alertType),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        onAlertDialogPositiveClick(alertType, user);
+                    }
+                });
+
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+    }
+
+    private void onAlertDialogPositiveClick(String alertType, User user) {
+        switch (alertType) {
+            case LEAVE_TRIP_ALERT:
+                mController.leaveTrip();
+                break;
+
+            case DELETE_TRIP_ALERT:
+                mController.deleteTrip();
+                break;
+
+            case REMOVE_MEMBER_ALERT:
+                mController.kickMember(user);
+                break;
+
+            case REMOVE_INVITEE_ALERT:
+                mController.kickInvitee(user);
+                break;
+        }
+    }
+
+    private String getAlertDialogMessage(String alertType, User user) {
+        switch (alertType) {
+            case LEAVE_TRIP_ALERT:
+                return getString(R.string.leave_trip_alert);
+
+            case DELETE_TRIP_ALERT:
+                return getString(R.string.delete_trip_alert);
+
+            case REMOVE_MEMBER_ALERT:
+                return getString(R.string.kick_friend_alert, user.getFullName(), mController.trip.getName());
+
+            case REMOVE_INVITEE_ALERT:
+                return getString(R.string.kick_friend_alert, user.getFullName(), mController.trip.getName());
+
+            default:
+                return "";
+        }
+    }
+
+    private String getAlertPositiveButtonText(String alertType) {
+        switch (alertType) {
+            case LEAVE_TRIP_ALERT:
+                return "Leave";
+
+            case DELETE_TRIP_ALERT:
+                return "Delete";
+
+            case REMOVE_MEMBER_ALERT:
+                return "Remove";
+
+            case REMOVE_INVITEE_ALERT:
+                return "Remove";
+
+            default:
+                return "";
+        }
     }
 
     private void setUIForCreator(boolean isCreator, Menu menu) {
@@ -290,7 +296,7 @@ public class TripActivity extends AppCompatActivity {
 
     /**
      * Displays a Chooser menu for sharing content
-     *
+     * <p/>
      * TODO: Set up the content to be shared here
      */
     private void startShareIntent() {
@@ -304,7 +310,8 @@ public class TripActivity extends AppCompatActivity {
     /**
      * Called to start the intent for editing the trip via CreateTripActivity with an extra boolean
      * to indicate the trip is being edited
-     * @param trip  current trip, needed to populate the CreateTripActivity fields
+     *
+     * @param trip current trip, needed to populate the CreateTripActivity fields
      */
     public void editTripIntent(Trip trip) {
         Intent intent = new Intent(this, CreateTripActivity.class);
@@ -319,7 +326,7 @@ public class TripActivity extends AppCompatActivity {
         Snackbar snackbar = Snackbar.make(mMembersRecyclerView, "", Snackbar.LENGTH_SHORT);
         switch (requestCode) {
 
-            case Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY :
+            case Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY:
                 if (resultCode == Constants.RESULT_CODE_TRIP_UPDATED) {
                     mController.trip = data.getParcelableExtra(getString(R.string.intent_key_trip));
                     populateData();
@@ -328,7 +335,7 @@ public class TripActivity extends AppCompatActivity {
                 }
                 break;
 
-            case Constants.REQUEST_CODE_ADD_FRIENDS_ACTIVITY :
+            case Constants.REQUEST_CODE_ADD_FRIENDS_ACTIVITY:
                 if (resultCode == Constants.RESULT_CODE_INVITEES_ADDED) {
                     mController.trip = data.getParcelableExtra(getString(R.string.intent_key_trip));
                     populateData();

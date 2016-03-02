@@ -2,74 +2,72 @@ package droidsquad.voyage.model.objects;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.parse.LogInCallback;
 import com.parse.LogOutCallback;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
-import com.parse.interceptors.ParseLogInterceptor;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import droidsquad.voyage.model.api.FacebookAPI;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 
+/**
+ * This class encapsulates everything related to the currently logged in user.
+ * It uses the singleton pattern to always have at any moment an instance of hte
+ * current user available through a static getter #currentUser
+ */
 public class VoyageUser {
     private static final String TAG = VoyageUser.class.getSimpleName();
+    private volatile static User currentUser;
 
+    private VoyageUser() {}
+
+    public static User currentUser() {
+        if (currentUser == null) {
+            synchronized (User.class) {
+                if (currentUser == null) {
+                    currentUser = new User(getId(), getFbId(), getFirstName(), getLastName());
+                }
+            }
+        }
+        return currentUser;
+    }
+
+    /**
+     * Queries Facebook for the latest user info and stores in the ParseUser currentUser
+     */
     public static void refreshInfoFromFB() {
         Log.d(TAG, "Refreshing the user's info from FB.");
-        final ParseUser currentUser = ParseUser.getCurrentUser();
-        AccessToken token = AccessToken.getCurrentAccessToken();
+        FacebookAPI.requestFBInfo(new FacebookAPI.FBUserInfoCallback() {
+            @Override
+            public void onCompleted(User user) {
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                currentUser.put("firstName", user.firstName);
+                currentUser.put("lastName", user.lastName);
+                currentUser.put("gender", user.gender);
+                currentUser.put("fbId", user.fbId);
+                currentUser.saveInBackground();
 
-        GraphRequest request = GraphRequest.newMeRequest(
-                token,
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        Log.d(TAG, "Info recevied from FB: " + object.toString());
-
-                        try {
-                            // Public profile. These fields are guaranteed to be in the JSON
-                            currentUser.put("firstName", object.get("first_name").toString());
-                            currentUser.put("lastName", object.get("last_name").toString());
-                            currentUser.put("gender", object.get("gender").toString());
-                            currentUser.put("fbId", object.get(("id")).toString());
-
-                            Log.d(TAG, "Info saved.");
-                        } catch (JSONException e) {
-                            Log.d(TAG, "JSONException occurred: " + e.getMessage());
-                        }
-
-                        currentUser.saveInBackground();
-                    }
-                });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "first_name,last_name,gender,id");
-        request.setParameters(parameters);
-        request.executeAsync();
-
+                Log.d(TAG, "User's information saved successfully to Parse");
+            }
+        });
     }
 
     public static void attemptFBLogin(final Activity activity, final View view) {
         Log.d(TAG, "Logging in user with Facebook.");
+
         Collection<String> permissions = new ArrayList<>();
         permissions.add("public_profile");
         permissions.add("user_friends");
+
         ParseFacebookUtils.logInWithReadPermissionsInBackground(activity, permissions, new LogInCallback() {
             @Override
             public void done(ParseUser user, com.parse.ParseException err) {
@@ -79,17 +77,16 @@ public class VoyageUser {
                     if (err != null) {
                         Log.d(TAG, "ParseException occurred. Code: " + err.getCode()
                                 + " Message: " + err.getMessage());
-                    }
 
-                    if (err != null && err.getCode() == -1) {
-                        Snackbar snackbar = Snackbar.make(view, Constants.ERROR_NO_INTERNET_CONNECTION, Snackbar.LENGTH_LONG)
-                                .setAction("RETRY", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        attemptFBLogin(activity, view);
-                                    }
-                                });
-                        snackbar.show();
+                        if (err.getCode() == -1) {
+                            Snackbar.make(view, Constants.ERROR_NO_INTERNET_CONNECTION, Snackbar.LENGTH_LONG)
+                                    .setAction("RETRY", new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            attemptFBLogin(activity, view);
+                                        }
+                                    }).show();
+                        }
                     }
                 } else {
                     Log.d(TAG, (user.isNew()) ? "Signing up new user." : "User logged in through Facebook!");
@@ -99,7 +96,8 @@ public class VoyageUser {
                     installation.put("userId", user.getObjectId());
                     installation.saveInBackground();
 
-                    VoyageUser.refreshInfoFromFB();
+                    refreshInfoFromFB();
+
                     Intent intent = new Intent(activity, MainNavDrawerActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     activity.startActivity(intent);
@@ -108,24 +106,7 @@ public class VoyageUser {
         });
     }
 
-    public static boolean isEmailValid(String email) {
-        Pattern p = Pattern.compile(".+@.+\\.[a-z]+"); // matching email with regex
-        Matcher m = p.matcher(email);
-        return m.matches();
-    }
-
-    public static boolean isMobileNumValid(String mobileNum) {
-        /*
-         *   matching phone number with regex
-         *   Examples: Matches following phone numbers:
-         *   (123)456-7890, 123-456-7890, 1234567890, (123)-456-7890
-         */
-        Pattern p = Pattern.compile("^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$");
-        Matcher m = p.matcher(mobileNum);
-        return m.matches();
-    }
-
-    public void logOut() {
+    public static void logOut() {
         Log.d(TAG, "Logging user out.");
 
         ParseUser currentUser = ParseUser.getCurrentUser();
@@ -147,5 +128,29 @@ public class VoyageUser {
                 }
             }
         });
+    }
+
+    public static String getId() {
+        return ParseUser.getCurrentUser().getObjectId();
+    }
+
+    public static String getFirstName() {
+        return ParseUser.getCurrentUser().getString("firstName");
+    }
+
+    public static String getLastName() {
+        return ParseUser.getCurrentUser().getString("lastName");
+    }
+
+    public static String getFullName() {
+        return getFirstName() + " " + getLastName();
+    }
+
+    public static String getFbId() {
+        return ParseUser.getCurrentUser().getString("fbId");
+    }
+
+    public static boolean isLoggedIn() {
+        return ParseUser.getCurrentUser() != null;
     }
 }

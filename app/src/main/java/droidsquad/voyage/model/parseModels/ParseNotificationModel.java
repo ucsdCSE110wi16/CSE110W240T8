@@ -1,4 +1,4 @@
-package droidsquad.voyage.model;
+package droidsquad.voyage.model.parseModels;
 
 import android.util.Log;
 
@@ -16,11 +16,18 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.util.Constants;
 
-public class ParseNotificationModel {
+public class ParseNotificationModel extends ParseModel {
     private final static String TAG = ParseNotificationModel.class.getSimpleName();
 
+    /**
+     * Send a request notification to each of the parseUsers in the list
+     *
+     * @param parseTrip Trip from which the request originated
+     * @param parseUsers Users to send the notification to
+     */
     public static void sendRequestNotifications(ParseObject parseTrip, List<ParseUser> parseUsers) {
         List<String> ids = new ArrayList<>();
 
@@ -32,7 +39,7 @@ public class ParseNotificationModel {
         JSONObject data = new JSONObject();
 
         try {
-            data.put("title", currentUser.get("firstName") + " " + currentUser.get("lastName"));
+            data.put("title", VoyageUser.getFullName());
             data.put("alert", "invited you to join " + parseTrip.get("name"));
             data.put("fbId", currentUser.get("fbId"));
             data.put("tripId", parseTrip.getObjectId());
@@ -52,6 +59,8 @@ public class ParseNotificationModel {
             public void done(ParseException e) {
                 if (e == null) {
                     Log.d(TAG, "Invitation successfully sent");
+                } else {
+                    Log.d(TAG, "ParseException occurred while sending a request notification", e);
                 }
             }
         });

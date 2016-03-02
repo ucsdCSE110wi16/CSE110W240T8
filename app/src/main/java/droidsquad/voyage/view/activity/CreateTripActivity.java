@@ -28,9 +28,7 @@ import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.activityController.CreateTripController;
@@ -61,10 +59,8 @@ public class CreateTripActivity extends AppCompatActivity {
 
     private Button mCreateTripButton;
 
-    private static final int DEFAULT_TRIP_LENGTH = 7;
     private static final int FROM_PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private static final int TO_PLACE_AUTOCOMPLETE_REQUEST_CODE = 2;
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
     private static final String TAG = CreateTripActivity.class.getSimpleName();
 
     @Override
@@ -99,6 +95,7 @@ public class CreateTripActivity extends AppCompatActivity {
             case android.R.id.home:
                 controller.attemptClose();
                 return true;
+
             default:
                 return super.onOptionsItemSelected(menuItem);
         }
@@ -155,22 +152,6 @@ public class CreateTripActivity extends AppCompatActivity {
             }
         });
 
-        // Set the TextChanged listener to clear TripName error messages
-        mTripNameView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                controller.hideError(mTripNameView);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-
         // Set the Locations listener to show the PlaceAutocomplete Dialogs
         mLeavingFromView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,11 +160,26 @@ public class CreateTripActivity extends AppCompatActivity {
             }
         });
 
-        mLeavingFromView.addTextChangedListener(new TextWatcher() {
+        // Set the TextChanged listener to clear TripName error messages
+        mTripNameView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                controller.hideError(mTripNameView);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+
+        mLeavingFromView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -191,9 +187,7 @@ public class CreateTripActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
         mDestinationView.setOnClickListener(new View.OnClickListener() {
@@ -205,9 +199,7 @@ public class CreateTripActivity extends AppCompatActivity {
 
         mDestinationView.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -215,11 +207,8 @@ public class CreateTripActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void afterTextChanged(Editable s) {}
         });
-
     }
 
 
@@ -237,6 +226,7 @@ public class CreateTripActivity extends AppCompatActivity {
                     new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
                             .setFilter(typeFilter)
                             .build(this);
+
             startActivityForResult(intent, requestCode);
         } catch (GooglePlayServicesRepairableException e) {
             // TODO: Handle the error.
@@ -341,7 +331,7 @@ public class CreateTripActivity extends AppCompatActivity {
      */
     public void exitActivity() {
         finish();
-        // tell the parent activity it has been updated
+        // TODO: tell the parent activity it has been updated
     }
 
     /* GETTERS */
@@ -370,11 +360,11 @@ public class CreateTripActivity extends AppCompatActivity {
         return mCalendarFrom;
     }
 
-    public void setCalendarFrom(Calendar calendarFrom){
+    public void setCalendarFrom(Calendar calendarFrom) {
         mCalendarFrom = calendarFrom;
     }
 
-    public void setCalendarTo(Calendar calendarTo){
+    public void setCalendarTo(Calendar calendarTo) {
         mCalendarTo = calendarTo;
     }
 
@@ -410,7 +400,7 @@ public class CreateTripActivity extends AppCompatActivity {
         return mDestinationPlace;
     }
 
-    public Button getCreateTripButton(){
+    public Button getCreateTripButton() {
         return mCreateTripButton;
     }
 
