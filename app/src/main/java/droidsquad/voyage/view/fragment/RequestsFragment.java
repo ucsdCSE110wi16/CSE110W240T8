@@ -36,16 +36,15 @@ public class RequestsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_requests, container, false);
-
         initUI(view);
 
         mController = new RequestsController(this);
 
         mRequestsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRequestsRecyclerView.setAdapter(mController.getAdapter());
-
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

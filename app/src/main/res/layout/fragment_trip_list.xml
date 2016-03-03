@@ -12,6 +12,10 @@
         tools:context=".view.activity.MainNavDrawerActivity"
         tools:showIn="@layout/app_bar_main">
 
+        <include
+            android:id="@+id/trip_list_progress_bar"
+            layout="@layout/fragments_progress_bar" />
+
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swiperefresh"
             android:layout_width="match_parent"
@@ -24,11 +28,6 @@
                 android:scrollbars="vertical" />
 
         </android.support.v4.widget.SwipeRefreshLayout>
-
-        <include
-            android:id="@+id/trip_list_progress_bar"
-            layout="@layout/fragments_progress_bar" />
-
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton

@@ -22,18 +22,18 @@ import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.AddFriendsActivity;
 
 public class AddFriendsController {
+    public static final String TAG = AddFriendsController.class.getSimpleName();
+
     private AddFriendsActivity mActivity;
     private FBFriendsAdapter mResultsAdapter;
     private SelectedFBFriendsAdapter mSelectedFriendsAdapter;
     private List<User> friends;
     private Trip mTrip;
 
-    public static final String TAG = AddFriendsController.class.getSimpleName();
-
     public AddFriendsController(AddFriendsActivity activity) {
         mActivity = activity;
         mTrip = activity.getIntent().getParcelableExtra(activity.getString(R.string.intent_key_trip));
-        mResultsAdapter = new FBFriendsAdapter(activity, false);
+        mResultsAdapter = new FBFriendsAdapter(activity);
         mSelectedFriendsAdapter = new SelectedFBFriendsAdapter(activity);
 
         mResultsAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
@@ -106,7 +106,7 @@ public class AddFriendsController {
     }
 
     /**
-     * TODO: Optimize the search indexing algorithm
+     * Update the adapter with the friends matching the query
      *
      * @param query The query string to search for friends
      */
@@ -114,11 +114,10 @@ public class AddFriendsController {
         // Get the friends according to the query
         query = query.toLowerCase();
         ArrayList<User> queriedFriends = new ArrayList<>();
-
         if (!query.isEmpty()) {
             for (User friend : friends) {
                 if (friend.getFullName().toLowerCase().contains(query)
-                        && !mSelectedFriendsAdapter.mSelectedUsers.contains(friend)) {
+                        && !mSelectedFriendsAdapter.getSelectedFriends().contains(friend)) {
                     queriedFriends.add(friend);
                 }
             }
@@ -128,10 +127,10 @@ public class AddFriendsController {
     }
 
     public void addFriendsToTrip() {
-        Log.d(TAG, "Adding " + mSelectedFriendsAdapter.mSelectedUsers.size() + " friends to Trip.");
+        Log.d(TAG, "Adding " + mSelectedFriendsAdapter.getSelectedFriends().size() + " friends to Trip.");
         mActivity.showProgress(true);
 
-        final List<User> invitees = mSelectedFriendsAdapter.mSelectedUsers;
+        final List<User> invitees = mSelectedFriendsAdapter.getSelectedFriends();
 
         // No invitees to add
         if (invitees.isEmpty()) {

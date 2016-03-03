@@ -49,7 +49,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         holder.hostNameView.setText(request.hostName);
         holder.invitationMsgView.setText(context.getString(R.string.request_message_template,
                 request.tripName));
-        holder.elapsedTimeView.setText("");
+        holder.elapsedTimeView.setText(request.elapsedTime);
 
         holder.acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override

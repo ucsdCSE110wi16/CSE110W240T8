@@ -9,17 +9,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.User;
 
 public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFriendsAdapter.ViewHolder> {
-    public ArrayList<User> mSelectedUsers;
     private Activity mActivity;
     private OnItemRemovedListener mListener;
+    private ArrayList<User> mSelectedFriends;
 
     public SelectedFBFriendsAdapter(Activity activity) {
-        mSelectedUsers = new ArrayList<>();
+        mSelectedFriends = new ArrayList<>();
         mActivity = activity;
     }
 
@@ -32,7 +33,7 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        User friend = mSelectedUsers.get(position);
+        User friend = mSelectedFriends.get(position);
         friend.loadProfilePicInto(mActivity, holder.mProfilePic);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -48,7 +49,7 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
 
     @Override
     public int getItemCount() {
-        return mSelectedUsers.size();
+        return mSelectedFriends.size();
     }
 
     /**
@@ -57,8 +58,8 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
      * @param friend Friend to be added
      */
     public void addFriend(User friend) {
-        mSelectedUsers.add(friend);
-        notifyItemInserted(mSelectedUsers.size() - 1);
+        mSelectedFriends.add(friend);
+        notifyItemInserted(mSelectedFriends.size() - 1);
     }
 
     /**
@@ -67,9 +68,21 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
      * @param position Position of friend to be removed
      */
     private void removeFriend(int position) {
-        mSelectedUsers.remove(position);
+        mSelectedFriends.remove(position);
         notifyItemRemoved(position);
-        notifyItemRangeChanged(position, mSelectedUsers.size());
+        notifyItemRangeChanged(position, mSelectedFriends.size());
+    }
+
+    public void setOnItemRemovedListener(OnItemRemovedListener listener) {
+        mListener = listener;
+    }
+
+    public List<User> getSelectedFriends() {
+        return mSelectedFriends;
+    }
+
+    public interface OnItemRemovedListener {
+        void onRemoved();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -79,13 +92,5 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
             super(view);
             mProfilePic = (ImageView) view.findViewById(R.id.selected_friend_profile_pic);
         }
-    }
-
-    public interface OnItemRemovedListener {
-        void onRemoved();
-    }
-
-    public void setOnItemRemovedListener(OnItemRemovedListener listener) {
-        mListener = listener;
     }
 }

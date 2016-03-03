@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.adapters.FBFriendsAdapter;
+import droidsquad.voyage.model.adapters.TripMembersAdapter;
+import droidsquad.voyage.model.objects.Member;
 import droidsquad.voyage.model.objects.Trip;
-import droidsquad.voyage.model.objects.User;
 import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.util.Constants;
@@ -19,8 +19,8 @@ public class TripController {
     private static final String TAG = TripController.class.getSimpleName();
 
     private TripActivity mActivity;
-    public FBFriendsAdapter mMemAdapter;
-    public FBFriendsAdapter mInviteesAdapter;
+    public TripMembersAdapter mMembersAdapter;
+    public TripMembersAdapter mInviteesAdapter;
     public Trip trip;
 
     public TripController(TripActivity instance) {
@@ -29,8 +29,8 @@ public class TripController {
         trip = mActivity.getIntent().getParcelableExtra(
                 mActivity.getString(R.string.intent_key_trip));
 
-        mMemAdapter = new FBFriendsAdapter(mActivity, isCreator());
-        mInviteesAdapter = new FBFriendsAdapter(mActivity, isCreator());
+        mMembersAdapter = new TripMembersAdapter(mActivity);
+        mInviteesAdapter = new TripMembersAdapter(mActivity);
     }
 
     public void deleteTrip() {
@@ -54,89 +54,56 @@ public class TripController {
 
     public void leaveTrip() {
         Log.d(TAG, "Leaving trip: " + trip.getName());
-        ParseTripModel.removeUserFromTrip(trip.getId(), VoyageUser.getId(), new ParseTripModel.ParseResponseCallback() {
-            @Override
-            public void onSuccess() {
-                Log.d(TAG, "Successfully Left trip");
-                mActivity.setResult(Constants.RESULT_CODE_TRIP_LEFT);
-                mActivity.finish();
-            }
+        ParseTripModel.removeMemberFromTrip(trip.getId(), trip.getMemberWithUserId(VoyageUser.getId()).id,
+                new ParseTripModel.ParseResponseCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, "Successfully Left trip");
+                        mActivity.setResult(Constants.RESULT_CODE_TRIP_LEFT);
+                        mActivity.finish();
+                    }
 
-            @Override
-            public void onFailure(String error) {
-                Log.d(TAG, "Couldn\'t leave the trip. Error: " + error);
-                Snackbar.make(mActivity.findViewById(android.R.id.content), error,
-                        Snackbar.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onFailure(String error) {
+                        Log.d(TAG, "Couldn\'t leave the trip. Error: " + error);
+                        Snackbar.make(mActivity.findViewById(android.R.id.content), error,
+                                Snackbar.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     public void editTrip() {
-        mActivity.editTripIntent(this.trip);
+        mActivity.startEditTripIntent(trip);
     }
-
-
 
     public void updateMembersAdapter() {
-        updateFBFriendsAdapter(trip.getMembersAsUsers(), mMemAdapter);
-    }
-
-    public void updateInviteesAdapter() {
-        updateFBFriendsAdapter(trip.getInviteesAsUsers(), mInviteesAdapter);
-    }
-
-    private void updateFBFriendsAdapter(List<User> users, FBFriendsAdapter adapter) {
-        ArrayList<User> friends = new ArrayList<>();
-
-        for (User member : users) {
-            // Shouldn't show the option to remove myself
-            if (isCreator() && member.equals(VoyageUser.currentUser())) {
-                continue;
-            }
-
-            friends.add(member);
-        }
-
-        adapter.updateResults(friends);
-    }
-
-
-    public void kickMember(final User user) {
-        kickUser(user, trip.getMembersAsUsers(), mMemAdapter,
-                mActivity.getString(R.string.snackbar_member_removed));
-    }
-
-    public void kickInvitee(final User user) {
-        kickUser(user, trip.getInviteesAsUsers(), mInviteesAdapter,
-                mActivity.getString(R.string.snackbar_invitee_removed));
-    }
-
-    private void kickUser(final User user, final List<User> users,
-                         final FBFriendsAdapter adapter, final String snackBarMessage) {
-        String userId = "";
-        for (User member : users) {
-            if (member.fbId.endsWith(user.id)) {
-                userId = member.id;
+        List<Member> members = new ArrayList<>(trip.getMembers());
+        for (int i = 0; i < members.size(); i++) {
+            if (members.get(i).user.equals(VoyageUser.currentUser())) {
+                members.remove(i);
                 break;
             }
         }
 
+        mMembersAdapter.updateMembers(members);
+    }
+
+    public void updateInviteesAdapter() {
+        mInviteesAdapter.updateMembers(trip.getInvitees());
+    }
+
+    public void kickMember(final Member member) {
+        final TripMembersAdapter adapter = (member.pendingRequest) ? mInviteesAdapter : mMembersAdapter;
+
         // Remove user from member
-        ParseTripModel.removeUserFromTrip(trip.getId(), userId, new ParseTripModel.ParseResponseCallback() {
+        ParseTripModel.removeMemberFromTrip(trip.getId(), member.id, new ParseTripModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
-                adapter.removeFriend(user);
-
-                // Successfully remove the user from the trip object now
-                for (int i = 0; i < users.size(); i++) {
-                    if (users.get(i).fbId.endsWith(user.id)) {
-                        users.remove(i);
-                        break;
-                    }
-                }
-
+                adapter.removeMember(member);
+                trip.removeMember(member);
                 Snackbar.make(mActivity.findViewById(android.R.id.content),
-                        snackBarMessage, Snackbar.LENGTH_SHORT).show();
+                        (member.pendingRequest ? R.string.snackbar_invitee_removed : R.string.snackbar_member_removed),
+                        Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
@@ -147,8 +114,7 @@ public class TripController {
         });
     }
 
-
-    public boolean isCreator() {
+    public boolean isAdmin() {
         return trip.getAdmin().equals(VoyageUser.currentUser());
     }
 

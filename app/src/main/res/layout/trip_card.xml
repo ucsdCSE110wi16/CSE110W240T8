@@ -52,7 +52,6 @@
             android:layout_marginTop="@dimen/margin_vertical_for_divider"
             android:background="@drawable/divider_faded" />
 
-
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/trip_card_transportation_icon"
             android:layout_width="36dp"

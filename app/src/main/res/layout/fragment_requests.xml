@@ -4,6 +4,10 @@
     android:layout_height="match_parent"
     tools:context="droidsquad.voyage.view.fragment.RequestsFragment">
 
+    <include
+        android:id="@+id/requests_progress_bar"
+        layout="@layout/fragments_progress_bar" />
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
@@ -37,9 +41,5 @@
             android:layout_height="wrap_content"
             android:text="@string/label_no_requests" />
     </LinearLayout>
-
-    <include
-        android:id="@+id/requests_progress_bar"
-        layout="@layout/fragments_progress_bar" />
 
 </RelativeLayout>

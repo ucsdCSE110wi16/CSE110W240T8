@@ -86,9 +86,9 @@
     </string>
 
     <!-- Deletion alert dialog-->
-    <string name="delete_trip_alert">Are you sure you want to delete this trip?</string>
-    <string name="leave_trip_alert">Are you sure you want to leave this trip?</string>
-    <string name="kick_friend_alert">Are you sure you want remove %1$s from %2$s</string>
+    <string name="delete_trip_alert">Delete trip?</string>
+    <string name="leave_trip_alert">Leave trip?</string>
+    <string name="kick_friend_alert">Remove %1$s from %2$s?</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

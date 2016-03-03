@@ -302,25 +302,30 @@ public class ParseTripModel extends ParseModel {
      * Remove the given user from the given trip
      *
      * @param tripId   Id of the user to be removed
-     * @param userId   Id of the user to remove from
+     * @param memberId Id of the member to remove from
      * @param callback Called on success or failure
      */
-    public static void removeUserFromTrip(final String tripId, final String userId, final ParseResponseCallback callback) {
+    public static void removeMemberFromTrip(final String tripId, final String memberId,
+                                            final ParseResponseCallback callback) {
+
+        ParseQuery<ParseObject> memberQuery = ParseQuery.getQuery(ParseMemberModel.MEMBER_CLASS);
+        memberQuery.whereEqualTo(ParseMemberModel.Field.ID, memberId);
+
         ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
+        query.whereMatchesQuery(Field.MEMBERS, memberQuery);
         query.include(Field.MEMBERS);
-        // TODO: Change the TripActivity to display members instead of Users so we can delete them by Member objectId
-        query.include(Field.MEMBERS + ParseMemberModel.Field.USER);
 
         getParseTrip(tripId, query, new ParseObjectCallback() {
             @Override
             public void onSuccess(ParseObject parseTrip) {
-                ParseObject parseMember = getParseMemberFromParseTrip(userId, parseTrip);
+                ParseObject parseMember = getParseMemberFromParseTrip(memberId, parseTrip);
                 if (parseMember != null) {
                     parseTrip.removeAll(Field.MEMBERS, Collections.singletonList(parseMember));
                     parseMember.deleteInBackground();
                     saveTrip(parseTrip, callback);
                 } else {
-                    Log.d(TAG, "Failed to remove User from Trip, could not find member");
+                    Log.d(TAG, "Failed to remove member from Trip: Could not find member");
+                    callback.onFailure("There was an error with the server");
                 }
             }
 
@@ -336,7 +341,7 @@ public class ParseTripModel extends ParseModel {
      ***************************************************************************************/
 
     /**
-     * Save the trip to Parse's database
+     * Save the trip to Parse database
      *
      * @param parseTrip The parseTrip object to be saved
      * @param callback  Called once saving is done
@@ -430,15 +435,15 @@ public class ParseTripModel extends ParseModel {
     /**
      * Get the Member with the specified id from the ParseTrip
      *
-     * @param userId    User id of the member to be retrieved
+     * @param memberId  Id of the member to be retrieved
      * @param parseTrip ParseTrip to extract member from
      * @return Member with the given userId
      */
-    private static ParseObject getParseMemberFromParseTrip(String userId, ParseObject parseTrip) {
+    private static ParseObject getParseMemberFromParseTrip(String memberId, ParseObject parseTrip) {
         List<ParseObject> members = parseTrip.getList(Field.MEMBERS);
         if (members != null) {
             for (ParseObject member : members) {
-                if (member.getParseObject(ParseMemberModel.Field.USER).getObjectId().equals(userId)) {
+                if (member.getObjectId().equals(memberId)) {
                     return member;
                 }
             }

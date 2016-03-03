@@ -202,6 +202,14 @@ public class Trip implements Parcelable {
         for (Member member : members) addMember(member);
     }
 
+    public void removeMember(Member member) {
+        if (!member.pendingRequest) {
+            members.remove(member);
+        } else {
+            invitees.remove(member);
+        }
+    }
+
     /**
      * Get the members of the Trip excluding the Admin and the Current User
      *
@@ -243,6 +251,15 @@ public class Trip implements Parcelable {
         allMembers.addAll(members);
         allMembers.addAll(invitees);
         return allMembers;
+    }
+
+    public Member getMemberWithUserId(String userId) {
+        for (Member member : members) {
+            if (member.user.id.equals(userId)) {
+                return member;
+            }
+        }
+        return null;
     }
 
     public String getName() {

@@ -29,7 +29,7 @@ public class ParseRequestModel extends ParseModel {
      * @param callback Called on success or error
      */
     public static void declineRequest(String tripId, final ParseResponseCallback callback) {
-        ParseTripModel.removeUserFromTrip(tripId, VoyageUser.getId(), new ParseModel.ParseResponseCallback() {
+        ParseTripModel.removeMemberFromTrip(tripId, VoyageUser.getId(), new ParseModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 callback.onSuccess();

@@ -22,6 +22,14 @@ import droidsquad.voyage.util.Constants;
 public class ParseNotificationModel extends ParseModel {
     private final static String TAG = ParseNotificationModel.class.getSimpleName();
 
+    protected interface Field {
+        String TITLE = "title";
+        String ALERT = "alert";
+        String FB_ID = "fbId";
+        String TRIP_ID = "tripId";
+        String TYPE = "type";
+    }
+
     /**
      * Send a request notification to each of the parseUsers in the list
      *
@@ -39,11 +47,11 @@ public class ParseNotificationModel extends ParseModel {
         JSONObject data = new JSONObject();
 
         try {
-            data.put("title", VoyageUser.getFullName());
-            data.put("alert", "invited you to join " + parseTrip.get("name"));
-            data.put("fbId", currentUser.get("fbId"));
-            data.put("tripId", parseTrip.getObjectId());
-            data.put("type", Constants.NOTIFICATION_INVITATION);
+            data.put(Field.TITLE, VoyageUser.getFullName());
+            data.put(Field.ALERT, "invited you to join " + parseTrip.get("name"));
+            data.put(Field.FB_ID, currentUser.get("fbId"));
+            data.put(Field.TRIP_ID, parseTrip.getObjectId());
+            data.put(Field.TYPE, Constants.NOTIFICATION_INVITATION);
         } catch (JSONException e) {
             e.printStackTrace();
         }

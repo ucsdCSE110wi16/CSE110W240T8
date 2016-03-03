@@ -3,5 +3,7 @@
     android:id="@+id/selected_friend_profile_pic"
     android:layout_width="48dp"
     android:layout_height="48dp"
-    android:layout_marginEnd="8dp"
-    android:layout_marginRight="4dp" />
+    android:layout_marginEnd="4dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp"
+    android:layout_marginStart="4dp" />
