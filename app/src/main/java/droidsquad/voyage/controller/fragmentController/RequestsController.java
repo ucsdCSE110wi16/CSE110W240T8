@@ -21,7 +21,6 @@ public class RequestsController {
         this.mAdapter = new RequestsAdapter(mFragment.getContext());
 
         setRequestButtonClicks();
-
         setOnAdapterEmptyListener();
 
         mFragment.refreshing(true);
@@ -90,7 +89,7 @@ public class RequestsController {
     public void fetchData() {
         mFragment.showProgress(true);
 
-        ParseRequestModel.fetchRequests(new ParseRequestModel.OnRequestsReceivedCallback() {
+        ParseRequestModel.fetchRequests(new ParseRequestModel.RequestListCallback() {
             @Override
             public void onSuccess(List<Request> requests) {
                 Log.d(TAG, "Requests received: " + requests.size());

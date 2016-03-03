@@ -47,7 +47,7 @@ public class ParseRequestModel extends ParseModel {
      *
      * @param callback Called with the list of Request objects
      */
-    public static void fetchRequests(final OnRequestsReceivedCallback callback) {
+    public static void fetchRequests(final RequestListCallback callback) {
         // Get all trips for which the user has been invited
         ParseTripModel.getTripsInvitedTo(new ParseTripModel.TripListCallback() {
             @Override
@@ -86,7 +86,7 @@ public class ParseRequestModel extends ParseModel {
         return requests;
     }
 
-    public interface OnRequestsReceivedCallback {
+    public interface RequestListCallback {
         void onSuccess(List<Request> requests);
 
         void onFailure(String error);

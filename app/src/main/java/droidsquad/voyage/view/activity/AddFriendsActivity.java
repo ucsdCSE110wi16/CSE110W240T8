@@ -94,8 +94,11 @@ public class AddFriendsActivity extends AppCompatActivity {
         // Set the layout managers for the recycler views
         mResultsRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mResultsRecyclerView.setHasFixedSize(true);
+
         mSelectedFriendsRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        mSelectedFriendsRecyclerView.setHasFixedSize(true);
 
         // Set the adapters for the recycler views
         mResultsRecyclerView.setAdapter(controller.getResultsAdapter());
@@ -116,5 +119,9 @@ public class AddFriendsActivity extends AppCompatActivity {
 
     public String getQuery() {
         return mSearchView.getQuery().toString();
+    }
+
+    public RecyclerView getmResultsRecyclerView() {
+        return mResultsRecyclerView;
     }
 }
