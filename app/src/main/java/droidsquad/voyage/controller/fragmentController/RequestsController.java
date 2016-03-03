@@ -24,7 +24,6 @@ public class RequestsController {
 
         setOnAdapterEmptyListener();
 
-        mFragment.showProgress(true);
         mFragment.refreshing(true);
         fetchData();
     }
@@ -89,6 +88,8 @@ public class RequestsController {
     }
 
     public void fetchData() {
+        mFragment.showProgress(true);
+
         ParseRequestModel.fetchRequests(new ParseRequestModel.OnRequestsReceivedCallback() {
             @Override
             public void onSuccess(List<Request> requests) {

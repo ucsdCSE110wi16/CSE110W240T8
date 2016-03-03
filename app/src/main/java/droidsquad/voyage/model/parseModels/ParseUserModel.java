@@ -10,10 +10,11 @@ import droidsquad.voyage.model.objects.User;
 public class ParseUserModel extends ParseModel {
     // Class for providing a namespace for the Fields of the User class in Parse database
     protected interface Field {
-        String ID = "id";
-        String Facebook_ID = "fbId";
+        String ID = "objectId";
         String FIRST_NAME = "firstName";
         String LAST_NAME = "lastName";
+        String GENDER = "gender";
+        String Facebook_ID = "fbId";
     }
 
     /**
@@ -23,6 +24,12 @@ public class ParseUserModel extends ParseModel {
      * @return The User from ParseUser
      */
     public static User getUserFromParseUser(ParseUser parseUser) {
+        try {
+            parseUser.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         return new User(
                 parseUser.getObjectId(),
                 parseUser.getString(Field.Facebook_ID),

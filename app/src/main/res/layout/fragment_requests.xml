@@ -11,39 +11,35 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/requests_recycler_view"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:id="@+id/no_requests_view"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center"
         android:orientation="vertical"
-        android:gravity="center">
+        android:visibility="gone">
+
         <android.support.v7.widget.AppCompatImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:src="@drawable/ic_notifications_none"/>
+            android:src="@drawable/ic_notifications_none" />
 
         <android.support.v7.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/label_no_requests"/>
+            android:text="@string/label_no_requests" />
     </LinearLayout>
 
-    <ProgressBar
+    <include
         android:id="@+id/requests_progress_bar"
-        style="?android:progressBarStyleLarge"
-        android:indeterminate="true"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
+        layout="@layout/fragments_progress_bar" />
 
 </RelativeLayout>

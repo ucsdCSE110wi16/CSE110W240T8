@@ -13,19 +13,8 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.VoyageUser;
 
 public class LoginActivity extends AppCompatActivity {
-<<<<<<< HEAD
-    private boolean currentlyLoggingIn = false;
-
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
-
-    // UI references.
-    private Button mLoginWithFBButton;
-=======
->>>>>>> refactoring
     private final String TAG = LoginActivity.class.getSimpleName();
+    private Button mLoginWithFBButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,15 +29,8 @@ public class LoginActivity extends AppCompatActivity {
                 VoyageUser.attemptFBLogin(LoginActivity.this, v);
             }
         });
-<<<<<<< HEAD
-
     }
 
-
-=======
-    }
-
->>>>>>> refactoring
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

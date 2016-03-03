@@ -1,6 +1,7 @@
 package droidsquad.voyage.controller.fragmentController;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -61,6 +62,7 @@ public class TripListController {
 
             @Override
             public void onFailure(String error) {
+                fragment.showProgress(false);
                 Log.d(TAG, "Failed to retrieved the data for the trips: " + error);
             }
         });

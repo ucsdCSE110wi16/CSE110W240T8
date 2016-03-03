@@ -23,21 +23,19 @@ import droidsquad.voyage.model.objects.VoyageUser;
 
 public class ParseTripModel extends ParseModel {
     private static final String TAG = ParseTripModel.class.getSimpleName();
-    protected static final String TRIP_OBJECT = "Trip";
+    protected static final String TRIP_CLASS = "Trip";
 
     // Interfaces for providing a namespace for the Fields of the Trip class in Parse database
     protected interface Field {
         String NAME = "name";
-        String CREATOR_ID = "creatorId";
+        String PRIVATE = "private";
+        String CREATED_BY = "createdBy";
         String ORIGIN = "origin";
         String DESTINATION = "destination";
         String DATE_FROM = "dateFrom";
         String DATE_TO = "dateTo";
         String TRANSPORTATION = "transportation";
-        String PRIVATE = "private";
-        String CREATED_BY = "createdBy";
         String MEMBERS = "members";
-        String FB_ID = "fbId";
     }
 
     /***************************************************************************************
@@ -135,11 +133,12 @@ public class ParseTripModel extends ParseModel {
      * @param callback Called with the retrieved Trips
      */
     public static void getTrips(TripListCallback callback) {
-        ParseQuery<ParseObject> innerQuery = ParseQuery.getQuery(ParseMemberModel.MEMBER_OBJECT);
+        ParseQuery<ParseObject> innerQuery = ParseQuery.getQuery(ParseMemberModel.MEMBER_CLASS);
         innerQuery.whereEqualTo(ParseMemberModel.Field.USER, ParseUser.getCurrentUser());
         innerQuery.whereEqualTo(ParseMemberModel.Field.PENDING_REQUEST, false);
+        innerQuery.include(ParseMemberModel.Field.USER);
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_OBJECT);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
         query.whereMatchesQuery(Field.MEMBERS, innerQuery);
         query.include(Field.MEMBERS);
 
@@ -147,12 +146,12 @@ public class ParseTripModel extends ParseModel {
     }
 
     /**
-     * Get all the public trips from the current user's Facebook friends
+     * Get all the public trips
      *
      * @param callback Called with the retrieved Trips
      */
-    public static void getPublicTrips(final TripListCallback callback) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_OBJECT);
+    public static void getPublicTrips(TripListCallback callback) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
         query.whereEqualTo(Field.PRIVATE, false);
         query.include(Field.MEMBERS);
         getTrips(query, callback);
@@ -163,12 +162,12 @@ public class ParseTripModel extends ParseModel {
      *
      * @param callback Called with the trips retrieved
      */
-    public static void getTripsInvitedTo(final TripListCallback callback) {
-        ParseQuery<ParseObject> memberQuery = ParseQuery.getQuery(ParseMemberModel.MEMBER_OBJECT);
+    public static void getTripsInvitedTo(TripListCallback callback) {
+        ParseQuery<ParseObject> memberQuery = ParseQuery.getQuery(ParseMemberModel.MEMBER_CLASS);
         memberQuery.whereEqualTo(ParseMemberModel.Field.USER, ParseUser.getCurrentUser());
         memberQuery.whereEqualTo(ParseMemberModel.Field.PENDING_REQUEST, true);
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_OBJECT);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
         query.whereMatchesQuery(ParseTripModel.Field.MEMBERS, memberQuery);
         query.include(ParseTripModel.Field.MEMBERS);
 
@@ -178,35 +177,29 @@ public class ParseTripModel extends ParseModel {
     /**
      * Get the public trips for which the current user's friends are part of
      *
-     * @param friends The friends to get the trips from
+     * @param friends  The friends to get the trips from
      * @param callback Called with the Trips or error on failure
      */
-    public static void getTripsFromFriends(List<User> friends, final TripListCallback callback) {
+    public static void getTripsFromFriends(List<User> friends, TripListCallback callback) {
         List<String> ids = new ArrayList<>();
         for (User friend : friends) {
             ids.add(friend.id);
         }
 
-        ParseQuery<ParseObject> memberQuery = new ParseQuery<>(ParseMemberModel.MEMBER_OBJECT);
-        memberQuery.whereContainedIn(
-                ParseMemberModel.Field.USER + ParseUserModel.Field.ID, ids);
+        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+        userQuery.whereContainedIn(ParseUserModel.Field.ID, ids);
 
-        ParseQuery<ParseObject> query = new ParseQuery<>(TRIP_OBJECT);
+        ParseQuery<ParseObject> memberQuery = new ParseQuery<>(ParseMemberModel.MEMBER_CLASS);
+        memberQuery.whereMatchesQuery(ParseMemberModel.Field.USER, userQuery);
+        memberQuery.include(ParseMemberModel.Field.USER);
+
+        ParseQuery<ParseObject> query = new ParseQuery<>(TRIP_CLASS);
         query.whereEqualTo(Field.PRIVATE, false);
         query.whereMatchesQuery(Field.MEMBERS, memberQuery);
         query.addAscendingOrder(Field.DATE_FROM);
         query.setLimit(10);
 
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if (e == null) {
-                    // TODO: Parse the response
-                } else {
-                    e.printStackTrace();
-                }
-            }
-        });
+        getTrips(query, callback);
     }
 
     /**
@@ -229,7 +222,7 @@ public class ParseTripModel extends ParseModel {
                     fbIds.add(user.fbId);
                 }
 
-                userQuery.whereContainedIn(Field.FB_ID, fbIds);
+                userQuery.whereContainedIn(ParseUserModel.Field.Facebook_ID, fbIds);
                 userQuery.findInBackground(new FindCallback<ParseUser>() {
                     @Override
                     public void done(final List<ParseUser> parseUsers, ParseException e) {
@@ -276,7 +269,7 @@ public class ParseTripModel extends ParseModel {
      * @param callback Called on success or failure
      */
     public static void deleteTrip(String tripId, final ParseResponseCallback callback) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_OBJECT);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
         query.include(Field.MEMBERS);
         getParseTrip(tripId, new ParseObjectCallback() {
             @Override
@@ -306,21 +299,29 @@ public class ParseTripModel extends ParseModel {
     }
 
     /**
-     * Remove the given user from the database
+     * Remove the given user from the given trip
      *
      * @param tripId   Id of the user to be removed
      * @param userId   Id of the user to remove from
      * @param callback Called on success or failure
      */
     public static void removeUserFromTrip(final String tripId, final String userId, final ParseResponseCallback callback) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_OBJECT);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
         query.include(Field.MEMBERS);
+        // TODO: Change the TripActivity to display members instead of Users so we can delete them by Member objectId
+        query.include(Field.MEMBERS + ParseMemberModel.Field.USER);
+
         getParseTrip(tripId, query, new ParseObjectCallback() {
             @Override
             public void onSuccess(ParseObject parseTrip) {
-                ParseObject parseMember = getMemberFromParseTrip(userId, parseTrip);
-                parseTrip.removeAll(Field.MEMBERS, Collections.singletonList(parseMember));
-                saveTrip(parseTrip, callback);
+                ParseObject parseMember = getParseMemberFromParseTrip(userId, parseTrip);
+                if (parseMember != null) {
+                    parseTrip.removeAll(Field.MEMBERS, Collections.singletonList(parseMember));
+                    parseMember.deleteInBackground();
+                    saveTrip(parseTrip, callback);
+                } else {
+                    Log.d(TAG, "Failed to remove User from Trip, could not find member");
+                }
             }
 
             @Override
@@ -359,6 +360,8 @@ public class ParseTripModel extends ParseModel {
      * @param callback Called with the trips as an argument
      */
     private static void getTrips(ParseQuery<ParseObject> query, final TripListCallback callback) {
+        query.include(Field.CREATED_BY);
+
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> parseTrips, ParseException e) {
@@ -396,7 +399,7 @@ public class ParseTripModel extends ParseModel {
      * @param callback Called with the ParseTrip object
      */
     private static void getParseTrip(String tripId, final ParseObjectCallback callback) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_OBJECT);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
         getParseTrip(tripId, query, callback);
     }
 
@@ -431,7 +434,7 @@ public class ParseTripModel extends ParseModel {
      * @param parseTrip ParseTrip to extract member from
      * @return Member with the given userId
      */
-    private static ParseObject getMemberFromParseTrip(String userId, ParseObject parseTrip) {
+    private static ParseObject getParseMemberFromParseTrip(String userId, ParseObject parseTrip) {
         List<ParseObject> members = parseTrip.getList(Field.MEMBERS);
         if (members != null) {
             for (ParseObject member : members) {
@@ -452,7 +455,6 @@ public class ParseTripModel extends ParseModel {
     private static Trip getTripFromParseObject(ParseObject parseTrip) {
         Trip trip = new Trip();
         trip.setId(parseTrip.getObjectId());
-        trip.setCreatorId(parseTrip.getString(Field.CREATOR_ID));
         trip.setName(parseTrip.getString(Field.NAME));
         trip.setTransportation(parseTrip.getString(Field.TRANSPORTATION));
         trip.setPrivate(parseTrip.getBoolean(Field.PRIVATE));
@@ -461,7 +463,7 @@ public class ParseTripModel extends ParseModel {
         trip.setDateFrom(parseTrip.getDate(Field.DATE_FROM));
         trip.setDateTo(parseTrip.getDate(Field.DATE_TO));
         trip.setAdmin(ParseUserModel.getUserFromParseUser(
-                parseTrip.getParseUser(ParseTripModel.Field.CREATED_BY)));
+                parseTrip.getParseUser(Field.CREATED_BY)));
         return trip;
     }
 
@@ -472,7 +474,7 @@ public class ParseTripModel extends ParseModel {
      * @return The ParseObject with the Trip's fields
      */
     private static ParseObject getParseObjectFromTrip(Trip trip) {
-        ParseObject parseTrip = new ParseObject(TRIP_OBJECT);
+        ParseObject parseTrip = new ParseObject(TRIP_CLASS);
         setTripFieldsIntoParseObject(trip, parseTrip);
         return parseTrip;
     }
@@ -485,7 +487,6 @@ public class ParseTripModel extends ParseModel {
      */
     private static void setTripFieldsIntoParseObject(Trip trip, ParseObject parseTrip) {
         parseTrip.put(Field.NAME, trip.getName());
-        parseTrip.put(Field.CREATOR_ID, trip.getCreatorId());
         parseTrip.put(Field.ORIGIN, trip.getOrigin());
         parseTrip.put(Field.DESTINATION, trip.getDestination());
         parseTrip.put(Field.PRIVATE, trip.isPrivate());

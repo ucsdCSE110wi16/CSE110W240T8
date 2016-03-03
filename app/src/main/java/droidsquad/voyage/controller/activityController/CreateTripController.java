@@ -24,7 +24,6 @@ import droidsquad.voyage.model.parseModels.ParseModel;
 import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.objects.Trip;
-import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.CreateTripActivity;
 
@@ -291,7 +290,7 @@ public class CreateTripController {
         Date dateFrom = calendarFrom.getTime();
         Date dateTo = calendarTo.getTime();
 
-        Trip newTrip = new Trip(tripName, VoyageUser.getId(), transportation, leavingFrom,
+        Trip newTrip = new Trip(tripName, transportation, leavingFrom,
                 destination, isPrivate, dateFrom, dateTo);
 
         finalizeTripCheck(newTrip);
@@ -367,11 +366,12 @@ public class CreateTripController {
      * any other trips the user is already enrolled in
      */
     public void finalizeTripCheck(final Trip newTrip) {
+        Log.d(TAG, "Finalizing the trip creation checks");
         if (isEditMode) newTrip.setId(trip.getId());
         ParseTripModel.getTrips(new ParseTripModel.TripListCallback() {
             @Override
-            public void onSuccess(List<Trip> trip) {
-                if (!compareForOverlaps(newTrip, trip)) {
+            public void onSuccess(List<Trip> trips) {
+                if (!compareForOverlaps(newTrip, trips)) {
                     completeSave(newTrip);
                 }
             }
@@ -386,24 +386,23 @@ public class CreateTripController {
     /**
      * Check for trip overlaps between existing trips for a user, and a newly created one
      *
-     * @param newTrip The new trip to be created
+     * @param trip The new trip to be created
      * @param trips   All the trips this user is currently part off
      * @return True if
      */
-    public boolean compareForOverlaps(final Trip newTrip, List<Trip> trips) {
+    public boolean compareForOverlaps(final Trip trip, List<Trip> trips) {
         for (Trip t : trips) {
-            if (isEditMode && newTrip.equals(t)) continue;
+            if (isEditMode && trip.equals(t)) continue;
 
-            if (newTrip.overlaps(t)) {
-                String message = activity.getString(R.string.error_overlap,
-                        t.getName(),
+            if (trip.overlaps(t)) {
+                String message = activity.getString(R.string.error_overlap, t.getName(),
                         overlapDateFormat.format(t.getDateFrom()),
                         overlapDateFormat.format(t.getDateTo()));
 
                 activity.showAlertDialog(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        completeSave(newTrip);
+                        completeSave(trip);
                     }
                 }, new DialogInterface.OnClickListener() {
                     @Override

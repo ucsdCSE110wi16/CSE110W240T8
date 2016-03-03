@@ -58,6 +58,7 @@ public class ParseRequestModel extends ParseModel {
             @Override
             public void onFailure(String error) {
                 Log.d(TAG, "Failed to fetch the requests: " + error);
+                callback.onFailure(error);
             }
         });
     }
@@ -74,7 +75,7 @@ public class ParseRequestModel extends ParseModel {
             Request request = new Request();
             request.tripId = trip.getId();
             request.tripName = trip.getName();
-            request.hostId = trip.getCreatorId();
+            request.hostId = trip.getAdminId();
             request.hostName = trip.getAdmin().getFullName();
             request.hostPicURL = trip.getAdmin().getPictureURL();
             request.memberId = trip.getMembers().get(0).id;

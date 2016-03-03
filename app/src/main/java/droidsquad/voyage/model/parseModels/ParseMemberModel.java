@@ -9,9 +9,10 @@ import com.parse.ParseUser;
 import droidsquad.voyage.model.objects.Member;
 
 public class ParseMemberModel extends ParseModel {
-    protected static final String MEMBER_OBJECT = "Member";
+    protected static final String MEMBER_CLASS = "Member";
 
     protected interface Field {
+        String ID = "objectId";
         String USER = "user";
         String PENDING_REQUEST = "pendingRequest";
         String TIME = "time";
@@ -25,7 +26,7 @@ public class ParseMemberModel extends ParseModel {
      * @param callback Called on success or failure
      */
     public static void promoteInvitee(String memberId, final ParseResponseCallback callback) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(MEMBER_OBJECT);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(MEMBER_CLASS);
         query.getInBackground(memberId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseMember, ParseException e) {
@@ -48,7 +49,7 @@ public class ParseMemberModel extends ParseModel {
      * @return The ParseMember object
      */
     public static ParseObject createMemberFromParseUser(ParseUser parseUser) {
-        ParseObject parseMember = new ParseObject(MEMBER_OBJECT);
+        ParseObject parseMember = new ParseObject(MEMBER_CLASS);
         parseMember.put(Field.USER, parseUser);
         parseMember.put(Field.PENDING_REQUEST, false);
         parseMember.put(Field.TIME, System.currentTimeMillis());
@@ -65,7 +66,7 @@ public class ParseMemberModel extends ParseModel {
         ParseUserModel.getParseUserFromUser(member.user, new ParseUserModel.ParseUserCallback() {
             @Override
             public void onSuccess(ParseUser parseUser) {
-                ParseObject parseMember = new ParseObject(MEMBER_OBJECT);
+                ParseObject parseMember = new ParseObject(MEMBER_CLASS);
                 parseMember.put(Field.USER, parseUser);
                 parseMember.put(Field.PENDING_REQUEST, member.pendingRequest);
                 parseMember.put(Field.TIME, member.time);

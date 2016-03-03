@@ -57,7 +57,6 @@ public class TripActivity extends AppCompatActivity {
         setContentView(R.layout.activity_trip);
 
         mController = new TripController(this);
-
         initUI();
 
         mFAB.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +70,31 @@ public class TripActivity extends AppCompatActivity {
 
         mController = new TripController(this);
         populateData();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Snackbar snackbar = Snackbar.make(mMembersRecyclerView, "", Snackbar.LENGTH_SHORT);
+        switch (requestCode) {
+
+            case Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY:
+                if (resultCode == Constants.RESULT_CODE_TRIP_UPDATED) {
+                    mController.trip = data.getParcelableExtra(getString(R.string.intent_key_trip));
+                    populateData();
+                    snackbar.setText(R.string.snackbar_trip_updated);
+                    snackbar.show();
+                }
+                break;
+
+            case Constants.REQUEST_CODE_ADD_FRIENDS_ACTIVITY:
+                if (resultCode == Constants.RESULT_CODE_INVITEES_ADDED) {
+                    mController.trip = data.getParcelableExtra(getString(R.string.intent_key_trip));
+                    populateData();
+                    snackbar.setText(R.string.snackbar_invitees_added);
+                    snackbar.show();
+                }
+                break;
+        }
     }
 
     @Override
@@ -318,31 +342,5 @@ public class TripActivity extends AppCompatActivity {
         intent.putExtra(this.getString(R.string.intent_key_trip), trip);
         intent.putExtra(getString(R.string.edit_trip), true);
         startActivityForResult(intent, Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY);
-    }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Snackbar snackbar = Snackbar.make(mMembersRecyclerView, "", Snackbar.LENGTH_SHORT);
-        switch (requestCode) {
-
-            case Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY:
-                if (resultCode == Constants.RESULT_CODE_TRIP_UPDATED) {
-                    mController.trip = data.getParcelableExtra(getString(R.string.intent_key_trip));
-                    populateData();
-                    snackbar.setText(R.string.snackbar_trip_updated);
-                    snackbar.show();
-                }
-                break;
-
-            case Constants.REQUEST_CODE_ADD_FRIENDS_ACTIVITY:
-                if (resultCode == Constants.RESULT_CODE_INVITEES_ADDED) {
-                    mController.trip = data.getParcelableExtra(getString(R.string.intent_key_trip));
-                    populateData();
-                    snackbar.setText(R.string.snackbar_invitees_added);
-                    snackbar.show();
-                }
-                break;
-        }
     }
 }

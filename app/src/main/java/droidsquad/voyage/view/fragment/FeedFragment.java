@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.fragmentController.FeedController;
@@ -21,6 +22,7 @@ public class FeedFragment extends Fragment {
     private FeedController controller;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private ProgressBar mProgressBar;
     private FloatingActionButton mFab;
 
     public static Fragment newInstance() {
@@ -44,14 +46,13 @@ public class FeedFragment extends Fragment {
         // the controller must be set here!
         this.controller = new FeedController(this);
 
-        // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_trip_list, container, false);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefresh);
+        mProgressBar = (ProgressBar) v.findViewById(R.id.trip_list_progress_bar);
 
         recyclerView = (RecyclerView) v.findViewById(R.id.trip_recycler_view);
         controller.setAdapter(recyclerView);
-
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -116,4 +117,13 @@ public class FeedFragment extends Fragment {
         }
     }
 
+    public void showProgress(boolean show) {
+        if (show) {
+            mSwipeRefreshLayout.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.VISIBLE);
+        } else {
+            mSwipeRefreshLayout.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.GONE);
+        }
+    }
 }

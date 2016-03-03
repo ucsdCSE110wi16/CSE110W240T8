@@ -76,11 +76,6 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
         notifyDataSetChanged();
     }
 
-    public void addFriend(User friend) {
-        mResults.add(friend);
-        notifyItemInserted(mResults.size() - 1);
-    }
-
     /**
      * Removes the given friend from this adapter
      *

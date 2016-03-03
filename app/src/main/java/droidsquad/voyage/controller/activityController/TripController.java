@@ -149,7 +149,7 @@ public class TripController {
 
 
     public boolean isCreator() {
-        return trip.getCreatorId().equals(VoyageUser.getId());
+        return trip.getAdmin().equals(VoyageUser.currentUser());
     }
 
     public CharSequence getTitle() {

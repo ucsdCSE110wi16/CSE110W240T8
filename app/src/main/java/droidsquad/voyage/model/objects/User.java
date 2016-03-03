@@ -15,10 +15,10 @@ import droidsquad.voyage.model.api.FacebookAPI;
  * information retrieved from Facebook Graph API
  */
 public class User implements Serializable {
-    public String firstName;
-    public String lastName;
     public String id;
     public String fbId;
+    public String firstName;
+    public String lastName;
     public String gender;
 
     public User() {
@@ -56,6 +56,11 @@ public class User implements Serializable {
     public boolean equals(Object o) {
         return ((o instanceof User) &&
                 (id != null)) ? id.equals(((User) o).id) : fbId.equals(((User) o).fbId);
+    }
+
+    @Override
+    public String toString() {
+        return "User: " + getFullName();
     }
 
     public String getFullName() {

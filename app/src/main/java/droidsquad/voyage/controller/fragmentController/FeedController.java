@@ -39,14 +39,17 @@ public class FeedController {
 
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
+        fragment.showProgress(true);
         ParseTripModel.getPublicTrips(new ParseTripModel.TripListCallback() {
             @Override
             public void onSuccess(List<Trip> trips) {
+                fragment.showProgress(false);
                 updateAdapter(trips);
             }
 
             @Override
             public void onFailure(String error) {
+                fragment.showProgress(false);
                 Log.d(TAG, "Failed to retrieve data from trips: " + error);
             }
         });
