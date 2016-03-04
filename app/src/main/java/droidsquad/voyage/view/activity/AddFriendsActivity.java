@@ -121,7 +121,7 @@ public class AddFriendsActivity extends AppCompatActivity {
         return mSearchView.getQuery().toString();
     }
 
-    public RecyclerView getmResultsRecyclerView() {
+    public RecyclerView getResultsRecyclerView() {
         return mResultsRecyclerView;
     }
 }

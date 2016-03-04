@@ -5,11 +5,8 @@ package droidsquad.voyage.model.objects;
  * to be displayed in the requests activity
  */
 public class Request {
-    public String hostName;
-    public String hostId;
-    public String hostPicURL;
-    public String tripName;
-    public String tripId;
+    public User user;
+    public Trip trip;
     public String elapsedTime;
     public String memberId;
 }

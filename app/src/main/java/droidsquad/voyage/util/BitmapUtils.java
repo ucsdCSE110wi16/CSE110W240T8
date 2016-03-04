@@ -13,9 +13,9 @@ import android.util.DisplayMetrics;
  * This class has a bunch of utility functions for manipulating bitmaps
  * All methods are static since it does not maintain state
  *
- * TODO: Turn BitmapManipulator into a singleton with the singleton pattern
+ * TODO: Turn BitmapUtils into a singleton with the singleton pattern
  */
-public class BitmapManipulator {
+public class BitmapUtils {
     /**
      * Get a scaled version of bitmap that scales to fit the metrics of the device
      *

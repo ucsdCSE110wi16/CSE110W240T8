@@ -28,7 +28,7 @@ public class AddFriendsController {
     private AddFriendsActivity mActivity;
     private FBFriendsAdapter mResultsAdapter;
     private SelectedFBFriendsAdapter mSelectedFriendsAdapter;
-    private List<User> friends;
+    private List<User> mFriends;
     private Trip mTrip;
 
     public AddFriendsController(AddFriendsActivity activity) {
@@ -36,28 +36,34 @@ public class AddFriendsController {
         mTrip = activity.getIntent().getParcelableExtra(activity.getString(R.string.intent_key_trip));
         mResultsAdapter = new FBFriendsAdapter(activity);
         mSelectedFriendsAdapter = new SelectedFBFriendsAdapter(activity);
+        mFriends = new ArrayList<>();
 
-        mResultsAdapter.setOnClickListener(new FBFriendsAdapter.OnClickListener() {
+        mResultsAdapter.setOnFriendSelectedListener(new FBFriendsAdapter.OnFriendSelected() {
             @Override
-            public void onClick(User user) {
-                mSelectedFriendsAdapter.addFriend(user);
-                updateAdapter(mActivity.getQuery());
+            public void onSelected(User friend) {
+                if (mResultsAdapter.removeFriend(friend)) {
+                    mSelectedFriendsAdapter.addFriend(friend);
+                }
+
+                if (mResultsAdapter.getItemCount() == 0) {
+                    mActivity.getResultsRecyclerView().setVisibility(View.GONE);
+                }
             }
         });
 
-        mSelectedFriendsAdapter.setOnItemRemovedListener(
-                new SelectedFBFriendsAdapter.OnItemRemovedListener() {
-                    @Override
-                    public void onRemoved() {
-                        updateAdapter(mActivity.getQuery());
-                    }
-                });
+        mSelectedFriendsAdapter.setOnFriendRemovedListener(new SelectedFBFriendsAdapter.OnFriendRemovedListener() {
+            @Override
+            public void onRemoved(User friend) {
+                mResultsAdapter.addFriend(friend);
+                updateAdapter(mActivity.getQuery());
+            }
+        });
 
         loadFBFriends();
     }
 
     /**
-     * Load all the facebook friends of the current user in the member variable friends
+     * Load all the facebook mFriends of the current user in the member variable mFriends
      * Fields retrieved are ID, Name and Picture
      */
     private void loadFBFriends() {
@@ -91,14 +97,14 @@ public class AddFriendsController {
                     }
                 }
 
-                friends = queriedFriends;
+                mFriends = queriedFriends;
                 updateAdapter(mActivity.getQuery());
             }
         });
     }
 
     /**
-     * If friends haven't yet been loaded save the query for later, else display the results
+     * If mFriends haven't yet been loaded save the query for later, else display the results
      *
      * @param query The string the user typed in the search box
      */
@@ -107,16 +113,16 @@ public class AddFriendsController {
     }
 
     /**
-     * Update the adapter with the friends matching the query
+     * Update the adapter with the mFriends matching the query
      *
-     * @param query The query string to search for friends
+     * @param query The query string to search for mFriends
      */
     private void updateAdapter(String query) {
-        // Get the friends according to the query
+        // Get the mFriends according to the query
         query = query.toLowerCase();
         ArrayList<User> queriedFriends = new ArrayList<>();
         if (!query.isEmpty()) {
-            for (User friend : friends) {
+            for (User friend : mFriends) {
                 if (friend.getFullName().toLowerCase().contains(query)
                         && !mSelectedFriendsAdapter.getSelectedFriends().contains(friend)) {
                     queriedFriends.add(friend);
@@ -124,7 +130,7 @@ public class AddFriendsController {
             }
         }
 
-        mActivity.getmResultsRecyclerView().setVisibility(
+        mActivity.getResultsRecyclerView().setVisibility(
                 (queriedFriends.isEmpty()) ? View.GONE : View.VISIBLE);
         mResultsAdapter.updateResults(queriedFriends);
     }

@@ -26,7 +26,7 @@ import java.util.Random;
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.api.FacebookAPI;
 import droidsquad.voyage.model.parseModels.ParseRequestModel;
-import droidsquad.voyage.util.BitmapManipulator;
+import droidsquad.voyage.util.BitmapUtils;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 
@@ -45,7 +45,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
                 onAcceptTripInvitation(context, intent);
                 break;
             case ACTION_REQUEST_DECLINE:
-                onDeclineTripInvitation(context, intent);
+//                onDeclineTripInvitation(context, intent);
                 break;
             default:
                 super.onReceive(context, intent);
@@ -87,21 +87,21 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
         });
     }
 
-    private void onDeclineTripInvitation(final Context context, final Intent intent) {
-        ParseRequestModel.declineRequest(data.optString("tripId"), new ParseRequestModel.ParseResponseCallback() {
-            @Override
-            public void onSuccess() {
-                Log.i(TAG, "Declined trip from notification");
-                dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
-            }
-
-            @Override
-            public void onFailure(String error) {
-                Log.i(TAG, "Error while declining trip from notification: " + error);
-                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+//    private void onDeclineTripInvitation(final Context context, final Intent intent) {
+//        ParseRequestModel.declineRequest(data.optString("tripId"), new ParseRequestModel.ParseResponseCallback() {
+//            @Override
+//            public void onSuccess() {
+//                Log.i(TAG, "Declined trip from notification");
+//                dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
+//            }
+//
+//            @Override
+//            public void onFailure(String error) {
+//                Log.i(TAG, "Error while declining trip from notification: " + error);
+//                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
 
     /**
      * Starts the activities given the type of this notification
@@ -162,8 +162,8 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
             FacebookAPI.getProfilePicAsync(fbId, "normal", new FacebookAPI.ProfilePicCallback() {
                 @Override
                 public void onCompleted(Bitmap bitmap) {
-                    bitmap = BitmapManipulator.getRoundedBitmap(bitmap);
-                    bitmap = BitmapManipulator.getScaledBitmap(context, bitmap);
+                    bitmap = BitmapUtils.getRoundedBitmap(bitmap);
+                    bitmap = BitmapUtils.getScaledBitmap(context, bitmap);
                     builder.setLargeIcon(bitmap);
                     fireNotification(context, builder.build(), notificationId);
                 }

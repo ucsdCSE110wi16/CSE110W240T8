@@ -13,12 +13,15 @@ import java.util.List;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.Member;
+import droidsquad.voyage.model.objects.User;
+import droidsquad.voyage.model.objects.VoyageUser;
 
 public class TripMembersAdapter extends RecyclerView.Adapter<TripMembersAdapter.ViewHolder> {
     public static final String TAG = TripMembersAdapter.class.getSimpleName();
 
     private Activity mActivity;
     private List<Member> mMembers;
+    private User admin;
     private onDeleteMemberListener mListener;
 
     public TripMembersAdapter(Activity activity) {
@@ -30,6 +33,10 @@ public class TripMembersAdapter extends RecyclerView.Adapter<TripMembersAdapter.
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.trip_member, parent, false);
+
+        if (admin != null && !admin.equals(VoyageUser.currentUser())) {
+            view.findViewById(R.id.delete_button).setVisibility(View.GONE);
+        }
 
         return new ViewHolder(view);
     }
@@ -65,6 +72,10 @@ public class TripMembersAdapter extends RecyclerView.Adapter<TripMembersAdapter.
         int pos = this.mMembers.indexOf(member);
         this.mMembers.remove(pos);
         notifyItemRemoved(pos);
+    }
+
+    public void setAdmin(User admin) {
+        this.admin = admin;
     }
 
     public void setOnDeleteMemberListener(onDeleteMemberListener listener) {

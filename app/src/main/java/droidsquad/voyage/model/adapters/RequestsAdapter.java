@@ -7,8 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,15 +39,12 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final Request request = mRequests.get(position);
 
-        Glide.with(context)
-                .load(request.hostPicURL)
-                .placeholder(R.drawable.ic_account_circle_gray)
-                .into(holder.imageView);
+        request.user.loadProfilePicInto(context, holder.imageView);
 
-        holder.hostNameView.setText(request.hostName);
-        holder.invitationMsgView.setText(context.getString(R.string.request_message_template,
-                request.tripName));
+        holder.hostNameView.setText(request.user.getFullName());
         holder.elapsedTimeView.setText(request.elapsedTime);
+        holder.invitationMsgView.setText(context.getString(R.string.request_message_template,
+                request.trip.getName()));
 
         holder.acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,10 +63,6 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
                 }
             }
         });
-    }
-
-    public void setOnButtonClickedCallback(OnButtonClickedCallback callback) {
-        this.mCallback = callback;
     }
 
     @Override
@@ -97,6 +88,10 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         if (mEmptyListener != null && mRequests.size() == 0) {
             mEmptyListener.onEmpty();
         }
+    }
+
+    public void setOnButtonClickedCallback(OnButtonClickedCallback callback) {
+        this.mCallback = callback;
     }
 
     public void setOnDataEmptyListener(OnDataEmptyListener listener) {

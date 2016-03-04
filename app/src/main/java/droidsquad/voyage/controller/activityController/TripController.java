@@ -30,12 +30,14 @@ public class TripController {
                 mActivity.getString(R.string.intent_key_trip));
 
         mMembersAdapter = new TripMembersAdapter(mActivity);
+        mMembersAdapter.setAdmin(trip.getAdmin());
         mInviteesAdapter = new TripMembersAdapter(mActivity);
+        mInviteesAdapter.setAdmin(trip.getAdmin());
     }
 
     public void deleteTrip() {
         Log.d(TAG, "Deleting trip: " + trip.getName());
-        ParseTripModel.deleteTrip(trip.getId(), new ParseTripModel.ParseResponseCallback() {
+        ParseTripModel.deleteTrip(trip, new ParseTripModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Trip Successfully deleted");
@@ -79,7 +81,7 @@ public class TripController {
     public void updateMembersAdapter() {
         List<Member> members = new ArrayList<>(trip.getMembers());
         for (int i = 0; i < members.size(); i++) {
-            if (members.get(i).user.equals(VoyageUser.currentUser())) {
+            if (members.get(i).user.equals(VoyageUser.currentUser()) ) {
                 members.remove(i);
                 break;
             }

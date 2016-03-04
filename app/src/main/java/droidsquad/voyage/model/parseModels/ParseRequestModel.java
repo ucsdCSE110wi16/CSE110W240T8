@@ -7,7 +7,6 @@ import java.util.List;
 
 import droidsquad.voyage.model.objects.Request;
 import droidsquad.voyage.model.objects.Trip;
-import droidsquad.voyage.model.objects.VoyageUser;
 
 public class ParseRequestModel extends ParseModel {
     public static final String TAG = ParseRequestModel.class.getSimpleName();
@@ -25,11 +24,12 @@ public class ParseRequestModel extends ParseModel {
     /**
      * Decline the request for the given trip
      *
-     * @param tripId Trip to accept the request from
+     * @param request Request to be declined
      * @param callback Called on success or error
      */
-    public static void declineRequest(String tripId, final ParseResponseCallback callback) {
-        ParseTripModel.removeMemberFromTrip(tripId, VoyageUser.getId(), new ParseModel.ParseResponseCallback() {
+    public static void declineRequest(Request request, final ParseResponseCallback callback) {
+        ParseTripModel.removeMemberFromTrip(request.trip.getId(), request.memberId,
+                new ParseModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 callback.onSuccess();
@@ -73,13 +73,10 @@ public class ParseRequestModel extends ParseModel {
 
         for (Trip trip : trips) {
             Request request = new Request();
-            request.tripId = trip.getId();
-            request.tripName = trip.getName();
-            request.hostId = trip.getAdminId();
-            request.hostName = trip.getAdmin().getFullName();
-            request.hostPicURL = trip.getAdmin().getPictureURL();
-            request.memberId = trip.getMembers().get(0).id;
-            request.elapsedTime = trip.getMembers().get(0).getElapsedTimeString();
+            request.trip = trip;
+            request.user = trip.getAdmin();
+            request.memberId = trip.getInvitees().get(0).id;
+            request.elapsedTime = trip.getInvitees().get(0).getElapsedTimeString();
             requests.add(request);
         }
 

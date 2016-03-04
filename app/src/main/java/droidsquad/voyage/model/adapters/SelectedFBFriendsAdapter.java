@@ -16,7 +16,7 @@ import droidsquad.voyage.model.objects.User;
 
 public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFriendsAdapter.ViewHolder> {
     private Activity mActivity;
-    private OnItemRemovedListener mListener;
+    private OnFriendRemovedListener mListener;
     private ArrayList<User> mSelectedFriends;
 
     public SelectedFBFriendsAdapter(Activity activity) {
@@ -33,7 +33,7 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        User friend = mSelectedFriends.get(position);
+        final User friend = mSelectedFriends.get(position);
         friend.loadProfilePicInto(mActivity, holder.mProfilePic);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -41,7 +41,7 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
             public void onClick(View v) {
                 removeFriend(position);
                 if (mListener != null) {
-                    mListener.onRemoved();
+                    mListener.onRemoved(friend);
                 }
             }
         });
@@ -68,12 +68,14 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
      * @param position Position of friend to be removed
      */
     private void removeFriend(int position) {
-        mSelectedFriends.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, mSelectedFriends.size());
+        if (position < mSelectedFriends.size()) {
+            mSelectedFriends.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, mSelectedFriends.size());
+        }
     }
 
-    public void setOnItemRemovedListener(OnItemRemovedListener listener) {
+    public void setOnFriendRemovedListener(OnFriendRemovedListener listener) {
         mListener = listener;
     }
 
@@ -81,8 +83,8 @@ public class SelectedFBFriendsAdapter extends RecyclerView.Adapter<SelectedFBFri
         return mSelectedFriends;
     }
 
-    public interface OnItemRemovedListener {
-        void onRemoved();
+    public interface OnFriendRemovedListener {
+        void onRemoved(User friend);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

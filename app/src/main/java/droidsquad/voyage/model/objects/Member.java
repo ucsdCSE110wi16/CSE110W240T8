@@ -1,5 +1,7 @@
 package droidsquad.voyage.model.objects;
 
+import android.text.format.DateUtils;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,9 +25,8 @@ public class Member implements Serializable {
         // Default no-args constructor
     }
 
-    // TODO change format to relative
     public String getElapsedTimeString() {
-        return "";
+        return (String) DateUtils.getRelativeTimeSpanString(time);
     }
 
     @Override

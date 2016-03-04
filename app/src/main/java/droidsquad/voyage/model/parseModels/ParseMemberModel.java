@@ -6,6 +6,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import droidsquad.voyage.model.objects.Member;
 
 public class ParseMemberModel extends ParseModel {
@@ -44,6 +47,7 @@ public class ParseMemberModel extends ParseModel {
 
     /**
      * Creates a ParseMember as invitee from the ParseUser
+     * OBS: Pending request is set to true
      *
      * @param parseUser ParseUser to turn into member
      * @return The ParseMember object
@@ -51,9 +55,23 @@ public class ParseMemberModel extends ParseModel {
     public static ParseObject createMemberFromParseUser(ParseUser parseUser) {
         ParseObject parseMember = new ParseObject(MEMBER_CLASS);
         parseMember.put(Field.USER, parseUser);
-        parseMember.put(Field.PENDING_REQUEST, false);
+        parseMember.put(Field.PENDING_REQUEST, true);
         parseMember.put(Field.TIME, System.currentTimeMillis());
         return parseMember;
+    }
+
+    /**
+     * Creates a ParseMember as invitee for each of the ParseUsers
+     *
+     * @param parseUsers The ParseUsers to create ParseMembers from
+     * @return List containing all the created ParseMembers
+     */
+    public static List<ParseObject> createMembersFromParseUsers(List<ParseUser> parseUsers) {
+        List<ParseObject> members = new ArrayList<>();
+        for (ParseUser parseUser : parseUsers) {
+            members.add(createMemberFromParseUser(parseUser));
+        }
+        return members;
     }
 
     /**
@@ -93,5 +111,13 @@ public class ParseMemberModel extends ParseModel {
         member.pendingRequest = parseMember.getBoolean(Field.PENDING_REQUEST);
         member.time = parseMember.getLong(Field.TIME);
         return member;
+    }
+
+    public static List<Member> getMembersFromParseObjects(List<ParseObject> parseMembers) {
+        List<Member> members = new ArrayList<>();
+        for (ParseObject parseMember : parseMembers) {
+            members.add(getMemberFromParseObject(parseMember));
+        }
+        return members;
     }
 }

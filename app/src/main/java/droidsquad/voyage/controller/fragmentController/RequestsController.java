@@ -20,23 +20,6 @@ public class RequestsController {
         this.mFragment = fragment;
         this.mAdapter = new RequestsAdapter(mFragment.getContext());
 
-        setRequestButtonClicks();
-        setOnAdapterEmptyListener();
-
-        mFragment.refreshing(true);
-        fetchData();
-    }
-
-    private void setOnAdapterEmptyListener() {
-        mAdapter.setOnDataEmptyListener(new RequestsAdapter.OnDataEmptyListener() {
-            @Override
-            public void onEmpty() {
-                mFragment.showNoRequestsView(true);
-            }
-        });
-    }
-
-    private void setRequestButtonClicks() {
         mAdapter.setOnButtonClickedCallback(new RequestsAdapter.OnButtonClickedCallback() {
             @Override
             public void onAcceptClicked(final Request request) {
@@ -48,10 +31,20 @@ public class RequestsController {
                 declineRequest(request);
             }
         });
+
+        mAdapter.setOnDataEmptyListener(new RequestsAdapter.OnDataEmptyListener() {
+            @Override
+            public void onEmpty() {
+                mFragment.showNoRequestsView(true);
+            }
+        });
+
+        mFragment.refreshing(true);
+        fetchData();
     }
 
     private void acceptRequest(final Request request) {
-        Log.d(TAG, "Accepting request for " + request.tripName);
+        Log.d(TAG, "Accepting request for " + request.trip.getName());
         ParseRequestModel.acceptRequest(request.memberId, new ParseRequestModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
@@ -69,8 +62,8 @@ public class RequestsController {
     }
 
     private void declineRequest(final Request request) {
-        Log.d(TAG, "Declining request for " + request.tripName);
-        ParseRequestModel.declineRequest(request.tripId, new ParseRequestModel.ParseResponseCallback() {
+        Log.d(TAG, "Declining request for " + request.trip.getName());
+        ParseRequestModel.declineRequest(request, new ParseRequestModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Successfully declined Trip.");
@@ -109,8 +102,8 @@ public class RequestsController {
         });
     }
 
-    private void showSnackbar(String messageId) {
-        Snackbar.make(mFragment.getView(), messageId, Snackbar.LENGTH_SHORT).show();
+    private void showSnackbar(String message) {
+        Snackbar.make(mFragment.getView(), message, Snackbar.LENGTH_SHORT).show();
     }
 
     private void showSnackbar(int messageId) {

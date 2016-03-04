@@ -139,7 +139,7 @@ public class Trip implements Parcelable {
     public String toString() {
         return "Name: " + name + "\n" +
                 "Private: " + isPrivate + "\n" +
-                "Created By: " + admin.getFullName() +
+                "Created By: " + admin.getFullName() + "\n" +
                 "Leaving From: " + origin + "\n" +
                 "Destination: " + destination + "\n" +
                 "Date From: " + dateFrom + "\n" +

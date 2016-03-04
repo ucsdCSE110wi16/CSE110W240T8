@@ -227,17 +227,14 @@ public class ParseTripModel extends ParseModel {
                     @Override
                     public void done(final List<ParseUser> parseUsers, ParseException e) {
                         if (e == null) {
-                            for (ParseUser parseUser : parseUsers) {
-                                ParseObject parseMember = ParseMemberModel.createMemberFromParseUser(parseUser);
-                                parseMember.put(ParseMemberModel.Field.PENDING_REQUEST, true);
-                                parseTrip.add(ParseTripModel.Field.MEMBERS, parseMember);
-                                trip.addMember(ParseMemberModel.getMemberFromParseObject(parseMember));
-                            }
+                            final List<ParseObject> parseMembers = ParseMemberModel.createMembersFromParseUsers(parseUsers);
+                            parseTrip.addAll(ParseTripModel.Field.MEMBERS, parseMembers);
 
                             saveTrip(parseTrip, new ParseResponseCallback() {
                                 @Override
                                 public void onSuccess() {
                                     ParseNotificationModel.sendRequestNotifications(parseTrip, parseUsers);
+                                    trip.addMembers(ParseMemberModel.getMembersFromParseObjects(parseMembers));
                                     callback.onSuccess();
                                 }
 
@@ -265,18 +262,17 @@ public class ParseTripModel extends ParseModel {
     /**
      * Delete the given trip from the Parse
      *
-     * @param tripId   Id of the trip to be deleted
+     * @param trip     Trip to be deleted
      * @param callback Called on success or failure
      */
-    public static void deleteTrip(String tripId, final ParseResponseCallback callback) {
+    public static void deleteTrip(Trip trip, final ParseResponseCallback callback) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
         query.include(Field.MEMBERS);
-        getParseTrip(tripId, new ParseObjectCallback() {
+        getParseTrip(trip.getId(), new ParseObjectCallback() {
             @Override
             public void onSuccess(ParseObject parseObject) {
                 List<ParseUser> members = parseObject.getList(Field.MEMBERS);
                 ParseObject.deleteAllInBackground(members);
-
                 parseObject.deleteInBackground(new DeleteCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -301,7 +297,7 @@ public class ParseTripModel extends ParseModel {
     /**
      * Remove the given user from the given trip
      *
-     * @param tripId   Id of the user to be removed
+     * @param tripId   Id of the trip to remove member from
      * @param memberId Id of the member to remove from
      * @param callback Called on success or failure
      */
@@ -317,12 +313,16 @@ public class ParseTripModel extends ParseModel {
 
         getParseTrip(tripId, query, new ParseObjectCallback() {
             @Override
-            public void onSuccess(ParseObject parseTrip) {
+            public void onSuccess(final ParseObject parseTrip) {
                 ParseObject parseMember = getParseMemberFromParseTrip(memberId, parseTrip);
                 if (parseMember != null) {
                     parseTrip.removeAll(Field.MEMBERS, Collections.singletonList(parseMember));
-                    parseMember.deleteInBackground();
-                    saveTrip(parseTrip, callback);
+                    parseMember.deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            saveTrip(parseTrip, callback);
+                        }
+                    });
                 } else {
                     Log.d(TAG, "Failed to remove member from Trip: Could not find member");
                     callback.onFailure("There was an error with the server");
@@ -376,12 +376,10 @@ public class ParseTripModel extends ParseModel {
 
                     for (ParseObject parseTrip : parseTrips) {
                         Trip trip = getTripFromParseObject(parseTrip);
-
                         List<ParseObject> parseMembers = parseTrip.getList(ParseTripModel.Field.MEMBERS);
+
                         if (parseMembers != null) {
-                            for (ParseObject parseMember : parseMembers) {
-                                trip.addMember(ParseMemberModel.getMemberFromParseObject(parseMember));
-                            }
+                            trip.addMembers(ParseMemberModel.getMembersFromParseObjects(parseMembers));
                         }
 
                         trips.add(trip);

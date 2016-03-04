@@ -17,7 +17,7 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
     private static final String TAG = FBFriendsAdapter.class.getSimpleName();
 
     private Activity mActivity;
-    private OnClickListener mListener;
+    private OnFriendSelected mListener;
     private ArrayList<User> mFriends;
 
     public FBFriendsAdapter(Activity activity) {
@@ -44,7 +44,7 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
             @Override
             public void onClick(View v) {
                 if (mListener != null) {
-                    mListener.onClick(friend);
+                    mListener.onSelected(friend);
                 }
             }
         });
@@ -65,24 +65,30 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
         notifyDataSetChanged();
     }
 
+    public void addFriend(User friend) {
+        mFriends.add(friend);
+        notifyDataSetChanged();
+    }
+
     /**
      * Removes the given friend from this adapter
      *
      * @param friend Friend to be removed
      */
-    public void removeFriend(User friend) {
-        int position = mFriends.indexOf(friend);
-        mFriends.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, mFriends.size());
+    public boolean removeFriend(User friend) {
+        if (mFriends.remove(friend)) {
+            notifyDataSetChanged();
+            return true;
+        }
+        return false;
     }
 
-    public void setOnClickListener(OnClickListener listener) {
+    public void setOnFriendSelectedListener(OnFriendSelected listener) {
         this.mListener = listener;
     }
 
-    public interface OnClickListener {
-        void onClick(User user);
+    public interface OnFriendSelected {
+        void onSelected(User friend);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
