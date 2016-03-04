@@ -27,6 +27,7 @@ import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 public class VoyageUser {
     private static final String TAG = VoyageUser.class.getSimpleName();
     private volatile static User currentUser;
+    private static boolean profilePic;
 
     private VoyageUser() {}
 
@@ -128,6 +129,10 @@ public class VoyageUser {
                 }
             }
         });
+    }
+
+    public static String getProfilePicURL() {
+        return currentUser().getPictureURL();
     }
 
     public static String getId() {

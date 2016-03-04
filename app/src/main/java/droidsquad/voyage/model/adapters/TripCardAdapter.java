@@ -57,7 +57,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
 
         // Delegate displaying the members to TripCardMembersAdapter
         holder.mMembersAdapter.updateDataset(trip.getMembersAsUsersExclusive());
-        
+
         holder.mTripCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,7 +110,13 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             RecyclerView membersRecyclerView = (RecyclerView) view.findViewById(R.id.trip_card_members);
             membersRecyclerView.setAdapter(mMembersAdapter);
             membersRecyclerView.setLayoutManager(
-                    new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false));
+                    new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false) {
+                        @Override
+                        public boolean canScrollHorizontally() {
+                            return false;
+                        }
+                    }
+            );
         }
     }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import droidsquad.voyage.model.objects.Request;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.model.objects.VoyageUser;
 
 public class ParseRequestModel extends ParseModel {
     public static final String TAG = ParseRequestModel.class.getSimpleName();
@@ -30,16 +31,20 @@ public class ParseRequestModel extends ParseModel {
     public static void declineRequest(Request request, final ParseResponseCallback callback) {
         ParseTripModel.removeMemberFromTrip(request.trip.getId(), request.memberId,
                 new ParseModel.ParseResponseCallback() {
-            @Override
-            public void onSuccess() {
-                callback.onSuccess();
-            }
+                    @Override
+                    public void onSuccess() {
+                        callback.onSuccess();
+                    }
 
-            @Override
-            public void onFailure(String error) {
-                callback.onFailure(error);
-            }
-        });
+                    @Override
+                    public void onFailure(String error) {
+                        callback.onFailure(error);
+                    }
+                });
+    }
+
+    public static void acceptRequestFromNotification(String tripId, ParseResponseCallback callback) {
+        ParseMemberModel.promoteInvitee(VoyageUser.getId(), tripId, callback);
     }
 
     /**

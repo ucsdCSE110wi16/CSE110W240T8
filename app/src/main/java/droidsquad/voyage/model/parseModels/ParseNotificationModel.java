@@ -7,7 +7,6 @@ import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.parse.SendCallback;
 
 import org.json.JSONException;
@@ -22,34 +21,33 @@ import droidsquad.voyage.util.Constants;
 public class ParseNotificationModel extends ParseModel {
     private final static String TAG = ParseNotificationModel.class.getSimpleName();
 
-    protected interface Field {
+    public interface Field {
         String TITLE = "title";
         String ALERT = "alert";
-        String FB_ID = "fbId";
+        String SENDER_ID = "senderId";
+        String SENDER_PROFILE_PIC = "senderProfilePic";
         String TRIP_ID = "tripId";
         String TYPE = "type";
     }
 
     /**
      * Send a request notification to each of the parseUsers in the list
-     *
-     * @param parseTrip Trip from which the request originated
-     * @param parseUsers Users to send the notification to
+     *  @param parseTrip Trip from which the request originated
+     * @param parseMembers Users to send the notification to
      */
-    public static void sendRequestNotifications(ParseObject parseTrip, List<ParseUser> parseUsers) {
+    public static void sendRequestNotifications(ParseObject parseTrip, List<ParseObject> parseMembers) {
         List<String> ids = new ArrayList<>();
 
-        for (ParseUser user : parseUsers) {
-            ids.add(user.getObjectId());
+        for (ParseObject member : parseMembers) {
+            ids.add(member.getParseUser(ParseMemberModel.Field.USER).getObjectId());
         }
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
         JSONObject data = new JSONObject();
-
         try {
             data.put(Field.TITLE, VoyageUser.getFullName());
             data.put(Field.ALERT, "invited you to join " + parseTrip.get("name"));
-            data.put(Field.FB_ID, currentUser.get("fbId"));
+            data.put(Field.SENDER_ID, VoyageUser.getId());
+            data.put(Field.SENDER_PROFILE_PIC, VoyageUser.getProfilePicURL());
             data.put(Field.TRIP_ID, parseTrip.getObjectId());
             data.put(Field.TYPE, Constants.NOTIFICATION_INVITATION);
         } catch (JSONException e) {

@@ -233,7 +233,7 @@ public class ParseTripModel extends ParseModel {
                             saveTrip(parseTrip, new ParseResponseCallback() {
                                 @Override
                                 public void onSuccess() {
-                                    ParseNotificationModel.sendRequestNotifications(parseTrip, parseUsers);
+                                    ParseNotificationModel.sendRequestNotifications(parseTrip, parseMembers);
                                     trip.addMembers(ParseMemberModel.getMembersFromParseObjects(parseMembers));
                                     callback.onSuccess();
                                 }

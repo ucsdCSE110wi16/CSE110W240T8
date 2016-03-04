@@ -24,7 +24,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.api.FacebookAPI;
+import droidsquad.voyage.model.parseModels.ParseNotificationModel;
 import droidsquad.voyage.model.parseModels.ParseRequestModel;
 import droidsquad.voyage.util.BitmapUtils;
 import droidsquad.voyage.util.Constants;
@@ -32,6 +32,7 @@ import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 
 public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
     private final static String TAG = TripBroadcastReceiver.class.getSimpleName();
+
     private static final String ACTION_REQUEST_ACCEPT = "droidsquad.voyage.intent.ACCEPT_INVITATION";
     private static final String ACTION_REQUEST_DECLINE = "droidsquad.voyage.intent.DECLINE_INVITATION";
     private static final String NOTIFICATION_ID = "notificationId";
@@ -72,19 +73,20 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private void onAcceptTripInvitation(final Context context, final Intent intent) {
-        ParseRequestModel.acceptRequest(data.optString("tripId"), new ParseRequestModel.ParseResponseCallback() {
-            @Override
-            public void onSuccess() {
-                Log.i(TAG, "Accepted trip from notification");
-                dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
-            }
+        ParseRequestModel.acceptRequestFromNotification(data.optString(ParseNotificationModel.Field.TRIP_ID),
+                new ParseRequestModel.ParseResponseCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.i(TAG, "Accepted trip from notification");
+                        dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
+                    }
 
-            @Override
-            public void onFailure(String error) {
-                Log.i(TAG, "Error while accepting trip from notification: " + error);
-                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onFailure(String error) {
+                        Log.i(TAG, "Error while accepting trip from notification: " + error);
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
 //    private void onDeclineTripInvitation(final Context context, final Intent intent) {
@@ -110,7 +112,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
         Class<? extends Activity> activity;
         Bundle extras = intent.getExtras();
 
-        switch (data.optString("type")) {
+        switch (data.optString(ParseNotificationModel.Field.TYPE)) {
             case Constants.NOTIFICATION_INVITATION:
                 activity = MainNavDrawerActivity.class;
                 extras.putString(Constants.KEY_FRAGMENT_MAIN_ACTIVITY, Constants.FRAGMENT_REQUESTS);
@@ -133,9 +135,10 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
      * Send the notification to the user
      */
     private void sendNotification(final Context context, Intent intent) {
-        String title = data.optString("title");
-        String alert = data.optString("alert");
-        String fbId = data.optString("fbId");
+        String title = data.optString(ParseNotificationModel.Field.TITLE);
+        String alert = data.optString(ParseNotificationModel.Field.ALERT);
+        String senderId = data.optString(ParseNotificationModel.Field.SENDER_ID);
+        String senderPicURL = data.optString(ParseNotificationModel.Field.SENDER_PROFILE_PIC);
         String tickerText = String.format(Locale.getDefault(), "%s: %s", title, alert);
 
         // Pick an id that probably won't overlap anything
@@ -158,14 +161,15 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
                 .setCategory(NotificationCompat.CATEGORY_SOCIAL)
                 .setDefaults(Notification.DEFAULT_ALL);
 
-        if (fbId != null) {
-            FacebookAPI.getProfilePicAsync(fbId, "normal", new FacebookAPI.ProfilePicCallback() {
+        if (senderPicURL != null) {
+            BitmapUtils.getBitmapAsync(senderPicURL, new BitmapUtils.BitmapCallback() {
                 @Override
-                public void onCompleted(Bitmap bitmap) {
-                    bitmap = BitmapUtils.getRoundedBitmap(bitmap);
-                    bitmap = BitmapUtils.getScaledBitmap(context, bitmap);
-                    builder.setLargeIcon(bitmap);
-                    fireNotification(context, builder.build(), notificationId);
+                public void done(Bitmap bitmap, String error) {
+                    if (error == null) {
+                        builder.setLargeIcon(bitmap);
+                    } else {
+                        Log.d(TAG, "Failed to load the profile picture");
+                    }
                 }
             });
         } else {

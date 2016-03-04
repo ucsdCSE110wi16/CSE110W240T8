@@ -1,5 +1,7 @@
 package droidsquad.voyage.model.parseModels;
 
+import android.util.Log;
+
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -8,10 +10,12 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import droidsquad.voyage.model.objects.Member;
 
 public class ParseMemberModel extends ParseModel {
+    private static final String TAG = ParseMemberModel.class.getSimpleName();
     protected static final String MEMBER_CLASS = "Member";
 
     protected interface Field {
@@ -39,6 +43,29 @@ public class ParseMemberModel extends ParseModel {
                     parseMember.saveInBackground();
                     callback.onSuccess();
                 } else {
+                    callback.onFailure(getParseErrorString(e.getCode()));
+                }
+            }
+        });
+    }
+
+    public static void promoteInvitee(String userId, String tripId, final ParseResponseCallback callback) {
+        ParseQuery<ParseObject> memberQuery = ParseQuery.getQuery(MEMBER_CLASS);
+        memberQuery.whereEqualTo(Field.USER + "." + Field.ID, userId);
+
+        ParseQuery<ParseObject> tripQuery = ParseQuery.getQuery(ParseTripModel.TRIP_CLASS);
+        tripQuery.whereMatchesQuery(ParseTripModel.Field.MEMBERS, memberQuery);
+        tripQuery.include(ParseTripModel.Field.MEMBERS);
+
+        tripQuery.getInBackground(tripId, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseTrip, ParseException e) {
+                if (e == null) {
+                    parseTrip.getParseObject(ParseTripModel.Field.MEMBERS).put(Field.PENDING_REQUEST, false);
+                    parseTrip.saveInBackground();
+                    callback.onSuccess();
+                } else {
+                    Log.d(TAG, "Exception while promoting trip member", e);
                     callback.onFailure(getParseErrorString(e.getCode()));
                 }
             }

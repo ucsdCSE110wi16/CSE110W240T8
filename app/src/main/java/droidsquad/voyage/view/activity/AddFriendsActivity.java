@@ -18,16 +18,15 @@ import droidsquad.voyage.R;
 import droidsquad.voyage.controller.activityController.AddFriendsController;
 
 public class AddFriendsActivity extends AppCompatActivity {
-    private AddFriendsController controller;
+    private static final String TAG = AddFriendsActivity.class.getSimpleName();
 
+    private AddFriendsController controller;
     private android.support.v7.widget.SearchView mSearchView;
     private RecyclerView mResultsRecyclerView;
     private RecyclerView mSelectedFriendsRecyclerView;
     private ImageView mExitBackImage;
     private AppCompatImageButton mConfirmAddFriendsButton;
     private ProgressBar mProgressBar;
-
-    private static final String TAG = AddFriendsActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
