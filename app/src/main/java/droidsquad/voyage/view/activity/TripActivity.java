@@ -35,6 +35,8 @@ public class TripActivity extends AppCompatActivity {
     private TripController mController;
     private TextView mTripLocationsTextView;
     private TextView mTripDatesTextView;
+    private TextView mMembersLabelView;
+    private TextView mInviteesLabelView;
     private ImageView mHeaderImageView;
     private FloatingActionButton mFAB;
     private CollapsingToolbarLayout mCollapsingToolbar;
@@ -146,6 +148,8 @@ public class TripActivity extends AppCompatActivity {
         mTripLocationsTextView = (TextView) findViewById(R.id.trip_locations);
         mTripDatesTextView = (TextView) findViewById(R.id.trip_dates);
         mHeaderImageView = (ImageView) findViewById(R.id.header_image);
+        mMembersLabelView = (TextView) findViewById(R.id.members_label);
+        mInviteesLabelView = (TextView) findViewById(R.id.invitees_label);
         mFAB = (FloatingActionButton) findViewById(R.id.fab);
 
         mCollapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -175,7 +179,6 @@ public class TripActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
@@ -197,11 +200,11 @@ public class TripActivity extends AppCompatActivity {
     private void showRemoveMemberDialog(final Member member) {
         showAlertDialog(getString(R.string.kick_friend_alert, member.user.getFullName(), mController.trip.getName()),
                 new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mController.kickMember(member);
-            }
-        });
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mController.kickMember(member);
+                    }
+                });
     }
 
     private void showDeleteTripDialog() {
@@ -288,5 +291,13 @@ public class TripActivity extends AppCompatActivity {
         intent.putExtra(this.getString(R.string.intent_key_trip), trip);
         intent.putExtra(getString(R.string.edit_trip), true);
         startActivityForResult(intent, Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY);
+    }
+
+    public TextView getMembersLabel() {
+        return mMembersLabelView;
+    }
+
+    public TextView getInviteesLabel() {
+        return mInviteesLabelView;
     }
 }

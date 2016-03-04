@@ -2,6 +2,7 @@ package droidsquad.voyage.controller.activityController;
 
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,17 +82,19 @@ public class TripController {
     public void updateMembersAdapter() {
         List<Member> members = new ArrayList<>(trip.getMembers());
         for (int i = 0; i < members.size(); i++) {
-            if (members.get(i).user.equals(VoyageUser.currentUser()) ) {
+            if (members.get(i).user.equals(VoyageUser.currentUser())) {
                 members.remove(i);
                 break;
             }
         }
 
         mMembersAdapter.updateMembers(members);
+        updateLabelsVisibilityIfNecessary();
     }
 
     public void updateInviteesAdapter() {
         mInviteesAdapter.updateMembers(trip.getInvitees());
+        updateLabelsVisibilityIfNecessary();
     }
 
     public void kickMember(final Member member) {
@@ -101,8 +104,11 @@ public class TripController {
         ParseTripModel.removeMemberFromTrip(trip.getId(), member.id, new ParseTripModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
-                adapter.removeMember(member);
                 trip.removeMember(member);
+                adapter.removeMember(member);
+
+                updateLabelsVisibilityIfNecessary();
+
                 Snackbar.make(mActivity.findViewById(android.R.id.content),
                         (member.pendingRequest ? R.string.snackbar_invitee_removed : R.string.snackbar_member_removed),
                         Snackbar.LENGTH_SHORT).show();
@@ -114,6 +120,14 @@ public class TripController {
                         error, Snackbar.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void updateLabelsVisibilityIfNecessary() {
+        mActivity.getMembersLabel().setVisibility(
+                mMembersAdapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
+
+        mActivity.getInviteesLabel().setVisibility(
+                mInviteesAdapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
     }
 
     public boolean isAdmin() {

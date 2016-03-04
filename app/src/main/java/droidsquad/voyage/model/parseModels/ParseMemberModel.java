@@ -2,6 +2,7 @@ package droidsquad.voyage.model.parseModels;
 
 import android.util.Log;
 
+import com.parse.DeleteCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -9,10 +10,12 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import droidsquad.voyage.model.objects.Member;
+import droidsquad.voyage.model.objects.VoyageUser;
 
 public class ParseMemberModel extends ParseModel {
     private static final String TAG = ParseMemberModel.class.getSimpleName();
@@ -49,9 +52,9 @@ public class ParseMemberModel extends ParseModel {
         });
     }
 
-    public static void promoteInvitee(String userId, String tripId, final ParseResponseCallback callback) {
+    public static void promoteCurrentUser(String tripId, final ParseResponseCallback callback) {
         ParseQuery<ParseObject> memberQuery = ParseQuery.getQuery(MEMBER_CLASS);
-        memberQuery.whereEqualTo(Field.USER + "." + Field.ID, userId);
+        memberQuery.whereEqualTo(Field.USER, ParseUser.getCurrentUser());
 
         ParseQuery<ParseObject> tripQuery = ParseQuery.getQuery(ParseTripModel.TRIP_CLASS);
         tripQuery.whereMatchesQuery(ParseTripModel.Field.MEMBERS, memberQuery);
@@ -61,11 +64,44 @@ public class ParseMemberModel extends ParseModel {
             @Override
             public void done(ParseObject parseTrip, ParseException e) {
                 if (e == null) {
-                    parseTrip.getParseObject(ParseTripModel.Field.MEMBERS).put(Field.PENDING_REQUEST, false);
-                    parseTrip.saveInBackground();
+                    ParseObject parseMember = (ParseObject) parseTrip.getList(ParseTripModel.Field.MEMBERS).get(0);
+                    parseMember.put(Field.PENDING_REQUEST, false);
+                    parseMember.saveInBackground();
                     callback.onSuccess();
                 } else {
                     Log.d(TAG, "Exception while promoting trip member", e);
+                    callback.onFailure(getParseErrorString(e.getCode()));
+                }
+            }
+        });
+    }
+
+    public static void removeCurrentUser(String tripId, final ParseResponseCallback callback) {
+        ParseQuery<ParseObject> memberQuery = ParseQuery.getQuery(MEMBER_CLASS);
+        memberQuery.whereEqualTo(Field.USER, ParseUser.getCurrentUser());
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseTripModel.TRIP_CLASS);
+        query.whereMatchesQuery(ParseTripModel.Field.MEMBERS, memberQuery);
+        query.include(ParseTripModel.Field.MEMBERS);
+
+        query.getInBackground(tripId, new GetCallback<ParseObject>() {
+            @Override
+            public void done(final ParseObject parseTrip, ParseException e) {
+                if (e == null) {
+                    ParseObject member = (ParseObject) parseTrip.getList(ParseTripModel.Field.MEMBERS).get(0);
+                    parseTrip.removeAll(ParseTripModel.Field.MEMBERS, Collections.singletonList(member));
+                    member.deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                parseTrip.saveInBackground();
+                                callback.onSuccess();
+                            } else {
+                                callback.onFailure(getParseErrorString(e.getCode()));
+                            }
+                        }
+                    });
+                } else {
                     callback.onFailure(getParseErrorString(e.getCode()));
                 }
             }

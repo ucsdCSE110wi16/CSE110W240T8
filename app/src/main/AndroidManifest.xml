@@ -105,12 +105,14 @@
         <service android:name="com.parse.PushService" />
 
         <receiver
-            android:name="com.parse.ParsePushBroadcastReceiver"
+            android:name="droidsquad.voyage.model.TripBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
                 <action android:name="com.parse.push.intent.DELETE" />
                 <action android:name="com.parse.push.intent.OPEN" />
+                <action android:name="droidsquad.voyage.intent.ACCEPT_INVITATION" />
+                <action android:name="droidsquad.voyage.intent.DECLINE_INVITATION" />
             </intent-filter>
         </receiver>
         <receiver

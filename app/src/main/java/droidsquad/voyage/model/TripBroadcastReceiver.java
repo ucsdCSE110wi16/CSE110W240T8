@@ -43,10 +43,11 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         switch (intent.getAction()) {
             case ACTION_REQUEST_ACCEPT:
+                Log.d(TAG, "Accepting request");
                 onAcceptTripInvitation(context, intent);
                 break;
             case ACTION_REQUEST_DECLINE:
-//                onDeclineTripInvitation(context, intent);
+                onDeclineTripInvitation(context, intent);
                 break;
             default:
                 super.onReceive(context, intent);
@@ -73,6 +74,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private void onAcceptTripInvitation(final Context context, final Intent intent) {
+        Log.d(TAG, "Attempting to accept the trip from the notification dropdown");
         ParseRequestModel.acceptRequestFromNotification(data.optString(ParseNotificationModel.Field.TRIP_ID),
                 new ParseRequestModel.ParseResponseCallback() {
                     @Override
@@ -89,21 +91,22 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
                 });
     }
 
-//    private void onDeclineTripInvitation(final Context context, final Intent intent) {
-//        ParseRequestModel.declineRequest(data.optString("tripId"), new ParseRequestModel.ParseResponseCallback() {
-//            @Override
-//            public void onSuccess() {
-//                Log.i(TAG, "Declined trip from notification");
-//                dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
-//            }
-//
-//            @Override
-//            public void onFailure(String error) {
-//                Log.i(TAG, "Error while declining trip from notification: " + error);
-//                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
+    private void onDeclineTripInvitation(final Context context, final Intent intent) {
+        ParseRequestModel.declineRequestFromNotification(data.optString(ParseNotificationModel.Field.TRIP_ID),
+                new ParseRequestModel.ParseResponseCallback() {
+            @Override
+            public void onSuccess() {
+                Log.i(TAG, "Declined trip from notification");
+                dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.i(TAG, "Error while declining trip from notification: " + error);
+                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     /**
      * Starts the activities given the type of this notification
@@ -137,7 +140,6 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
     private void sendNotification(final Context context, Intent intent) {
         String title = data.optString(ParseNotificationModel.Field.TITLE);
         String alert = data.optString(ParseNotificationModel.Field.ALERT);
-        String senderId = data.optString(ParseNotificationModel.Field.SENDER_ID);
         String senderPicURL = data.optString(ParseNotificationModel.Field.SENDER_PROFILE_PIC);
         String tickerText = String.format(Locale.getDefault(), "%s: %s", title, alert);
 
@@ -166,7 +168,9 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
                 @Override
                 public void done(Bitmap bitmap, String error) {
                     if (error == null) {
+                        bitmap = BitmapUtils.getScaledBitmap(context, BitmapUtils.getRoundedBitmap(bitmap));
                         builder.setLargeIcon(bitmap);
+                        fireNotification(context, builder.build(), notificationId);
                     } else {
                         Log.d(TAG, "Failed to load the profile picture");
                     }

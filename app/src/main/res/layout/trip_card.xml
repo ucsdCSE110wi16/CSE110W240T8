@@ -106,7 +106,8 @@
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_below="@id/trip_card_cal_icon"
-            android:layout_marginTop="@dimen/activity_vertical_margin" />
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:clickable="false" />
 
         <TextView
             android:id="@+id/trip_card_pictures_excess"
@@ -122,8 +123,10 @@
             android:layout_toLeftOf="@+id/trip_card_admin_profile_pic"
             android:layout_toRightOf="@id/trip_card_members"
             android:layout_toStartOf="@id/trip_card_admin_profile_pic"
+            android:clickable="false"
             android:gravity="center_vertical"
-            android:text="... (+3)" />
+            android:text="... (+3)"
+            android:visibility="gone" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/trip_card_admin_profile_pic"
@@ -131,6 +134,7 @@
             android:layout_height="48dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/trip_card_members" />
+            android:layout_alignTop="@+id/trip_card_members"
+            android:clickable="false" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>

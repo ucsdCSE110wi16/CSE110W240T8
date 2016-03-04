@@ -44,7 +44,11 @@ public class ParseRequestModel extends ParseModel {
     }
 
     public static void acceptRequestFromNotification(String tripId, ParseResponseCallback callback) {
-        ParseMemberModel.promoteInvitee(VoyageUser.getId(), tripId, callback);
+        ParseMemberModel.promoteCurrentUser(tripId, callback);
+    }
+
+    public static void declineRequestFromNotification(String tripId, ParseResponseCallback callback) {
+        ParseMemberModel.removeCurrentUser(tripId, callback);
     }
 
     /**
