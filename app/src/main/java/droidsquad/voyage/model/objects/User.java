@@ -1,11 +1,11 @@
 package droidsquad.voyage.model.objects;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-
-import java.io.Serializable;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.api.FacebookAPI;
@@ -14,7 +14,7 @@ import droidsquad.voyage.model.api.FacebookAPI;
  * This class represents a Facebook User. It contains member variables for storing
  * information retrieved from Facebook Graph API
  */
-public class User implements Serializable {
+public class User implements Parcelable {
     public String id;
     public String fbId;
     public String firstName;
@@ -37,6 +37,26 @@ public class User implements Serializable {
         this.lastName = lastName;
         this.fbId = fbId;
     }
+
+    protected User(Parcel in) {
+        id = in.readString();
+        fbId = in.readString();
+        firstName = in.readString();
+        lastName = in.readString();
+        gender = in.readString();
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 
     /**
      * Loads this user's profile picture into the ImageView
@@ -69,5 +89,19 @@ public class User implements Serializable {
 
     public String getPictureURL() {
         return FacebookAPI.buildProfilePicURL(fbId, "normal");
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(fbId);
+        dest.writeString(firstName);
+        dest.writeString(lastName);
+        dest.writeString(gender);
     }
 }

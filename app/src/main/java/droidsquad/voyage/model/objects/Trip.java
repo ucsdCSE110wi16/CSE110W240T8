@@ -67,16 +67,16 @@ public class Trip implements Parcelable {
         dateFrom = new Date(in.readLong());
         dateTo = new Date(in.readLong());
         isPrivate = in.readByte() != 0;
-        admin = (User) in.readSerializable();
+        admin = in.readParcelable(User.class.getClassLoader());
 
         int numOfMembers = in.readInt();
         for (int i = 0; i < numOfMembers; i++) {
-            members.add((Member) in.readSerializable());
+            members.add((Member) in.readParcelable(Member.class.getClassLoader()));
         }
 
         int numOfInvitees = in.readInt();
         for (int i = 0; i < numOfInvitees; i++) {
-            invitees.add((Member) in.readSerializable());
+            invitees.add((Member) in.readParcelable(Member.class.getClassLoader()));
         }
     }
 
@@ -108,16 +108,16 @@ public class Trip implements Parcelable {
         dest.writeLong(dateTo.getTime());
         dest.writeByte((byte) (isPrivate ? 1 : 0));
 
-        dest.writeSerializable(admin);
+        dest.writeParcelable(admin, flags);
 
         dest.writeInt(members.size());
         for (Member member : members) {
-            dest.writeSerializable(member);
+            dest.writeParcelable(member, flags);
         }
 
         dest.writeInt(invitees.size());
         for (Member invitee : invitees) {
-            dest.writeSerializable(invitee);
+            dest.writeParcelable(invitee, flags);
         }
     }
 
