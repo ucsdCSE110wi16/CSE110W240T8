@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Locale;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.parseModels.ParseModel;
-import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.model.api.GooglePlacesAPI;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.model.parseModels.ParseModel;
+import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.CreateTripActivity;
 
@@ -290,9 +290,15 @@ public class CreateTripController {
         Date dateFrom = calendarFrom.getTime();
         Date dateTo = calendarTo.getTime();
 
-        Trip newTrip = new Trip(tripName, transportation, leavingFrom,
-                destination, isPrivate, dateFrom, dateTo);
+        Trip newTrip = (isEditMode) ? trip : new Trip();
 
+        newTrip.setName(tripName);
+        newTrip.setTransportation(transportation);
+        newTrip.setOrigin(leavingFrom);
+        newTrip.setDestination(destination);
+        newTrip.setPrivate(isPrivate);
+        newTrip.setDateFrom(dateFrom);
+        newTrip.setDateTo(dateTo);
         finalizeTripCheck(newTrip);
     }
 

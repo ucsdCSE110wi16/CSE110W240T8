@@ -6,9 +6,9 @@ import android.util.Log;
 import java.util.List;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.parseModels.ParseRequestModel;
 import droidsquad.voyage.model.adapters.RequestsAdapter;
 import droidsquad.voyage.model.objects.Request;
+import droidsquad.voyage.model.parseModels.ParseRequestModel;
 import droidsquad.voyage.view.fragment.RequestsFragment;
 
 public class RequestsController {
@@ -39,7 +39,7 @@ public class RequestsController {
             }
         });
 
-        mFragment.refreshing(true);
+        mFragment.showProgress(true);
         fetchData();
     }
 
@@ -80,7 +80,6 @@ public class RequestsController {
     }
 
     public void fetchData() {
-        mFragment.showProgress(true);
 
         ParseRequestModel.fetchRequests(new ParseRequestModel.RequestListCallback() {
             @Override
