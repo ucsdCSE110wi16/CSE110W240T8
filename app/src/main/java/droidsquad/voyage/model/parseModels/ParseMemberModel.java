@@ -58,7 +58,6 @@ public class ParseMemberModel extends ParseModel {
 
         ParseQuery<ParseObject> tripQuery = ParseQuery.getQuery(ParseTripModel.TRIP_CLASS);
         tripQuery.whereMatchesQuery(ParseTripModel.Field.MEMBERS, memberQuery);
-        tripQuery.include(ParseTripModel.Field.MEMBERS);
 
         tripQuery.getInBackground(tripId, new GetCallback<ParseObject>() {
             @Override

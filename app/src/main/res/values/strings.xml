@@ -74,8 +74,8 @@
 
     <string name="intent_key_trip">TRIP_OBJ</string>
 
-    <string name="trip_dates">%1$s -> %2$s</string>
-    <string name="trip_locations">%1$s -> %2$s</string>
+    <string name="trip_dates">%1$s  · · · · ·  %2$s</string>
+    <string name="trip_locations">%1$s  · · · · ·  %2$s</string>
     <string name="title_activity_add_friends">AddFriendsActivity</string>
 
     <string name="fb_friend_search_hint">Add friends to trip</string>

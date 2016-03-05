@@ -21,20 +21,10 @@
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/friend_name"
-        android:layout_width="wrap_content"
+        style="@style/TextAppearance.AppCompat.SearchResult.Subtitle"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Heitor Schueroff"
-        android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle" />
-
-    <android.support.v7.widget.AppCompatImageView
-        android:id="@+id/friend_delete_image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:padding="8dp"
-        android:src="@drawable/ic_cancel"
-        android:visibility="gone" />
+        android:text="Heitor Schueroff" />
 
 </LinearLayout>

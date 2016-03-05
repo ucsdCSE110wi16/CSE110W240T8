@@ -165,13 +165,13 @@ public class Trip implements Parcelable {
     public int getTransportationIconId() {
         switch (transportation) {
             case "Car":
-                return R.drawable.ic_car;
+                return R.drawable.ic_car_grey;
 
             case "Bus":
-                return R.drawable.ic_bus;
+                return R.drawable.ic_bus_grey;
 
             default:
-                return R.drawable.ic_flight;
+                return R.drawable.ic_flight_grey;
         }
     }
 
@@ -179,7 +179,7 @@ public class Trip implements Parcelable {
      * @return A simple string representing the origin and destination of this trip
      */
     public String getSimpleCitiesStringRepresentation() {
-        return origin.optString("city") + " –> " + destination.optString("city");
+        return origin.optString("city") + "  · · ·  " + destination.optString("city");
     }
 
     /**
@@ -187,7 +187,7 @@ public class Trip implements Parcelable {
      */
     public String getSimpleDatesStringRepresentation() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
-        return dateFormat.format(dateFrom) + " –> " + dateFormat.format(dateTo);
+        return dateFormat.format(dateFrom) + "  · · ·  " + dateFormat.format(dateTo);
     }
 
     public void addMember(Member member) {

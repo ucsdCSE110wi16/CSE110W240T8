@@ -58,7 +58,7 @@ public class TripCardMembersAdapter extends RecyclerView.Adapter<TripCardMembers
             mExcessView.setText(String.format("... (+%s)", mMembers.size() - MAX_MEMBER_TO_DISPLAY));
             mExcessView.setVisibility(View.VISIBLE);
         } else {
-            mExcessView.setVisibility(View.GONE);
+            mExcessView.setVisibility(View.INVISIBLE);
         }
     }
 

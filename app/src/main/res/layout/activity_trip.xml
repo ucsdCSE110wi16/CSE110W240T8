@@ -66,11 +66,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:drawableLeft="@drawable/ic_flight"
+                android:drawableLeft="@drawable/ic_flight_grey"
                 android:drawablePadding="@dimen/activity_horizontal_margin"
-                android:drawableStart="@drawable/ic_flight"
+                android:drawableStart="@drawable/ic_flight_grey"
                 android:gravity="center_vertical"
-                android:text="San Diego -> Phoenix"
+                android:text="San Diego  · · · · ·  Phoenix"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
             <android.support.v7.widget.AppCompatTextView
@@ -78,9 +78,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:drawableLeft="@drawable/ic_event"
+                android:drawableLeft="@drawable/ic_today_grey"
                 android:drawablePadding="@dimen/activity_horizontal_margin"
-                android:drawableStart="@drawable/ic_event"
+                android:drawableStart="@drawable/ic_today_grey"
                 android:gravity="center_vertical"
                 android:text="Monday 28, March – Friday 1, April"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />

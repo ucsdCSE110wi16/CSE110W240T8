@@ -17,6 +17,7 @@ import java.util.List;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.model.objects.User;
 import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.TripActivity;
@@ -48,7 +49,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         holder.mCities.setText(trip.getSimpleCitiesStringRepresentation());
         holder.mDates.setText(trip.getSimpleDatesStringRepresentation());
         holder.mPrivateIcon.setVisibility((trip.isPrivate()) ? View.VISIBLE : View.GONE);
-        holder.mTransportationIcon.setImageResource(trip.getTransportationIconId());
+        holder.mCities.setCompoundDrawablesWithIntrinsicBounds(trip.getTransportationIconId(), 0, 0, 0);
 
         // Handle displaying the Admin information logic
         trip.getAdmin().loadProfilePicInto(mFragment.getContext(), holder.mAdminProfilePic);
@@ -56,7 +57,9 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
                 (VoyageUser.currentUser().equals(trip.getAdmin())) ? View.VISIBLE : View.GONE);
 
         // Delegate displaying the members to TripCardMembersAdapter
-        holder.mMembersAdapter.updateDataset(trip.getMembersAsUsersExclusive());
+        List<User> members = trip.getMembersAsUsersExclusive();
+        holder.mMembersRecyclerView.setVisibility((members.size()) <= 0 ? View.GONE : View.VISIBLE);
+        holder.mMembersAdapter.updateDataset(members);
 
         holder.mTripCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,9 +90,9 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
         public TextView mDates;
         public ImageView mAdminProfilePic;
         public ImageView mPrivateIcon;
-        public ImageView mTransportationIcon;
         public CardView mTripCard;
         public TripCardMembersAdapter mMembersAdapter;
+        public RecyclerView mMembersRecyclerView;
 
         public ViewHolder(View view) {
             super(view);
@@ -100,16 +103,15 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             mDates = (TextView) view.findViewById(R.id.trip_card_date_range);
             mAdminProfilePic = (ImageView) view.findViewById(R.id.trip_card_admin_profile_pic);
             mPrivateIcon = (ImageView) view.findViewById(R.id.trip_card_private_icon);
-            mTransportationIcon = (ImageView) view.findViewById(R.id.trip_card_transportation_icon);
             mTripCard = (CardView) view.findViewById(R.id.trip_card_view);
 
             // Build the recycler view for the Trip members
             TextView picturesExcess = (TextView) view.findViewById(R.id.trip_card_pictures_excess);
             mMembersAdapter = new TripCardMembersAdapter(view.getContext(), picturesExcess);
 
-            RecyclerView membersRecyclerView = (RecyclerView) view.findViewById(R.id.trip_card_members);
-            membersRecyclerView.setAdapter(mMembersAdapter);
-            membersRecyclerView.setLayoutManager(
+            mMembersRecyclerView = (RecyclerView) view.findViewById(R.id.trip_card_members);
+            mMembersRecyclerView.setAdapter(mMembersAdapter);
+            mMembersRecyclerView.setLayoutManager(
                     new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false) {
                         @Override
                         public boolean canScrollHorizontally() {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!-- A CardView that contains a TextView -->
+<?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/trip_card_view"
@@ -8,8 +8,8 @@
     android:layout_marginLeft="@dimen/activity_horizontal_margin"
     android:layout_marginRight="@dimen/activity_horizontal_margin"
     android:layout_marginTop="@dimen/appbar_padding_top"
-    android:foreground="?attr/selectableItemBackground"
     android:clickable="true"
+    android:foreground="?attr/selectableItemBackground"
     card_view:cardBackgroundColor="@color/defaultTripCardColor"
     card_view:cardCornerRadius="4dp"
     card_view:cardElevation="2dp"
@@ -28,16 +28,16 @@
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/trip_card_private_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:layout_alignBottom="@+id/trip_card_name"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/trip_card_name"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_lock" />
+            android:src="@drawable/ic_lock_grey" />
 
-        <TextView
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/trip_card_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,87 +54,64 @@
             android:layout_marginTop="@dimen/margin_vertical_for_divider"
             android:background="@drawable/divider_faded" />
 
-        <android.support.v7.widget.AppCompatImageView
-            android:id="@+id/trip_card_transportation_icon"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_below="@+id/divider"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:src="@drawable/ic_flight" />
-
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/trip_card_cities"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/trip_card_transportation_icon"
-            android:layout_alignTop="@+id/trip_card_transportation_icon"
             android:layout_below="@+id/divider"
-            android:layout_toEndOf="@+id/trip_card_transportation_icon"
-            android:layout_toRightOf="@+id/trip_card_transportation_icon"
+            android:layout_marginTop="8dp"
+            android:drawableLeft="@drawable/ic_flight_grey"
+            android:drawablePadding="@dimen/activity_horizontal_margin"
+            android:drawableStart="@drawable/ic_flight_grey"
             android:gravity="center_vertical"
             android:text="San Diego -> Phoenix"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead" />
-
-        <android.support.v7.widget.AppCompatImageView
-            android:id="@+id/trip_card_cal_icon"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_below="@+id/trip_card_transportation_icon"
-            android:layout_marginBottom="@dimen/appbar_padding_top"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:src="@drawable/ic_date_range_black_24dp" />
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/trip_card_date_range"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/trip_card_cal_icon"
-            android:layout_alignTop="@+id/trip_card_cal_icon"
-            android:layout_below="@+id/trip_card_transportation_icon"
-            android:layout_toEndOf="@id/trip_card_cal_icon"
-            android:layout_toRightOf="@+id/trip_card_cal_icon"
+            android:layout_below="@+id/trip_card_cities"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:drawableLeft="@drawable/ic_today_grey"
+            android:drawablePadding="@dimen/activity_horizontal_margin"
+            android:drawableStart="@drawable/ic_today_grey"
             android:gravity="center_vertical"
             android:text="Mon 28 March - Fri 1 April"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/trip_card_members"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_below="@id/trip_card_cal_icon"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:clickable="false" />
-
-        <TextView
-            android:id="@+id/trip_card_pictures_excess"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/excess_and_admin"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/trip_card_members"
-            android:layout_alignTop="@+id/trip_card_members"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_toEndOf="@id/trip_card_members"
-            android:layout_toLeftOf="@+id/trip_card_admin_profile_pic"
-            android:layout_toRightOf="@id/trip_card_members"
-            android:layout_toStartOf="@id/trip_card_admin_profile_pic"
-            android:clickable="false"
+            android:layout_below="@+id/trip_card_date_range"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:gravity="center_vertical"
-            android:text="... (+3)"
-            android:visibility="gone" />
+            android:orientation="horizontal">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/trip_card_admin_profile_pic"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/trip_card_members"
-            android:clickable="false" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/trip_card_members"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:visibility="gone" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/trip_card_pictures_excess"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:text="... (+3)"
+                android:visibility="invisible" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/trip_card_admin_profile_pic"
+                android:layout_width="48dp"
+                android:layout_height="48dp" />
+        </LinearLayout>
     </RelativeLayout>
 </android.support.v7.widget.CardView>
