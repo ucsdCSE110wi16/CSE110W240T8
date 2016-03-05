@@ -323,12 +323,7 @@ public class CreateTripController {
      * @param view View to display the error on
      */
     public void hideError(View view) {
-        if (view == activity.getTripNameView()) {
-            //view.setVisibility(View.GONE);
-            ((EditText) view).setError(null);
-        } else {
-            ((EditText) view).setError(null);
-        }
+        ((EditText) view).setError(null);
     }
 
     /**

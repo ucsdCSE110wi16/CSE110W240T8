@@ -222,7 +222,7 @@ public class CreateTripActivity extends AppCompatActivity {
 
 
     /**
-     * Start the PlaceAutocomplete Intent for the user to selecte a google place
+     * Start the PlaceAutocomplete Intent for the user to select a google place
      *
      * @param requestCode The request code to be returned after this Intent finishes
      */
