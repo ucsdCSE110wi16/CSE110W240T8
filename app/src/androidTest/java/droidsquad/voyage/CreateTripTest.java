@@ -6,14 +6,22 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isNotChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
+
+import com.parse.Parse;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,12 +47,16 @@ public class CreateTripTest {
 
     String TRIP_NAME;
     String LEAVING_FROM;
+    String LOCATION_ERROR;
+    String TRIP_NAME_ERROR;
 
     @Before
     public void setUp() throws Exception {
 
         TRIP_NAME = "TEST";
         LEAVING_FROM = "San Diego, CA, USA";
+        LOCATION_ERROR = "Please enter a valid location";
+        TRIP_NAME_ERROR = "Name must be at least 3 character long";
 
     }
 
@@ -63,6 +75,9 @@ public class CreateTripTest {
     @Test
     public void testPrivateCheckboxChangeText() {
 
+        // Check if checkbox is set by default
+        onView(withId(R.id.private_check)).check(matches(isChecked()));
+
         // Check original text.
         onView(withId(R.id.trip_private_help)).check(matches(withText(R.string.help_trip_private)));
 
@@ -70,8 +85,32 @@ public class CreateTripTest {
         onView(withId(R.id.private_check))
                 .perform(click());
 
+        // Check if checkbox is unset properly
+        onView(withId(R.id.private_check)).check(matches(isNotChecked()));
+
         // Check that the text was changed.
         onView(withId(R.id.trip_private_help)).check(matches(withText(R.string.help_trip_public)));
+
+    }
+
+    @Test
+    public void testErrorMessages(){
+
+        // Click button before filling in fields
+        onView(withId(R.id.create_trip_button))
+                .perform(click());
+
+        // Check if error was set correctly on trip name
+        onView(withId(R.id.trip_name))
+                .check(matches(hasErrorText(TRIP_NAME_ERROR)));
+
+        // Check if error was set correctly on leaving from
+        onView(withId(R.id.leaving_from))
+                .check(matches(hasErrorText(LOCATION_ERROR)));
+
+        // Check if error was set correctly on destination
+        onView(withId(R.id.destination))
+                .check(matches(hasErrorText(LOCATION_ERROR)));
 
     }
 
@@ -79,8 +118,8 @@ public class CreateTripTest {
     public void testLeavingFromChangeText() {
 
         // Un-check private checkbox
-        onView(withId(R.id.leaving_from))
-                .perform(click());
+        //onView(withId(R.id.leaving_from))
+        //        .perform(click());
 
         /** TODO: Continue here */
 
@@ -88,6 +127,8 @@ public class CreateTripTest {
         //onView(withId(R.id.trip_private_help)).check(matches(withText(R.string.help_trip_public)));
 
     }
+
+
 
 }
 
