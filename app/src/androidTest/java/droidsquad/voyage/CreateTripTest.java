@@ -56,7 +56,9 @@ public class CreateTripTest {
     String LEAVING_FROM;
     String LOCATION_ERROR;
     String TRIP_NAME_ERROR;
-    String TRIP_TRANSPORTATION;
+    String PLANE;
+    String CAR;
+    String BUS;
 
     @Before
     public void setUp() throws Exception {
@@ -66,28 +68,37 @@ public class CreateTripTest {
         LEAVING_FROM = "San Diego, CA, USA";
         LOCATION_ERROR = "Please enter a valid location";
         TRIP_NAME_ERROR = "Name must be at least 3 character long";
-        TRIP_TRANSPORTATION = "Plane";
+        PLANE = "Plane";
+        BUS = "Bus";
+        CAR = "Car";
     }
 
     @Test
     public void testTripNameChangeText() {
 
         // check that trip name must be set
-        onView(withId(R.id.create_trip_button)).perform(click());
-        onView(withId(R.id.trip_name)).check(matches(hasErrorText(TRIP_NAME_ERROR)));
+        onView(withId(R.id.create_trip_button))
+                .perform(click());
+        onView(withId(R.id.trip_name))
+                .check(matches(hasErrorText(TRIP_NAME_ERROR)));
 
         // check entering a trip name that is too short
-        onView(withId(R.id.trip_name)).perform(typeText(TRIP_NAME_TOO_SHORT));
-        onView(withId(R.id.trip_name)).check(matches(withText(TRIP_NAME_TOO_SHORT)));
-        onView(withId(R.id.create_trip_button)).perform(click());
-        onView(withId(R.id.trip_name)).check(matches(hasErrorText(TRIP_NAME_ERROR)));
+        onView(withId(R.id.trip_name))
+                .perform(typeText(TRIP_NAME_TOO_SHORT), closeSoftKeyboard());
+        onView(withId(R.id.trip_name))
+                .check(matches(withText(TRIP_NAME_TOO_SHORT)));
+        onView(withId(R.id.create_trip_button))
+                .perform(click());
+        onView(withId(R.id.trip_name))
+                .check(matches(hasErrorText(TRIP_NAME_ERROR)));
 
         // Type trip name
         onView(withId(R.id.trip_name))
                 .perform(clearText(), typeText(TRIP_NAME), closeSoftKeyboard());
 
         // Check that the text was changed.
-        onView(withId(R.id.trip_name)).check(matches(withText(TRIP_NAME)));
+        onView(withId(R.id.trip_name)).
+                check(matches(withText(TRIP_NAME)));
     }
 
     @Test
@@ -168,10 +179,31 @@ public class CreateTripTest {
 
     @Test
     public void testTransportation() {
+
         // Select Plane transportation option and check that view updates
-        onView(withId(R.id.transportation)).perform(click());
-        onData(allOf(is(instanceOf(String.class)), is(TRIP_TRANSPORTATION))).perform(click());
-        onView(withId(R.id.transportation)).check(matches(withSpinnerText(containsString(TRIP_TRANSPORTATION))));
+        onView(withId(R.id.transportation))
+                .perform(click());
+        onData(allOf(is(instanceOf(String.class)), is(PLANE)))
+                .perform(click());
+        onView(withId(R.id.transportation))
+                .check(matches(withSpinnerText(PLANE)));
+
+        // Select Car transportation option and check that view updates
+        onView(withId(R.id.transportation))
+                .perform(click());
+        onData(allOf(is(instanceOf(String.class)), is(CAR)))
+                .perform(click());
+        onView(withId(R.id.transportation))
+                .check(matches(withSpinnerText(CAR)));
+
+        // Select Bus transportation option and check that view updates
+        onView(withId(R.id.transportation))
+                .perform(click());
+        onData(allOf(is(instanceOf(String.class)), is(BUS)))
+                .perform(click());
+        onView(withId(R.id.transportation))
+                .check(matches(withSpinnerText(BUS)));
+
     }
 }
 
