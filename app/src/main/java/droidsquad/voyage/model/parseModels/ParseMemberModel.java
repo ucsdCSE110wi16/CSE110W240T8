@@ -8,11 +8,11 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import droidsquad.voyage.model.objects.Member;
 import droidsquad.voyage.model.objects.VoyageUser;
@@ -52,57 +52,78 @@ public class ParseMemberModel extends ParseModel {
         });
     }
 
+    /**
+     * Promote the current user from invitee to member for the given trip
+     *
+     * @param tripId Id of the trip to promote user from
+     * @param callback Called on successful promotion or on failure with error string
+     */
     public static void promoteCurrentUser(String tripId, final ParseResponseCallback callback) {
-        ParseQuery<ParseObject> memberQuery = ParseQuery.getQuery(MEMBER_CLASS);
-        memberQuery.whereEqualTo(Field.USER, ParseUser.getCurrentUser());
-
-        ParseQuery<ParseObject> tripQuery = ParseQuery.getQuery(ParseTripModel.TRIP_CLASS);
-        tripQuery.whereMatchesQuery(ParseTripModel.Field.MEMBERS, memberQuery);
-
-        tripQuery.getInBackground(tripId, new GetCallback<ParseObject>() {
+        ParseTripModel.getParseTripWithMembers(tripId, new ParseObjectCallback() {
             @Override
-            public void done(ParseObject parseTrip, ParseException e) {
-                if (e == null) {
-                    ParseObject parseMember = (ParseObject) parseTrip.getList(ParseTripModel.Field.MEMBERS).get(0);
-                    parseMember.put(Field.PENDING_REQUEST, false);
-                    parseMember.saveInBackground();
-                    callback.onSuccess();
-                } else {
-                    Log.d(TAG, "Exception while promoting trip member", e);
-                    callback.onFailure(getParseErrorString(e.getCode()));
+            public void onSuccess(ParseObject parseObject) {
+                List<ParseObject> parseMembers = parseObject.getList(ParseTripModel.Field.MEMBERS);
+
+                for (ParseObject parseMember : parseMembers) {
+                    if (parseMember.getParseUser(Field.USER).equals(ParseUser.getCurrentUser())) {
+                        parseMember.put(Field.PENDING_REQUEST, false);
+                        parseMember.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    callback.onSuccess();
+                                } else {
+                                    callback.onFailure(getParseErrorString(e.getCode()));
+                                }
+                            }
+                        });
+                        break;
+                    }
                 }
+            }
+
+            @Override
+            public void onFailure(String error) {
+                callback.onFailure(error);
             }
         });
     }
 
+
+    /**
+     * Removes the current user from the members list of the given trip
+     *
+     * @param tripId Id of the trip to remove the user from
+     * @param callback Called on success or failure
+     */
     public static void removeCurrentUser(String tripId, final ParseResponseCallback callback) {
-        ParseQuery<ParseObject> memberQuery = ParseQuery.getQuery(MEMBER_CLASS);
-        memberQuery.whereEqualTo(Field.USER, ParseUser.getCurrentUser());
-
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseTripModel.TRIP_CLASS);
-        query.whereMatchesQuery(ParseTripModel.Field.MEMBERS, memberQuery);
-        query.include(ParseTripModel.Field.MEMBERS);
-
-        query.getInBackground(tripId, new GetCallback<ParseObject>() {
+        ParseTripModel.getParseTripWithMembers(tripId, new ParseObjectCallback() {
             @Override
-            public void done(final ParseObject parseTrip, ParseException e) {
-                if (e == null) {
-                    ParseObject member = (ParseObject) parseTrip.getList(ParseTripModel.Field.MEMBERS).get(0);
-                    parseTrip.removeAll(ParseTripModel.Field.MEMBERS, Collections.singletonList(member));
-                    member.deleteInBackground(new DeleteCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                parseTrip.saveInBackground();
-                                callback.onSuccess();
-                            } else {
-                                callback.onFailure(getParseErrorString(e.getCode()));
+            public void onSuccess(final ParseObject parseTrip) {
+                List<ParseObject> parseMembers = parseTrip.getList(ParseTripModel.Field.MEMBERS);
+
+                for (ParseObject parseMember : parseMembers) {
+                    if (parseMember.getParseUser(Field.USER).equals(ParseUser.getCurrentUser())) {
+                        parseTrip.removeAll(ParseTripModel.Field.MEMBERS, Collections.singletonList(parseMember));
+                        parseMember.deleteInBackground(new DeleteCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    parseTrip.saveInBackground();
+                                    callback.onSuccess();
+                                } else {
+                                    callback.onFailure(getParseErrorString(e.getCode()));
+                                }
                             }
-                        }
-                    });
-                } else {
-                    callback.onFailure(getParseErrorString(e.getCode()));
+                        });
+                        break;
+                    }
                 }
+            }
+
+            @Override
+            public void onFailure(String error) {
+                callback.onFailure(error);
             }
         });
     }

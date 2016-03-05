@@ -104,8 +104,8 @@ public class TripController {
         ParseTripModel.removeMemberFromTrip(trip.getId(), member.id, new ParseTripModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
-                trip.removeMember(member);
                 adapter.removeMember(member);
+                trip.removeMember(member);
 
                 updateLabelsVisibilityIfNecessary();
 

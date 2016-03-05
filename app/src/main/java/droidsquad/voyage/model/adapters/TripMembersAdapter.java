@@ -70,8 +70,10 @@ public class TripMembersAdapter extends RecyclerView.Adapter<TripMembersAdapter.
 
     public void removeMember(Member member) {
         int pos = this.mMembers.indexOf(member);
-        this.mMembers.remove(pos);
-        notifyItemRemoved(pos);
+        if (pos != -1) {
+            this.mMembers.remove(pos);
+            notifyItemRemoved(pos);
+        }
     }
 
     public void setAdmin(User admin) {

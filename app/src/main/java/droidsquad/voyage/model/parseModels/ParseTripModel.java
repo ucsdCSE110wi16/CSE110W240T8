@@ -128,6 +128,30 @@ public class ParseTripModel extends ParseModel {
     }
 
     /**
+     * Get the parseTrip with the given tripId and include all of the members and users
+     *
+     * @param tripId The tripId of the trip to be retrieved
+     * @param callback Called on success with the parseTrip object or on failure
+     */
+    public static void getParseTripWithMembers(String tripId, final ParseObjectCallback callback) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
+        query.include(Field.MEMBERS);
+        query.include(Field.MEMBERS + "." + ParseMemberModel.Field.USER);
+        query.include(Field.CREATED_BY);
+
+        query.getInBackground(tripId, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseTrip, ParseException e) {
+                if (e == null) {
+                    callback.onSuccess(parseTrip);
+                } else {
+                    callback.onFailure(getParseErrorString(e.getCode()));
+                }
+            }
+        });
+    }
+
+    /**
      * Get all the trips for which the current user is a member or creator of
      *
      * @param callback Called with the retrieved Trips
