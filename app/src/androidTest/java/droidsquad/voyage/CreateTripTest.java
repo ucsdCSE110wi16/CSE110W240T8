@@ -5,6 +5,7 @@ import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
@@ -66,6 +67,7 @@ public class CreateTripTest {
     String TRIP_NAME_TOO_SHORT;
     String TRIP_NAME;
     String LEAVING_FROM;
+    String DESTINATION;
     String LOCATION_ERROR;
     String TRIP_NAME_ERROR;
     String PLANE;
@@ -82,6 +84,7 @@ public class CreateTripTest {
         TRIP_NAME_TOO_SHORT = "AA";
         TRIP_NAME = "123";
         LEAVING_FROM = "San Diego, CA, USA";
+        DESTINATION = "Cupertino, CA, USA";
         LOCATION_ERROR = "Please enter a valid location";
         TRIP_NAME_ERROR = "Name must be at least 3 character long";
         PLANE = "Plane";
@@ -166,16 +169,17 @@ public class CreateTripTest {
     @Test
     public void testLeavingFromChangeText() {
 
-        // Un-check private checkbox
-        //onView(withId(R.id.leaving_from))
-        //        .perform(click());
+        onView(withId(R.id.leaving_from))
+                .perform(replaceText(LEAVING_FROM));
 
-        /** TODO: Continue here */
+        onView(withId(R.id.leaving_from))
+                .check(matches(withText(LEAVING_FROM)));
 
-        // Check that the text was changed.
-        //onView(withId(R.id.trip_private_help)).check(matches(withText(R.string.help_trip_public)));
+        onView(withId(R.id.destination))
+                .perform(replaceText(DESTINATION));
 
-        //onView(withId(R.id.leaving_from)).perform(click());
+        onView(withId(R.id.destination))
+                .check(matches(withText(DESTINATION)));
 
         // other possible ideas:
 
@@ -306,6 +310,34 @@ public class CreateTripTest {
         onView(withId(R.id.date_to))
                 .check(matches(withText(dateFormat.format(CALENDAR_TO.getTime()))));
 
+    }
+
+    @Test
+    public void fullRunThrough() {
+        onView(withId(R.id.trip_name))
+                .perform(typeText("TEST!"), closeSoftKeyboard());
+        onView(withId(R.id.trip_name))
+                .check(matches(withText("TEST!")));
+        onView(withId(R.id.private_check)).check(matches(isChecked()));
+
+        onView(withId(R.id.leaving_from))
+                .perform(replaceText("San Jose, CA, USA"));
+        onView(withId(R.id.leaving_from))
+                .check(matches(withText("San Jose, CA, USA")));
+
+        onView(withId(R.id.destination))
+                .perform(replaceText("San Francisco, CA, USA"));
+        onView(withId(R.id.destination))
+                .check(matches(withText("San Francisco, CA, USA")));
+
+        onView(withId(R.id.transportation))
+                .perform(click());
+        onData(allOf(is(instanceOf(String.class)), is(PLANE)))
+                .perform(click());
+        onView(withId(R.id.transportation))
+                .check(matches(withSpinnerText(PLANE)));
+        onView(withId(R.id.create_trip_button))
+                .perform(click());
     }
 
     /* Give the app extra time to update */
