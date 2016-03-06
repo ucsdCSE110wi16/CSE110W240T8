@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import droidsquad.voyage.R;
@@ -25,9 +26,10 @@ import droidsquad.voyage.view.activity.CreateTripActivity;
 public class TripListFragment extends Fragment {
     private TripListController controller;
     private RecyclerView recyclerView;
+    private LinearLayout mNoTripsView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private FloatingActionButton mFab;
     private ProgressBar mProgressBar;
+    private FloatingActionButton mFab;
 
 
     public static Fragment newInstance() {
@@ -57,6 +59,7 @@ public class TripListFragment extends Fragment {
         mProgressBar = (ProgressBar) v.findViewById(R.id.trip_list_progress_bar);
         recyclerView = (RecyclerView) v.findViewById(R.id.trip_recycler_view);
         mFab = (FloatingActionButton) v.findViewById(R.id.fab);
+        mNoTripsView = (LinearLayout) v.findViewById(R.id.no_trips_view);
 
         controller.setAdapter(recyclerView);
 
@@ -116,6 +119,10 @@ public class TripListFragment extends Fragment {
                 }
                 break;
         }
+    }
+
+    public void showNoRequestsView(boolean show) {
+        mNoTripsView.setVisibility((show) ? View.VISIBLE : View.GONE);
     }
 
     public void showProgress(boolean show) {

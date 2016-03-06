@@ -20,7 +20,6 @@ import droidsquad.voyage.view.activity.CreateTripActivity;
 
 public class FeedFragment extends Fragment {
     private FeedController controller;
-    private RecyclerView recyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressBar;
     private FloatingActionButton mFab;
@@ -30,7 +29,7 @@ public class FeedFragment extends Fragment {
     }
 
     /**
-     * onResume overriden so that upon returning to this fragment when another activity closes
+     * onResume overridden so that upon returning to this fragment when another activity closes
      * (like CreateTripActivity), data is re-polled to reflect newest changes on the Parse server.
      */
     @Override
@@ -51,7 +50,7 @@ public class FeedFragment extends Fragment {
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefresh);
         mProgressBar = (ProgressBar) v.findViewById(R.id.trip_list_progress_bar);
 
-        recyclerView = (RecyclerView) v.findViewById(R.id.trip_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.trip_recycler_view);
         controller.setAdapter(recyclerView);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefresh);

@@ -14,14 +14,13 @@ import java.util.List;
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.User;
 
-public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.ViewHolder> {
-    private static final String TAG = FBFriendsAdapter.class.getSimpleName();
+public class FeedCardMembersAdapter extends RecyclerView.Adapter<FeedCardMembersAdapter.ViewHolder> {
+    private static final String TAG = FeedCardMembersAdapter.class.getSimpleName();
 
     private Activity mActivity;
-    private OnFriendSelected mListener;
     private List<User> mFriends;
 
-    public FBFriendsAdapter(Activity activity) {
+    public FeedCardMembersAdapter(Activity activity) {
         mActivity = activity;
         mFriends = new ArrayList<>();
     }
@@ -29,7 +28,7 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fb_friend_drop_down_item, parent, false);
+                .inflate(R.layout.feed_members_dropdown, parent, false);
 
         return new ViewHolder(view);
     }
@@ -40,15 +39,6 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
 
         friend.loadProfilePicInto(mActivity, holder.mProfilePicImageView);
         holder.mNameTextView.setText(friend.getFullName());
-
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onSelected(friend);
-                }
-            }
-        });
     }
 
     @Override
@@ -61,35 +51,9 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
      *
      * @param friends The friends to update the data set with
      */
-    public void updateResults(ArrayList<User> friends) {
+    public void updateResults(List<User> friends) {
         mFriends = friends;
         notifyDataSetChanged();
-    }
-
-    public void addFriend(User friend) {
-        mFriends.add(friend);
-        notifyDataSetChanged();
-    }
-
-    /**
-     * Removes the given friend from this adapter
-     *
-     * @param friend Friend to be removed
-     */
-    public boolean removeFriend(User friend) {
-        if (mFriends.remove(friend)) {
-            notifyDataSetChanged();
-            return true;
-        }
-        return false;
-    }
-
-    public void setOnFriendSelectedListener(OnFriendSelected listener) {
-        this.mListener = listener;
-    }
-
-    public interface OnFriendSelected {
-        void onSelected(User friend);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -99,8 +63,8 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
         public ViewHolder(View view) {
             super(view);
 
-            mNameTextView = (TextView) view.findViewById(R.id.friend_name);
-            mProfilePicImageView = (ImageView) view.findViewById(R.id.friend_profile_pic);
+            mNameTextView = (TextView) view.findViewById(R.id.name);
+            mProfilePicImageView = (ImageView) view.findViewById(R.id.profile_pic);
         }
     }
 }

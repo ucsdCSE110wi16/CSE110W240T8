@@ -27,6 +27,7 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
 
     private List<Trip> trips = new ArrayList<>();
     private Fragment mFragment;
+    private OnDataEmptyListener mListener;
 
     public TripCardAdapter(Fragment fragment) {
         this.trips = new ArrayList<>();
@@ -81,6 +82,18 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
     public void updateData(List<Trip> trips) {
         this.trips = trips;
         notifyDataSetChanged();
+
+        if (mListener != null && getItemCount() == 0) {
+            mListener.onEmpty();
+        }
+    }
+
+    public void setOnDataEmptyListener(OnDataEmptyListener listener) {
+        this.mListener = listener;
+    }
+
+    public interface OnDataEmptyListener {
+        void onEmpty();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

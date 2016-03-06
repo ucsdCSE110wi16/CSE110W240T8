@@ -2,15 +2,67 @@ package droidsquad.voyage.model.parseModels;
 
 import android.util.Log;
 
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import droidsquad.voyage.model.objects.Member;
 import droidsquad.voyage.model.objects.Request;
 import droidsquad.voyage.model.objects.Trip;
-import droidsquad.voyage.model.objects.VoyageUser;
 
 public class ParseRequestModel extends ParseModel {
     public static final String TAG = ParseRequestModel.class.getSimpleName();
+
+    /**
+     * Get all the invitations to join trips sent to the current user
+     *
+     * @param callback Called with the list of Request objects
+     */
+    public static void fetchInvitations(final RequestListCallback callback) {
+        // Get all trips for which the user has been invited
+        ParseTripModel.getTripsInvitedTo(new ParseTripModel.TripListCallback() {
+            @Override
+            public void onSuccess(List<Trip> trips) {
+                callback.onSuccess(getRequestsFromTrips(trips));
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.d(TAG, "Failed to fetch the requests: " + error);
+                callback.onFailure(error);
+            }
+        });
+    }
+
+    /**
+     * Get all the requests to join trips for which the current user is the admin
+     */
+    public static void fetchRequests() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseTripModel.TRIP_CLASS);
+        query.whereEqualTo(ParseTripModel.Field.CREATED_BY, ParseUser.getCurrentUser());
+        query.include(ParseTripModel.Field.REQUESTS);
+        query.include(ParseTripModel.Field.REQUESTS + "." + ParseMemberModel.Field.USER);
+
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseTrips, ParseException e) {
+                if (e == null) {
+                    for (ParseObject parseTrip : parseTrips) {
+                        List<ParseObject> requests = parseTrip.getList(ParseTripModel.Field.REQUESTS);
+                        //TODO
+                    }
+                }
+            }
+        });
+    }
 
     /**
      * Accept the request for the given trip
@@ -25,7 +77,7 @@ public class ParseRequestModel extends ParseModel {
     /**
      * Decline the request for the given trip
      *
-     * @param request Request to be declined
+     * @param request  Request to be declined
      * @param callback Called on success or error
      */
     public static void declineRequest(Request request, final ParseResponseCallback callback) {
@@ -51,23 +103,27 @@ public class ParseRequestModel extends ParseModel {
         ParseMemberModel.removeCurrentUser(tripId, callback);
     }
 
-    /**
-     * Get all the trip requests sent to the current user
-     *
-     * @param callback Called with the list of Request objects
-     */
-    public static void fetchRequests(final RequestListCallback callback) {
-        // Get all trips for which the user has been invited
-        ParseTripModel.getTripsInvitedTo(new ParseTripModel.TripListCallback() {
+    public static void sendRequest(Trip trip, final ParseResponseCallback callback) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseTripModel.TRIP_CLASS);
+        query.getInBackground(trip.getId(), new GetCallback<ParseObject>() {
             @Override
-            public void onSuccess(List<Trip> trips) {
-                callback.onSuccess(getRequestsFromTrips(trips));
-            }
-
-            @Override
-            public void onFailure(String error) {
-                Log.d(TAG, "Failed to fetch the requests: " + error);
-                callback.onFailure(error);
+            public void done(ParseObject parseTrip, ParseException e) {
+                if (e == null) {
+                    ParseObject parseMember = ParseMemberModel.createMemberFromParseUser(ParseUser.getCurrentUser());
+                    parseTrip.add(ParseTripModel.Field.REQUESTS, parseMember);
+                    parseTrip.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                callback.onSuccess();
+                            } else {
+                                callback.onFailure(e.getMessage());
+                            }
+                        }
+                    });
+                } else {
+                    callback.onFailure(e.getMessage());
+                }
             }
         });
     }
@@ -87,6 +143,27 @@ public class ParseRequestModel extends ParseModel {
             request.memberId = trip.getInvitees().get(0).id;
             request.elapsedTime = trip.getInvitees().get(0).getElapsedTimeString();
             requests.add(request);
+        }
+
+        return requests;
+    }
+
+    public static List<Request> getRequestsFromParseTrip(ParseObject parseTrip) {
+        List<ParseObject> parseMembers = parseTrip.getList(ParseTripModel.Field.REQUESTS);
+        List<Request> requests = new ArrayList<>();
+
+        try {
+            for (ParseObject parseMember : parseMembers) {
+                Member member = ParseMemberModel.getMemberFromParseObject(parseMember);
+                Request request = new Request();
+                request.user = member.user;
+                request.memberId = member.id;
+                request.elapsedTime = member.getElapsedTimeString();
+                requests.add(request);
+            }
+
+        } catch (Exception e) {
+            Log.d(TAG, "Exception occurred while getting requests from trips: " + e.getMessage());
         }
 
         return requests;

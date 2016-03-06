@@ -81,7 +81,7 @@ public class RequestsController {
 
     public void fetchData() {
 
-        ParseRequestModel.fetchRequests(new ParseRequestModel.RequestListCallback() {
+        ParseRequestModel.fetchInvitations(new ParseRequestModel.RequestListCallback() {
             @Override
             public void onSuccess(List<Request> requests) {
                 Log.d(TAG, "Requests received: " + requests.size());

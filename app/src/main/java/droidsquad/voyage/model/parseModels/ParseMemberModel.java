@@ -189,8 +189,8 @@ public class ParseMemberModel extends ParseModel {
      */
     public static Member getMemberFromParseObject(ParseObject parseMember) {
         Member member = new Member();
-        member.id = parseMember.getObjectId();
         member.user = ParseUserModel.getUserFromParseUser(parseMember.getParseUser(Field.USER));
+        member.id = parseMember.getObjectId();
         member.pendingRequest = parseMember.getBoolean(Field.PENDING_REQUEST);
         member.time = parseMember.getLong(Field.TIME);
         return member;

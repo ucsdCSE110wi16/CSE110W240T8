@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/trip_card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/appbar_padding_top"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="@dimen/appbar_padding_top"
+    card_view:cardBackgroundColor="@color/defaultTripCardColor"
+    card_view:cardCornerRadius="4dp"
+    card_view:cardElevation="2dp"
+    card_view:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/admin_profile_pic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:src="@drawable/ic_account_circle_gray" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/title"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_toEndOf="@+id/admin_profile_pic"
+                android:layout_toRightOf="@+id/admin_profile_pic"
+                android:text="Backpacking in Arizona" />
+
+            <TextView
+                android:id="@+id/subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/title"
+                android:layout_toEndOf="@+id/admin_profile_pic"
+                android:layout_toRightOf="@+id/admin_profile_pic"
+                android:text="Raghav Mehta and 2 more friends are going on this trip" />
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/divider_faded" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/list_item_padding_vertical"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/list_item_padding_vertical">
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/cities"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:drawableLeft="@drawable/ic_flight_grey"
+                android:drawablePadding="@dimen/activity_horizontal_margin"
+                android:drawableStart="@drawable/ic_flight_grey"
+                android:gravity="center_vertical"
+                android:text="San Diego -> Phoenix"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/dates"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cities"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:drawableLeft="@drawable/ic_today_grey"
+                android:drawablePadding="@dimen/activity_horizontal_margin"
+                android:drawableStart="@drawable/ic_today_grey"
+                android:gravity="center_vertical"
+                android:text="Mon 28 March - Fri 1 April"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/join_button"
+                style="@style/TextAppearance.AppCompat.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/dates"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:paddingBottom="8dp"
+                android:paddingEnd="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingStart="4dp"
+                android:paddingTop="8dp"
+                android:text="Ask to join"
+                android:textColor="@color/colorAccent" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/dates"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/view_friends_button"
+                    style="@style/TextAppearance.AppCompat.Widget.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="8dp"
+                    android:paddingEnd="4dp"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"
+                    android:paddingStart="4dp"
+                    android:paddingTop="8dp"
+                    android:text="View members"
+                    android:textColor="@android:color/darker_gray" />
+
+                <ImageView
+                    android:id="@+id/caret"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_keyboard_arrow_up_grey" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/members_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fafafa"
+            android:visibility="gone" />
+    </LinearLayout>
+</android.support.v7.widget.CardView>

@@ -36,6 +36,7 @@ public class ParseTripModel extends ParseModel {
         String DATE_TO = "dateTo";
         String TRANSPORTATION = "transportation";
         String MEMBERS = "members";
+        String REQUESTS = "requests";
     }
 
     /***************************************************************************************
@@ -178,6 +179,8 @@ public class ParseTripModel extends ParseModel {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
         query.whereEqualTo(Field.PRIVATE, false);
         query.include(Field.MEMBERS);
+        query.include(Field.REQUESTS);
+        query.include(Field.REQUESTS + "." + ParseMemberModel.Field.USER);
         getTrips(query, callback);
     }
 
@@ -400,11 +403,10 @@ public class ParseTripModel extends ParseModel {
 
                     for (ParseObject parseTrip : parseTrips) {
                         Trip trip = getTripFromParseObject(parseTrip);
-                        List<ParseObject> parseMembers = parseTrip.getList(ParseTripModel.Field.MEMBERS);
+                        List<ParseObject> parseMembers = parseTrip.getList(Field.MEMBERS);
 
-                        if (parseMembers != null) {
-                            trip.addMembers(ParseMemberModel.getMembersFromParseObjects(parseMembers));
-                        }
+                        trip.addMembers(ParseMemberModel.getMembersFromParseObjects(parseMembers));
+                        trip.addRequests(ParseRequestModel.getRequestsFromParseTrip(parseTrip));
 
                         trips.add(trip);
                     }
@@ -479,7 +481,7 @@ public class ParseTripModel extends ParseModel {
      * @param parseTrip ParseObject to extract Trip from
      * @return A trip with the fields of the ParseObject
      */
-    private static Trip getTripFromParseObject(ParseObject parseTrip) {
+    public static Trip getTripFromParseObject(ParseObject parseTrip) {
         Trip trip = new Trip();
         trip.setId(parseTrip.getObjectId());
         trip.setName(parseTrip.getString(Field.NAME));
@@ -500,7 +502,7 @@ public class ParseTripModel extends ParseModel {
      * @param trip Trip to turn into a ParseObject
      * @return The ParseObject with the Trip's fields
      */
-    private static ParseObject getParseObjectFromTrip(Trip trip) {
+    public static ParseObject getParseObjectFromTrip(Trip trip) {
         ParseObject parseTrip = new ParseObject(TRIP_CLASS);
         setTripFieldsIntoParseObject(trip, parseTrip);
         return parseTrip;
@@ -512,7 +514,7 @@ public class ParseTripModel extends ParseModel {
      * @param trip      The trip to get the fields from
      * @param parseTrip The parse object to set the fields to
      */
-    private static void setTripFieldsIntoParseObject(Trip trip, ParseObject parseTrip) {
+    public static void setTripFieldsIntoParseObject(Trip trip, ParseObject parseTrip) {
         parseTrip.put(Field.NAME, trip.getName());
         parseTrip.put(Field.ORIGIN, trip.getOrigin());
         parseTrip.put(Field.DESTINATION, trip.getDestination());

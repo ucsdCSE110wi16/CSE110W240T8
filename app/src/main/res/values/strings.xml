@@ -109,4 +109,5 @@
     <string name="snackbar_invitee_removed">Invitee Removed</string>
     <string name="snackbar_invitees_added">Invitations sent</string>
     <string name="trip_card_admin">Admin</string>
+    <string name="no_trips_label">Create or join a trip to get started!</string>
 </resources>

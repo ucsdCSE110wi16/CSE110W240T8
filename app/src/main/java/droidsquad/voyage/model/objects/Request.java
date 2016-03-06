@@ -9,4 +9,5 @@ public class Request {
     public Trip trip;
     public String elapsedTime;
     public String memberId;
+    boolean isInvitation;
 }

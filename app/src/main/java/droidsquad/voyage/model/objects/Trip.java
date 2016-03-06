@@ -29,10 +29,12 @@ public class Trip implements Parcelable {
     private Date dateTo;
     private List<Member> members;
     private List<Member> invitees;
+    private List<Request> requests;
 
     public Trip() {
         this.members = new ArrayList<>();
         this.invitees = new ArrayList<>();
+        this.requests = new ArrayList<>();
     }
 
     public Trip(String tripName, String transportation, JSONObject origin,
@@ -46,6 +48,7 @@ public class Trip implements Parcelable {
         this.isPrivate = isPrivate;
         this.members = new ArrayList<>();
         this.invitees = new ArrayList<>();
+        this.requests = new ArrayList<>();
     }
 
     protected Trip(Parcel in) {
@@ -262,6 +265,10 @@ public class Trip implements Parcelable {
         return null;
     }
 
+    public void addRequests(List<Request> requests) {
+        this.requests.addAll(requests);
+    }
+
     public String getName() {
         return name;
     }
@@ -336,5 +343,9 @@ public class Trip implements Parcelable {
 
     public String getAdminId() {
         return admin.id;
+    }
+
+    public List<Request> getRequests() {
+        return requests;
     }
 }

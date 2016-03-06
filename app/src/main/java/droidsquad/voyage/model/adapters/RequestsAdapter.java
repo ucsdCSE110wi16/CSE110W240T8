@@ -85,7 +85,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, mRequests.size());
 
-        if (mEmptyListener != null && mRequests.size() == 0) {
+        if (mEmptyListener != null && getItemCount() == 0) {
             mEmptyListener.onEmpty();
         }
     }

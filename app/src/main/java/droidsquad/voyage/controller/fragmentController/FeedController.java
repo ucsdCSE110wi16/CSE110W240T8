@@ -7,33 +7,27 @@ import android.util.Log;
 
 import java.util.List;
 
+import droidsquad.voyage.model.adapters.FeedCardAdapter;
 import droidsquad.voyage.model.parseModels.ParseTripModel;
-import droidsquad.voyage.model.adapters.TripCardAdapter;
 import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.view.fragment.FeedFragment;
 
 public class FeedController {
     private static final String TAG = FeedController.class.getSimpleName();
 
-    private FeedFragment fragment;
     private Context context;
-    private TripCardAdapter adapter;
+    private FeedFragment fragment;
+    private FeedCardAdapter adapter;
 
     public FeedController(FeedFragment fragment) {
         this.context = fragment.getContext();
         this.fragment = fragment;
+        this.adapter = new FeedCardAdapter(fragment);
     }
 
     // called once from the activity, only needs to be called once
     public void setAdapter(RecyclerView recyclerView) {
-        // set if size won't immediately change based on user interaction
-        recyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-
-        // specify an adapter (see also next example)
-        adapter = new TripCardAdapter(fragment);
         recyclerView.setAdapter(adapter);
     }
 
@@ -61,7 +55,7 @@ public class FeedController {
      * @param trips New trips to update the adapter with
      */
     public void updateAdapter(List<Trip> trips) {
-        adapter.updateData(trips);
+        adapter.updateDataset(trips);
         refreshData();
     }
 

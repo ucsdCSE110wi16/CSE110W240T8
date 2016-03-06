@@ -2,6 +2,7 @@ package droidsquad.voyage.view.fragment;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,6 +17,7 @@ import android.widget.ProgressBar;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.fragmentController.RequestsController;
+import droidsquad.voyage.model.DividerItemDecoration;
 
 public class RequestsFragment extends Fragment {
     private static final String TAG = RequestsFragment.class.getSimpleName();
@@ -45,6 +47,8 @@ public class RequestsFragment extends Fragment {
 
         mRequestsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRequestsRecyclerView.setAdapter(mController.getAdapter());
+        mRequestsRecyclerView.addItemDecoration(new DividerItemDecoration(getContext()));
+
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

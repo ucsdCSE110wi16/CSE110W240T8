@@ -168,8 +168,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
                 @Override
                 public void done(Bitmap bitmap, String error) {
                     if (error == null) {
-                        bitmap = BitmapUtils.getScaledBitmap(context, BitmapUtils.getRoundedBitmap(bitmap));
-                        builder.setLargeIcon(bitmap);
+                        builder.setLargeIcon(BitmapUtils.getRoundedBitmap(bitmap));
                         fireNotification(context, builder.build(), notificationId);
                     } else {
                         Log.d(TAG, "Failed to load the profile picture");
