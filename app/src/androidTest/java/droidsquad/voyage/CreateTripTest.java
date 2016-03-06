@@ -11,32 +11,42 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isNotChecked;
+import static android.support.test.espresso.matcher.ViewMatchers.withChild;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 
+import android.support.test.espresso.contrib.PickerActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
+import android.widget.DatePicker;
 
 import com.parse.Parse;
 
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
+import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.CreateTripActivity;
 import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.model.objects.Trip;
@@ -51,6 +61,8 @@ public class CreateTripTest {
     @Rule
     public ActivityTestRule<CreateTripActivity> mCreateTripActivityRule = new ActivityTestRule(CreateTripActivity.class);
 
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd", Locale.US);
+
     String TRIP_NAME_TOO_SHORT;
     String TRIP_NAME;
     String LEAVING_FROM;
@@ -59,6 +71,10 @@ public class CreateTripTest {
     String PLANE;
     String CAR;
     String BUS;
+    String OK_BUTTON;
+
+    Calendar CALENDAR_FROM;
+    Calendar CALENDAR_TO;
 
     @Before
     public void setUp() throws Exception {
@@ -71,6 +87,10 @@ public class CreateTripTest {
         PLANE = "Plane";
         BUS = "Bus";
         CAR = "Car";
+        OK_BUTTON = "OK";
+
+        resetCalendars();
+        sleep(500);
     }
 
     @Test
@@ -204,6 +224,130 @@ public class CreateTripTest {
         onView(withId(R.id.transportation))
                 .check(matches(withSpinnerText(BUS)));
 
+    }
+
+    @Test
+    public void defaultTestDatePickers () {
+
+        // Set Calendar to default
+        CALENDAR_TO.add(Calendar.DAY_OF_WEEK, Constants.DEFAULT_TRIP_LENGTH);
+
+        // Check if datePickers were initialized properly
+        onView(withId(R.id.date_from))
+                .check(matches(withText(dateFormat.format(CALENDAR_FROM.getTime()))));
+        onView(withId(R.id.date_to))
+                .check(matches(withText(dateFormat.format(CALENDAR_TO.getTime()))));
+
+    }
+
+    @Test
+    public void basicTestDatePickers (){
+
+        // Set Calendars to initial test date
+        CALENDAR_FROM.add(Calendar.DAY_OF_WEEK, Constants.DEFAULT_TRIP_LENGTH);
+        CALENDAR_TO.add(Calendar.MONTH, 1);
+
+        // Set FROM Date using the DatePicker
+        setDateFrom();
+
+        // Check if date to was updated automatically
+        CALENDAR_FROM.add(Calendar.DAY_OF_WEEK, Constants.DEFAULT_TRIP_LENGTH);
+        onView(withId(R.id.date_to))
+                .check(matches(withText(dateFormat.format(CALENDAR_FROM.getTime()))));
+
+        // Set Calendars to initial test date
+        resetCalendars();
+        CALENDAR_FROM.add(Calendar.DAY_OF_WEEK, Constants.DEFAULT_TRIP_LENGTH);
+        CALENDAR_TO.add(Calendar.MONTH, 1);
+
+        // SET TO Date using the DatePicker
+        setDateTo();
+
+        // Check if dates are displayed properly
+        onView(withId(R.id.date_from))
+                .check(matches(withText(dateFormat.format(CALENDAR_FROM.getTime()))));
+        onView(withId(R.id.date_to))
+                .check(matches(withText(dateFormat.format(CALENDAR_TO.getTime()))));
+
+    }
+
+    @Test
+    public void edgeTestDatePickers (){
+
+        // Set date FROM and TO to the same date
+        setDateFrom();
+        setDateTo();
+
+        // Check if displaying dates correctly
+        onView(withId(R.id.date_from))
+                .check(matches(withText(dateFormat.format(CALENDAR_FROM.getTime()))));
+        onView(withId(R.id.date_to))
+                .check(matches(withText(dateFormat.format(CALENDAR_TO.getTime()))));
+
+        // Update FROM date
+        CALENDAR_FROM.add(Calendar.DAY_OF_WEEK, 1);
+        setDateFrom();
+
+        // Both dates should still be the same
+        onView(withId(R.id.date_from))
+                .check(matches(withText(dateFormat.format(CALENDAR_FROM.getTime()))));
+        onView(withId(R.id.date_to))
+                .check(matches(withText(dateFormat.format(CALENDAR_FROM.getTime()))));
+
+        // Reset dates
+        resetCalendars();
+        setDateFrom();
+        CALENDAR_TO.add(Calendar.DAY_OF_WEEK, Constants.DEFAULT_TRIP_LENGTH);
+        setDateTo();
+
+        // Check if dates changed properly
+        onView(withId(R.id.date_from))
+                .check(matches(withText(dateFormat.format(CALENDAR_FROM.getTime()))));
+        onView(withId(R.id.date_to))
+                .check(matches(withText(dateFormat.format(CALENDAR_TO.getTime()))));
+
+    }
+
+    /* Give the app extra time to update */
+    private void sleep(int time){
+        try {
+            Thread.sleep(time);
+        }
+        catch(InterruptedException e){
+            e.printStackTrace();
+        }
+    }
+
+    /* Set Calendars to current date */
+    private void resetCalendars(){
+        CALENDAR_FROM = Calendar.getInstance();
+        CALENDAR_TO = Calendar.getInstance();
+    }
+
+    /* Uses CALENDAR_FROM and DatePicker to set FROM Date */
+    private void setDateFrom(){
+        onView(withId(R.id.date_from))
+                .perform(click());
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
+                .perform(PickerActions
+                        .setDate(CALENDAR_FROM.get(Calendar.YEAR),
+                                CALENDAR_FROM.get(Calendar.MONTH) + 1,
+                                CALENDAR_FROM.get(Calendar.DAY_OF_MONTH)));
+        onView(withText(OK_BUTTON))
+                .perform(click());
+    }
+
+    /* Uses CALENDAR_TO DatePicker to set TO Date */
+    private void setDateTo(){
+        onView(withId(R.id.date_to))
+                .perform(click());
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
+                .perform(PickerActions
+                        .setDate(CALENDAR_TO.get(Calendar.YEAR),
+                                CALENDAR_TO.get(Calendar.MONTH) + 1,
+                                CALENDAR_TO.get(Calendar.DAY_OF_MONTH)));
+        onView(withText(OK_BUTTON))
+                .perform(click());
     }
 }
 
