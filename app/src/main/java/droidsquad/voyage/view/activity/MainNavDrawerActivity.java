@@ -73,10 +73,6 @@ public class MainNavDrawerActivity extends AppCompatActivity
                 controller.tripsPressed();
                 break;
 
-            case R.id.nav_settings:
-                controller.settingsPressed();
-                break;
-
             case R.id.nav_logout:
                 controller.logOutUser();
                 break;

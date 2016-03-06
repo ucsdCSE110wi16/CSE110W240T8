@@ -36,10 +36,6 @@ public class MainNavDrawerController {
                     requestsPressed();
                     break;
 
-                case Constants.FRAGMENT_SETTINGS:
-                    settingsPressed();
-                    break;
-
                 case Constants.FRAGMENT_FEED:
                     feedPressed();
                     break;
@@ -70,16 +66,6 @@ public class MainNavDrawerController {
     public void feedPressed() {
         Fragment fragment = FeedFragment.newInstance();
         changeFragment(fragment, "Feed");
-    }
-
-    /**
-     * Called when the Settings option is selected from the navigation drawer
-     */
-    public void settingsPressed() {
-        Toast.makeText(activity, "Settings Fragment", Toast.LENGTH_SHORT).show();
-        // TODO: create settings fragment
-        // Fragment fragment = SettingsFragment.newInstance();
-        // changeFragment(fragment, "Feed");
     }
 
     public void requestsPressed() {
