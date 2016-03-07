@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -57,10 +58,10 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
         holder.mMembersAdapter.updateResults(trip.getMembersAsUsersExclusive());
 
         // Set the correct subhead text based on the number of friends going on the trip
-        int membersSize = trip.getMembers().size() - 1;
+        int membersSize = holder.mMembersAdapter.getItemCount();
         if (membersSize == 0) {
             holder.mSubhead.setText(String.format(NO_FRIENDS_FORMAT, trip.getAdmin().getFullName()));
-            holder.mViewMembersButton.setVisibility(View.GONE);
+            holder.mViewMembers.setVisibility(View.GONE);
             holder.mCaretIconView.setVisibility(View.GONE);
         } else if (membersSize == 1) {
             holder.mSubhead.setText(String.format(SINGLE_FRIEND_FORMAT,
@@ -168,10 +169,10 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
         public TextView mCities;
         public TextView mDates;
         public TextView mJoinButton;
-        public TextView mViewMembersButton;
         public RecyclerView mMembersRecyclerView;
         public FeedCardMembersAdapter mMembersAdapter;
         public ImageView mCaretIconView;
+        public LinearLayout mViewMembers;
 
         public ViewHolder(View itemVie) {
             super(itemVie);
@@ -182,8 +183,8 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
             mCities = (TextView) itemView.findViewById(R.id.cities);
             mDates = (TextView) itemView.findViewById(R.id.dates);
             mJoinButton = (TextView) itemView.findViewById(R.id.join_button);
-            mViewMembersButton = (TextView) itemView.findViewById(R.id.view_friends_button);
             mCaretIconView = (ImageView) itemView.findViewById(R.id.caret);
+            mViewMembers = (LinearLayout) itemVie.findViewById(R.id.view_members);
             mMembersAdapter = new FeedCardMembersAdapter(mFragment.getActivity());
 
             mMembersRecyclerView = (RecyclerView) itemView.findViewById(R.id.members_recycler_view);
@@ -191,14 +192,7 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
             mMembersRecyclerView.setAdapter(mMembersAdapter);
             mMembersRecyclerView.addItemDecoration(new DividerItemDecoration(mFragment.getContext()));
 
-            mViewMembersButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    toggleExpansion();
-                }
-            });
-
-            mCaretIconView.setOnClickListener(new View.OnClickListener() {
+            mViewMembers.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     toggleExpansion();

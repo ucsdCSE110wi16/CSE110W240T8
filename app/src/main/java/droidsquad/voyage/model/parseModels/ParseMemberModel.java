@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 
 import droidsquad.voyage.model.objects.Member;
-import droidsquad.voyage.model.objects.VoyageUser;
 
 public class ParseMemberModel extends ParseModel {
     private static final String TAG = ParseMemberModel.class.getSimpleName();
@@ -198,9 +197,15 @@ public class ParseMemberModel extends ParseModel {
 
     public static List<Member> getMembersFromParseObjects(List<ParseObject> parseMembers) {
         List<Member> members = new ArrayList<>();
-        for (ParseObject parseMember : parseMembers) {
-            members.add(getMemberFromParseObject(parseMember));
+
+        try {
+            for (ParseObject parseMember : parseMembers) {
+                members.add(getMemberFromParseObject(parseMember));
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Trip has no members");
         }
+
         return members;
     }
 }

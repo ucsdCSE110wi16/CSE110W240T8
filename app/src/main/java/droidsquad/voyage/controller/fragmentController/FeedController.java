@@ -25,16 +25,9 @@ public class FeedController {
         this.adapter = new FeedCardAdapter(fragment);
     }
 
-    // called once from the activity, only needs to be called once
-    public void setAdapter(RecyclerView recyclerView) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.setAdapter(adapter);
-    }
-
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
-        fragment.showProgress(true);
-        ParseTripModel.getPublicTrips(new ParseTripModel.TripListCallback() {
+        ParseTripModel.getTripsFromFriends(new ParseTripModel.TripListCallback() {
             @Override
             public void onSuccess(List<Trip> trips) {
                 fragment.showProgress(false);
@@ -68,5 +61,9 @@ public class FeedController {
 
     public void createTripButtonPressed() {
         fragment.createTrip();
+    }
+
+    public FeedCardAdapter getAdapter() {
+        return adapter;
     }
 }

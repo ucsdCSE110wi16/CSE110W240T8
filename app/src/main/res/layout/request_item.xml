@@ -39,7 +39,7 @@
         android:maxLines="2"
         android:minLines="2"
         android:paddingTop="4dp"
-        android:text="@string/request_message_template" />
+        android:text="@string/invitation_message_template" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/elapsed_time"

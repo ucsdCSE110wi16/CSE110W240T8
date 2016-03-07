@@ -3,6 +3,8 @@ package droidsquad.voyage.controller.fragmentController;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import droidsquad.voyage.R;
@@ -80,11 +82,20 @@ public class RequestsController {
     }
 
     public void fetchData() {
-
-        ParseRequestModel.fetchInvitations(new ParseRequestModel.RequestListCallback() {
+        ParseRequestModel.fetchInvitationsAndRequests(new ParseRequestModel.RequestListCallback() {
             @Override
-            public void onSuccess(List<Request> requests) {
+            public void onSuccess(final List<Request> requests) {
                 Log.d(TAG, "Requests received: " + requests.size());
+
+                Collections.sort(requests, new Comparator<Request>() {
+                    @Override
+                    public int compare(Request lhs, Request rhs) {
+                        if (lhs.elapsedTime < rhs.elapsedTime) return -1;
+                        else if (lhs.elapsedTime == rhs.elapsedTime) return 0;
+                        else return 1;
+                    }
+                });
+
                 mFragment.showProgress(false);
                 mFragment.refreshing(false);
                 mFragment.showNoRequestsView(false);

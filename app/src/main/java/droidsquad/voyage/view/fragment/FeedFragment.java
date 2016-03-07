@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,19 +42,19 @@ public class FeedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_trip_list, container, false);
 
         // the controller must be set here!
         this.controller = new FeedController(this);
 
-        View v = inflater.inflate(R.layout.fragment_trip_list, container, false);
-
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefresh);
         mProgressBar = (ProgressBar) v.findViewById(R.id.trip_list_progress_bar);
+        mFab = (FloatingActionButton) v.findViewById(R.id.fab);
 
         RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.trip_recycler_view);
-        controller.setAdapter(recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(controller.getAdapter());
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -68,7 +69,6 @@ public class FeedFragment extends Fragment {
             }
         });
 
-        mFab = (FloatingActionButton) v.findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,6 +76,7 @@ public class FeedFragment extends Fragment {
             }
         });
 
+        showProgress(true);
         return v;
     }
 

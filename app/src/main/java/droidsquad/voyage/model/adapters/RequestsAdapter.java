@@ -42,9 +42,11 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         request.user.loadProfilePicInto(context, holder.imageView);
 
         holder.hostNameView.setText(request.user.getFullName());
-        holder.elapsedTimeView.setText(request.elapsedTime);
-        holder.invitationMsgView.setText(context.getString(R.string.request_message_template,
-                request.trip.getName()));
+        holder.elapsedTimeView.setText(request.getElapsedTimeString());
+
+        holder.invitationMsgView.setText(context.getString((request.isInvitation)
+                ? R.string.invitation_message_template
+                : R.string.request_message_template, request.trip.getName()));
 
         holder.acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,6 +122,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
 
     public interface OnButtonClickedCallback {
         void onAcceptClicked(Request request);
+
         void onDeclineClicked(Request request);
     }
 

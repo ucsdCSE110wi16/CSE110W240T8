@@ -1,5 +1,7 @@
 package droidsquad.voyage.model.objects;
 
+import android.text.format.DateUtils;
+
 /**
  * Class for storing all the data relevant to trip requests
  * to be displayed in the requests activity
@@ -7,7 +9,11 @@ package droidsquad.voyage.model.objects;
 public class Request {
     public User user;
     public Trip trip;
-    public String elapsedTime;
     public String memberId;
-    boolean isInvitation;
+    public long elapsedTime;
+    public boolean isInvitation;
+
+    public String getElapsedTimeString() {
+        return (String) DateUtils.getRelativeTimeSpanString(elapsedTime);
+    }
 }

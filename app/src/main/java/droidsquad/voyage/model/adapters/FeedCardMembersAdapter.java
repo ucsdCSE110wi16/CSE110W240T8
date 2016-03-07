@@ -28,7 +28,7 @@ public class FeedCardMembersAdapter extends RecyclerView.Adapter<FeedCardMembers
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.feed_members_dropdown, parent, false);
+                .inflate(R.layout.feed_dropdown_member, parent, false);
 
         return new ViewHolder(view);
     }

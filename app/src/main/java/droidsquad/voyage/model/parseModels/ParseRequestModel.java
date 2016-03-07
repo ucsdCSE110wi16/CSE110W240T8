@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -12,6 +11,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import droidsquad.voyage.model.objects.Member;
@@ -31,7 +31,7 @@ public class ParseRequestModel extends ParseModel {
         ParseTripModel.getTripsInvitedTo(new ParseTripModel.TripListCallback() {
             @Override
             public void onSuccess(List<Trip> trips) {
-                callback.onSuccess(getRequestsFromTrips(trips));
+                callback.onSuccess(getInvitationsFromTrips(trips));
             }
 
             @Override
@@ -43,23 +43,38 @@ public class ParseRequestModel extends ParseModel {
     }
 
     /**
-     * Get all the requests to join trips for which the current user is the admin
+     * Get all the invitations and requests pertinent to the current user
+     *
+     * @param callback Called on success with all the invitations and requests
      */
-    public static void fetchRequests() {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseTripModel.TRIP_CLASS);
-        query.whereEqualTo(ParseTripModel.Field.CREATED_BY, ParseUser.getCurrentUser());
-        query.include(ParseTripModel.Field.REQUESTS);
-        query.include(ParseTripModel.Field.REQUESTS + "." + ParseMemberModel.Field.USER);
-
-        query.findInBackground(new FindCallback<ParseObject>() {
+    public static void fetchInvitationsAndRequests(final RequestListCallback callback) {
+        fetchInvitations(new RequestListCallback() {
             @Override
-            public void done(List<ParseObject> parseTrips, ParseException e) {
-                if (e == null) {
-                    for (ParseObject parseTrip : parseTrips) {
-                        List<ParseObject> requests = parseTrip.getList(ParseTripModel.Field.REQUESTS);
-                        //TODO
+            public void onSuccess(final List<Request> invitations) {
+                ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseTripModel.TRIP_CLASS);
+                query.whereEqualTo(ParseTripModel.Field.CREATED_BY, ParseUser.getCurrentUser());
+                query.include(ParseTripModel.Field.REQUESTS);
+                query.include(ParseTripModel.Field.REQUESTS + "." + ParseMemberModel.Field.USER);
+
+                ParseTripModel.getTrips(query, new ParseTripModel.TripListCallback() {
+                    @Override
+                    public void onSuccess(List<Trip> trips) {
+                        List<Request> requests = getRequestsFromTrips(trips);
+                        requests.addAll(invitations);
+                        callback.onSuccess(requests);
                     }
-                }
+
+                    @Override
+                    public void onFailure(String error) {
+                        Log.d(TAG, "Error while getting trips for invitations and requests");
+                        callback.onFailure(error);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                callback.onFailure(error);
             }
         });
     }
@@ -133,16 +148,27 @@ public class ParseRequestModel extends ParseModel {
      *
      * @param trips The parse trips objects to be turned into Request objects
      */
-    private static List<Request> getRequestsFromTrips(List<Trip> trips) {
-        final List<Request> requests = new ArrayList<>();
+    private static List<Request> getInvitationsFromTrips(List<Trip> trips) {
+        final List<Request> invitations = new ArrayList<>();
 
         for (Trip trip : trips) {
             Request request = new Request();
             request.trip = trip;
             request.user = trip.getAdmin();
             request.memberId = trip.getInvitees().get(0).id;
-            request.elapsedTime = trip.getInvitees().get(0).getElapsedTimeString();
-            requests.add(request);
+            request.elapsedTime = trip.getInvitees().get(0).time;
+            request.isInvitation = true;
+            invitations.add(request);
+        }
+
+        return invitations;
+    }
+
+    private static List<Request> getRequestsFromTrips(List<Trip> trips) {
+        List<Request> requests = new ArrayList<>();
+
+        for (Trip trip : trips) {
+            requests.addAll(trip.getRequests());
         }
 
         return requests;
@@ -158,7 +184,8 @@ public class ParseRequestModel extends ParseModel {
                 Request request = new Request();
                 request.user = member.user;
                 request.memberId = member.id;
-                request.elapsedTime = member.getElapsedTimeString();
+                request.elapsedTime = member.time;
+                request.isInvitation = false;
                 requests.add(request);
             }
 
