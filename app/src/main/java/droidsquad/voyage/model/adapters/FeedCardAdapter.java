@@ -1,5 +1,6 @@
 package droidsquad.voyage.model.adapters;
 
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,11 +18,14 @@ import java.util.List;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.DividerItemDecoration;
+import droidsquad.voyage.model.objects.Member;
 import droidsquad.voyage.model.objects.Request;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.model.objects.User;
 import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.model.parseModels.ParseModel;
 import droidsquad.voyage.model.parseModels.ParseRequestModel;
+import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.view.fragment.FeedFragment;
 
 public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHolder> {
@@ -47,7 +51,7 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Trip trip = mTrips.get(position);
 
         trip.getAdmin().loadProfilePicInto(mFragment.getActivity(), holder.mAdminPhoto);
@@ -74,27 +78,73 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
         // Disable the ask to join the trip button if user has already requested
         for (Request request : trip.getRequests()) {
             if (request.user.equals(VoyageUser.currentUser())) {
-                holder.mJoinButton.setText("Request sent");
-                holder.mJoinButton.setEnabled(false);
+                holder.mJoinButton.setText("Cancel request");
+                holder.requestSent = true;
+                holder.requestId = request.memberId;
             }
         }
 
         holder.mJoinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ParseRequestModel.sendRequest(trip, new ParseModel.ParseResponseCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Log.d(TAG, "Request sent with success");
-                        holder.mJoinButton.setText("Request sent");
-                        holder.mJoinButton.setEnabled(false);
+                if (!holder.requestSent) {
+                    for (Member member : trip.getInvitees()) {
+                        if (member.user.equals(VoyageUser.currentUser())) {
+                            final Request request = new Request();
+                            request.memberId = member.id;
+                            request.user = member.user;
+                            request.trip = trip;
+
+                            ParseRequestModel.acceptRequest(request, new ParseRequestModel.ParseResponseCallback() {
+                                @Override
+                                public void onSuccess() {
+                                    Log.d(TAG, "Successfully accepted Trip.");
+                                    Snackbar.make(mFragment.getView(), "You're in!", Snackbar.LENGTH_SHORT).show();
+
+                                    mTrips.remove(position);
+                                    notifyItemRemoved(position);
+                                    notifyItemRangeChanged(position, mTrips.size() - 1);
+                                }
+
+                                @Override
+                                public void onFailure(String error) {
+                                    Log.d(TAG, "Couldn't accept trip. Error: " + error);
+                                }
+                            });
+
+                            return;
+                        }
                     }
 
-                    @Override
-                    public void onFailure(String error) {
-                        Log.d(TAG, "Failed to send the request: " + error);
-                    }
-                });
+                    ParseRequestModel.sendRequest(trip, new ParseRequestModel.RequestSentCallback() {
+                        @Override
+                        public void onSuccess(String requestId) {
+                            Log.d(TAG, "Request sent with success");
+                            holder.mJoinButton.setText("Cancel request");
+                            holder.requestSent = true;
+                            holder.requestId = requestId;
+                        }
+
+                        @Override
+                        public void onFailure(String error) {
+                            Log.d(TAG, "Failed to send the request: " + error);
+                        }
+                    });
+                } else {
+                    ParseTripModel.removeRequestFromTrip(trip.getId(), holder.requestId, new ParseModel.ParseResponseCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d(TAG, "Request canceled with success");
+                            holder.mJoinButton.setText("Ask to join");
+                            holder.requestSent = false;
+                        }
+
+                        @Override
+                        public void onFailure(String error) {
+                            Log.d(TAG, "Failed to cancel the request: " + error);
+                        }
+                    });
+                }
             }
         });
     }
@@ -173,6 +223,8 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
         public FeedCardMembersAdapter mMembersAdapter;
         public ImageView mCaretIconView;
         public LinearLayout mViewMembers;
+        public boolean requestSent;
+        public String requestId;
 
         public ViewHolder(View itemVie) {
             super(itemVie);
@@ -198,6 +250,8 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
                     toggleExpansion();
                 }
             });
+
+            requestSent = false;
         }
 
         public void toggleExpansion() {

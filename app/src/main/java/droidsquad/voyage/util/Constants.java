@@ -27,4 +27,5 @@ public class Constants {
 
     // Notification types
     public static final String NOTIFICATION_INVITATION = "NOTIFICATION_INVITATION";
+    public static final String NOTIFICATION_REQUEST = "NOTIFICATION_REQUEST";
 }

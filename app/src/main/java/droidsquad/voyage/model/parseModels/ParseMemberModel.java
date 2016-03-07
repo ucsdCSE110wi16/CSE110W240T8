@@ -186,7 +186,7 @@ public class ParseMemberModel extends ParseModel {
      * @param parseMember ParseMember to get the information from
      * @return A Member object with the info from ParseMember
      */
-    public static Member getMemberFromParseObject(ParseObject parseMember) {
+    public static Member getMemberFromParseObject(ParseObject parseMember) throws IllegalStateException {
         Member member = new Member();
         member.user = ParseUserModel.getUserFromParseUser(parseMember.getParseUser(Field.USER));
         member.id = parseMember.getObjectId();
@@ -202,7 +202,7 @@ public class ParseMemberModel extends ParseModel {
             for (ParseObject parseMember : parseMembers) {
                 members.add(getMemberFromParseObject(parseMember));
             }
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             Log.d(TAG, "Trip has no members");
         }
 

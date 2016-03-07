@@ -14,6 +14,10 @@ public class Request {
     public boolean isInvitation;
 
     public String getElapsedTimeString() {
-        return (String) DateUtils.getRelativeTimeSpanString(elapsedTime);
+        if (System.currentTimeMillis() - elapsedTime < (60 * 1000)) {
+            return "Just Now";
+        } else {
+            return (String) DateUtils.getRelativeTimeSpanString(elapsedTime);
+        }
     }
 }

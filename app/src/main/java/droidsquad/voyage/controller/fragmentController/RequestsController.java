@@ -47,7 +47,7 @@ public class RequestsController {
 
     private void acceptRequest(final Request request) {
         Log.d(TAG, "Accepting request for " + request.trip.getName());
-        ParseRequestModel.acceptRequest(request.memberId, new ParseRequestModel.ParseResponseCallback() {
+        ParseRequestModel.acceptRequest(request, new ParseRequestModel.ParseResponseCallback() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Successfully accepted Trip.");

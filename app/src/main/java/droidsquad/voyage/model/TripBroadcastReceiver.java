@@ -24,6 +24,8 @@ import java.util.Locale;
 import java.util.Random;
 
 import droidsquad.voyage.R;
+import droidsquad.voyage.model.objects.Request;
+import droidsquad.voyage.model.parseModels.ParseModel;
 import droidsquad.voyage.model.parseModels.ParseNotificationModel;
 import droidsquad.voyage.model.parseModels.ParseRequestModel;
 import droidsquad.voyage.util.BitmapUtils;
@@ -75,37 +77,61 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     private void onAcceptTripInvitation(final Context context, final Intent intent) {
         Log.d(TAG, "Attempting to accept the trip from the notification dropdown");
-        ParseRequestModel.acceptRequestFromNotification(data.optString(ParseNotificationModel.Field.TRIP_ID),
-                new ParseRequestModel.ParseResponseCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Log.i(TAG, "Accepted trip from notification");
-                        dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
-                    }
 
-                    @Override
-                    public void onFailure(String error) {
-                        Log.i(TAG, "Error while accepting trip from notification: " + error);
-                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+        String type = data.optString(ParseNotificationModel.Field.TYPE);
+
+        if (type.equals(Constants.NOTIFICATION_INVITATION)) {
+            ParseRequestModel.acceptInvitationFromNotification(data.optString(ParseNotificationModel.Field.TRIP_ID),
+                    new ParseRequestModel.ParseResponseCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.i(TAG, "Accepted trip from notification");
+                            dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
+                        }
+
+                        @Override
+                        public void onFailure(String error) {
+                            Log.i(TAG, "Error while accepting trip from notification: " + error);
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                        }
                     }
-                });
+            );
+        } else if (type.equals(Constants.NOTIFICATION_REQUEST)) {
+            ParseRequestModel.acceptRequest(
+                    data.optString(ParseNotificationModel.Field.TRIP_ID),
+                    data.optString(ParseNotificationModel.Field.MEMBER_ID),
+                    new ParseModel.ParseResponseCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.i(TAG, "Accepted trip from notification");
+                            dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
+                        }
+
+                        @Override
+                        public void onFailure(String error) {
+                            Log.i(TAG, "Error while accepting trip from notification: " + error);
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+            );
+        }
     }
 
     private void onDeclineTripInvitation(final Context context, final Intent intent) {
         ParseRequestModel.declineRequestFromNotification(data.optString(ParseNotificationModel.Field.TRIP_ID),
                 new ParseRequestModel.ParseResponseCallback() {
-            @Override
-            public void onSuccess() {
-                Log.i(TAG, "Declined trip from notification");
-                dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
-            }
+                    @Override
+                    public void onSuccess() {
+                        Log.i(TAG, "Declined trip from notification");
+                        dismissNotification(context, intent.getIntExtra(NOTIFICATION_ID, 0));
+                    }
 
-            @Override
-            public void onFailure(String error) {
-                Log.i(TAG, "Error while declining trip from notification: " + error);
-                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onFailure(String error) {
+                        Log.i(TAG, "Error while declining trip from notification: " + error);
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     /**
@@ -142,6 +168,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
         String alert = data.optString(ParseNotificationModel.Field.ALERT);
         String senderPicURL = data.optString(ParseNotificationModel.Field.SENDER_PROFILE_PIC);
         String tickerText = String.format(Locale.getDefault(), "%s: %s", title, alert);
+        String type = data.optString(ParseNotificationModel.Field.TYPE);
 
         // Pick an id that probably won't overlap anything
         final int notificationId = (int) System.currentTimeMillis();
@@ -257,7 +284,7 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
      * Dismiss the notification with the given id
      *
      * @param context The context in which the notification lives
-     * @param id The id of the notification to be dismissed
+     * @param id      The id of the notification to be dismissed
      */
     private void dismissNotification(Context context, int id) {
         NotificationManager nm =

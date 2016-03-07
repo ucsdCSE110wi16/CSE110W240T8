@@ -58,6 +58,7 @@ public class TripListController {
                 });
 
                 fragment.showProgress(false);
+                fragment.showNoRequestsView(false);
                 adapter.updateData(trips);
             }
 
