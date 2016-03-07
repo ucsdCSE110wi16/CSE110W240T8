@@ -90,9 +90,9 @@ public class RequestsController {
                 Collections.sort(requests, new Comparator<Request>() {
                     @Override
                     public int compare(Request lhs, Request rhs) {
-                        if (lhs.elapsedTime < rhs.elapsedTime) return -1;
+                        if (lhs.elapsedTime < rhs.elapsedTime) return 1;
                         else if (lhs.elapsedTime == rhs.elapsedTime) return 0;
-                        else return 1;
+                        else return -1;
                     }
                 });
 
