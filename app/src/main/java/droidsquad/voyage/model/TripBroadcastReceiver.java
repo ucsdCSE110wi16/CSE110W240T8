@@ -168,6 +168,10 @@ public class TripBroadcastReceiver extends ParsePushBroadcastReceiver {
                 activity = MainNavDrawerActivity.class;
                 extras.putString(Constants.KEY_FRAGMENT_MAIN_ACTIVITY, Constants.FRAGMENT_REQUESTS);
                 break;
+            case Constants.NOTIFICATION_REQUEST:
+                activity = MainNavDrawerActivity.class;
+                extras.putString(Constants.KEY_FRAGMENT_MAIN_ACTIVITY, Constants.FRAGMENT_REQUESTS);
+                break;
 
             default:
                 activity = super.getActivity(context, intent);
