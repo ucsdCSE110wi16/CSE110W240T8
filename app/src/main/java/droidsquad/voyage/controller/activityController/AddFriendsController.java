@@ -94,6 +94,7 @@ public class AddFriendsController {
                 for (int i = 0; i < queriedFriends.size(); i++) {
                     if (allMembersAndInviteesFbIds.contains(queriedFriends.get(i).fbId)) {
                         queriedFriends.remove(i);
+                        --i;
                     }
                 }
 

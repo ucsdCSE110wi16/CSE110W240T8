@@ -94,12 +94,15 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
                             request.memberId = member.id;
                             request.user = member.user;
                             request.trip = trip;
+                            request.isInvitation = true;
 
                             ParseRequestModel.acceptRequest(request, new ParseRequestModel.ParseResponseCallback() {
                                 @Override
                                 public void onSuccess() {
                                     Log.d(TAG, "Successfully accepted Trip.");
-                                    Snackbar.make(mFragment.getView(), "You're in!", Snackbar.LENGTH_SHORT).show();
+                                    Snackbar.make(mFragment.getView(),
+                                            "You were already invited to this trip. You're in!",
+                                            Snackbar.LENGTH_LONG).show();
 
                                     mTrips.remove(position);
                                     notifyItemRemoved(position);
