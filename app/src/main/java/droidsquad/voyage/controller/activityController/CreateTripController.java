@@ -425,12 +425,14 @@ public class CreateTripController {
     public void completeSave(final Trip newTrip) {
         // TODO show progress spinning thingy and wait till the trip has been saved to parse
         // TODO: Change the text on the Snackbars
+        activity.showSpinner();
         if (isEditMode) {
             Log.i(TAG, "Updating the trip on Parse");
             newTrip.setId(trip.getId());
             ParseTripModel.updateTrip(newTrip, new ParseModel.ParseResponseCallback() {
                 @Override
                 public void onSuccess() {
+                    activity.hideSpinner();
                     Intent intent = new Intent();
                     intent.putExtra(activity.getString(R.string.intent_key_trip), newTrip);
                     activity.setResult(Constants.RESULT_CODE_TRIP_UPDATED, intent);
@@ -448,6 +450,7 @@ public class CreateTripController {
             ParseTripModel.saveNewTrip(newTrip, new ParseModel.ParseResponseCallback() {
                 @Override
                 public void onSuccess() {
+                    activity.hideSpinner();
                     activity.setResult(Constants.RESULT_CODE_TRIP_CREATED);
                     activity.finish();
                 }
