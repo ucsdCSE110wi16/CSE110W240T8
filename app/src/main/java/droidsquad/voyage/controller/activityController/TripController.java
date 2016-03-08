@@ -4,7 +4,10 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import droidsquad.voyage.R;
@@ -136,6 +139,18 @@ public class TripController {
 
     public CharSequence getTitle() {
         return trip.getName();
+    }
+
+    public JSONObject getDestination() {
+        return trip.getDestination();
+    }
+
+    public Date getDateFrom(){
+        return trip.getDateFrom();
+    }
+
+    public Date getDateTo(){
+        return trip.getDateTo();
     }
 
     public String getTransportationStringRepresentation() {
