@@ -123,6 +123,7 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
                         @Override
                         public void onSuccess(String requestId) {
                             Log.d(TAG, "Request sent with success");
+                            Snackbar.make(mFragment.getView(), "Trip Request Sent", Snackbar.LENGTH_LONG).show();
                             holder.mJoinButton.setText("Cancel request");
                             holder.requestSent = true;
                             holder.requestId = requestId;
@@ -138,6 +139,7 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
                         @Override
                         public void onSuccess() {
                             Log.d(TAG, "Request canceled with success");
+                            Snackbar.make(mFragment.getView(), "Trip Request Cancelled", Snackbar.LENGTH_LONG).show();
                             holder.mJoinButton.setText("Ask to join");
                             holder.requestSent = false;
                         }
