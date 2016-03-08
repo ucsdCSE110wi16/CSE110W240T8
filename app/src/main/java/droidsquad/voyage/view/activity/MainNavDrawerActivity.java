@@ -54,6 +54,8 @@ public class MainNavDrawerActivity extends AppCompatActivity
         mDrawer.setDrawerListener(toggle);
         navigationView.setNavigationItemSelectedListener(this);
 
+        navigationView.getMenu().getItem(1).setChecked(true); //set trips highlight at start
+
         toggle.syncState();
         userName.setText(VoyageUser.getFullName());
 
@@ -82,6 +84,7 @@ public class MainNavDrawerActivity extends AppCompatActivity
                 break;
         }
 
+        item.setChecked(true);
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
     }
