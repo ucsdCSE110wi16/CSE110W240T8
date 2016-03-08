@@ -45,6 +45,7 @@ public class TripListController {
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
         if (NetworkAlerts.isNetworkAvailable(context)) {
+            fragment.showProgress(true);
             ParseTripModel.getTrips(new ParseTripModel.TripListCallback() {
                 @Override
                 public void onSuccess(List<Trip> trips) {
