@@ -10,6 +10,7 @@ import java.util.List;
 import droidsquad.voyage.model.adapters.FeedCardAdapter;
 import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.util.NetworkAlerts;
 import droidsquad.voyage.view.fragment.FeedFragment;
 
 public class FeedController {
@@ -27,19 +28,25 @@ public class FeedController {
 
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
-        ParseTripModel.getTripsFromFriends(new ParseTripModel.TripListCallback() {
-            @Override
-            public void onSuccess(List<Trip> trips) {
-                fragment.showProgress(false);
-                updateAdapter(trips);
-            }
+        if (NetworkAlerts.isNetworkAvailable(context)) {
+            fragment.showProgress(true);
+            ParseTripModel.getTripsFromFriends(new ParseTripModel.TripListCallback() {
+                @Override
+                public void onSuccess(List<Trip> trips) {
+                    fragment.showProgress(false);
+                    updateAdapter(trips);
+                }
 
-            @Override
-            public void onFailure(String error) {
-                fragment.showProgress(false);
-                Log.d(TAG, "Failed to retrieve data from trips: " + error);
-            }
-        });
+                @Override
+                public void onFailure(String error) {
+                    fragment.showProgress(false);
+                    Log.d(TAG, "Failed to retrieve data from trips: " + error);
+                }
+            });
+        }
+        else {
+            NetworkAlerts.showNetworkAlert(context);
+        }
     }
 
     /**
