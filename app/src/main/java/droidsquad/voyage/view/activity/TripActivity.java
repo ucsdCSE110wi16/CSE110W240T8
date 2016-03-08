@@ -24,6 +24,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import droidsquad.voyage.R;
 import droidsquad.voyage.controller.activityController.TripController;
 import droidsquad.voyage.model.adapters.TripMembersAdapter;
@@ -273,9 +280,38 @@ public class TripActivity extends AppCompatActivity {
      * TODO: Set up the content to be shared here
      */
     private void startShareIntent() {
+
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+
+        /* Get destination */
+        JSONObject tripDestination = mController.getDestination();
+        String dest = "";
+        try {
+            dest = tripDestination.getString("address");
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+        /* Split string and get the city */
+        String[] data = dest.split(",");
+        dest = data[0];
+
+        /* Format date */
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d", Locale.US);
+        Date dateFrom = mController.getDateFrom();
+        Date dateTo = mController.getDateTo();
+
+        /* Get trip name */
+        CharSequence tripName = mController.getTitle();
+
+        /* Make string to share */
+        String share = "Hey! Are you available from " + dateFormat.format(dateFrom);
+        share += " to " + dateFormat.format(dateTo) + "? ";
+        share += "Join me in my new trip \""+ tripName + "\" to " + dest + " on Voyage!";
+
+        /* Share */
+        sendIntent.putExtra(Intent.EXTRA_TEXT, share);
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Share"));
     }
