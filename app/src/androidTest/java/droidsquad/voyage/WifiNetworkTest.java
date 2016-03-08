@@ -43,7 +43,7 @@ public class WifiNetworkTest {
         wifiManager.setWifiEnabled(false);
 
         onView(withId(android.R.id.content)).perform(swipeDown());
-        sleep(5000);
+        sleep(10000);
         onView(withText("No Network Connection"))
                 .inRoot(isDialog())
                 .check(matches(isDisplayed()));
@@ -62,7 +62,7 @@ public class WifiNetworkTest {
         wifiManager.setWifiEnabled(true);
 
         onView(withId(android.R.id.content)).perform(swipeDown());
-        sleep(5000);
+        sleep(10000);
         //check that everything is fine/dialog doesn't appear
     }
 
