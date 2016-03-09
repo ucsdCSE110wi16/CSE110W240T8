@@ -4,7 +4,10 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import droidsquad.voyage.R;
@@ -14,6 +17,7 @@ import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.model.objects.VoyageUser;
 import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.util.Constants;
+import droidsquad.voyage.util.NetworkAlerts;
 import droidsquad.voyage.view.activity.TripActivity;
 
 public class TripController {
@@ -38,41 +42,51 @@ public class TripController {
 
     public void deleteTrip() {
         Log.d(TAG, "Deleting trip: " + trip.getName());
-        ParseTripModel.deleteTrip(trip, new ParseTripModel.ParseResponseCallback() {
-            @Override
-            public void onSuccess() {
-                Log.d(TAG, "Trip Successfully deleted");
-                mActivity.setResult(Constants.RESULT_CODE_TRIP_DELETED);
-                mActivity.finish();
-            }
+        if (NetworkAlerts.isNetworkAvailable(mActivity)) {
+            ParseTripModel.deleteTrip(trip, new ParseTripModel.ParseResponseCallback() {
+                @Override
+                public void onSuccess() {
+                    Log.d(TAG, "Trip Successfully deleted");
+                    mActivity.setResult(Constants.RESULT_CODE_TRIP_DELETED);
+                    mActivity.finish();
+                }
 
-            @Override
-            public void onFailure(String error) {
-                Log.d(TAG, "Couldn\'t delete the trip. Error: " + error);
-                Snackbar.make(mActivity.findViewById(android.R.id.content), error,
-                        Snackbar.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure(String error) {
+                    Log.d(TAG, "Couldn\'t delete the trip. Error: " + error);
+                    Snackbar.make(mActivity.findViewById(android.R.id.content), error,
+                            Snackbar.LENGTH_SHORT).show();
+                }
+            });
+        }
+        else {
+            NetworkAlerts.showNetworkAlert(mActivity);
+        }
     }
 
     public void leaveTrip() {
         Log.d(TAG, "Leaving trip: " + trip.getName());
-        ParseTripModel.removeMemberFromTrip(trip.getId(), trip.getMemberWithUserId(VoyageUser.getId()).id,
-                new ParseTripModel.ParseResponseCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Log.d(TAG, "Successfully Left trip");
-                        mActivity.setResult(Constants.RESULT_CODE_TRIP_LEFT);
-                        mActivity.finish();
-                    }
+        if (NetworkAlerts.isNetworkAvailable(mActivity)) {
+            ParseTripModel.removeMemberFromTrip(trip.getId(), trip.getMemberWithUserId(VoyageUser.getId()).id,
+                    new ParseTripModel.ParseResponseCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d(TAG, "Successfully Left trip");
+                            mActivity.setResult(Constants.RESULT_CODE_TRIP_LEFT);
+                            mActivity.finish();
+                        }
 
-                    @Override
-                    public void onFailure(String error) {
-                        Log.d(TAG, "Couldn\'t leave the trip. Error: " + error);
-                        Snackbar.make(mActivity.findViewById(android.R.id.content), error,
-                                Snackbar.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(String error) {
+                            Log.d(TAG, "Couldn\'t leave the trip. Error: " + error);
+                            Snackbar.make(mActivity.findViewById(android.R.id.content), error,
+                                    Snackbar.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+        else {
+            NetworkAlerts.showNetworkAlert(mActivity);
+        }
     }
 
     public void editTrip() {
@@ -101,25 +115,30 @@ public class TripController {
         final TripMembersAdapter adapter = (member.pendingRequest) ? mInviteesAdapter : mMembersAdapter;
 
         // Remove user from member
-        ParseTripModel.removeMemberFromTrip(trip.getId(), member.id, new ParseTripModel.ParseResponseCallback() {
-            @Override
-            public void onSuccess() {
-                adapter.removeMember(member);
-                trip.removeMember(member);
+        if (NetworkAlerts.isNetworkAvailable(mActivity)) {
+            ParseTripModel.removeMemberFromTrip(trip.getId(), member.id, new ParseTripModel.ParseResponseCallback() {
+                @Override
+                public void onSuccess() {
+                    adapter.removeMember(member);
+                    trip.removeMember(member);
 
-                updateLabelsVisibilityIfNecessary();
+                    updateLabelsVisibilityIfNecessary();
 
-                Snackbar.make(mActivity.findViewById(android.R.id.content),
-                        (member.pendingRequest ? R.string.snackbar_invitee_removed : R.string.snackbar_member_removed),
-                        Snackbar.LENGTH_SHORT).show();
-            }
+                    Snackbar.make(mActivity.findViewById(android.R.id.content),
+                            (member.pendingRequest ? R.string.snackbar_invitee_removed : R.string.snackbar_member_removed),
+                            Snackbar.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onFailure(String error) {
-                Snackbar.make(mActivity.findViewById(android.R.id.content),
-                        error, Snackbar.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure(String error) {
+                    Snackbar.make(mActivity.findViewById(android.R.id.content),
+                            error, Snackbar.LENGTH_SHORT).show();
+                }
+            });
+        }
+        else {
+            NetworkAlerts.showNetworkAlert(mActivity);
+        }
     }
 
     private void updateLabelsVisibilityIfNecessary() {
@@ -136,6 +155,18 @@ public class TripController {
 
     public CharSequence getTitle() {
         return trip.getName();
+    }
+
+    public JSONObject getDestination() {
+        return trip.getDestination();
+    }
+
+    public Date getDateFrom(){
+        return trip.getDateFrom();
+    }
+
+    public Date getDateTo(){
+        return trip.getDateTo();
     }
 
     public String getTransportationStringRepresentation() {

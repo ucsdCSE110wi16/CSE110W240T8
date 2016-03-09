@@ -2,9 +2,12 @@ package droidsquad.voyage.view.activity;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +21,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -58,6 +62,8 @@ public class CreateTripActivity extends AppCompatActivity {
     private Place mDestinationPlace;
 
     private Button mCreateTripButton;
+
+    private ProgressDialog mSpinner;
 
     private static final int FROM_PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private static final int TO_PLACE_AUTOCOMPLETE_REQUEST_CODE = 2;
@@ -126,6 +132,8 @@ public class CreateTripActivity extends AppCompatActivity {
         mTransportation = (Spinner) findViewById(R.id.transportation);
 
         mCreateTripButton = (Button) findViewById(R.id.create_trip_button);
+
+        mSpinner = new ProgressDialog(this);
 
         // Set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.trip_toolbar);
@@ -333,6 +341,17 @@ public class CreateTripActivity extends AppCompatActivity {
     public void showKeyBoard(View view) {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    public void showSpinner() {
+        mSpinner.setMessage("Saving Trip, Please Wait...");
+        mSpinner.setIndeterminate(true);
+        mSpinner.setCancelable(false);
+        mSpinner.show();
+    }
+
+    public void hideSpinner() {
+        mSpinner.dismiss();
     }
 
     /**

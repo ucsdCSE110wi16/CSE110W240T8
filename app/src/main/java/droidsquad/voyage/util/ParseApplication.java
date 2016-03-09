@@ -21,5 +21,7 @@ public class ParseApplication extends Application {
         Parse.initialize(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
         ParseFacebookUtils.initialize(getApplicationContext());
+
+        NetworkAlerts.setContext(getApplicationContext());
     }
 }

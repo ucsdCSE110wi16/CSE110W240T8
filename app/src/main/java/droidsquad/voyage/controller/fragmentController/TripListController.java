@@ -12,6 +12,7 @@ import java.util.List;
 import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.model.adapters.TripCardAdapter;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.util.NetworkAlerts;
 import droidsquad.voyage.view.fragment.TripListFragment;
 
 public class TripListController {
@@ -43,27 +44,33 @@ public class TripListController {
 
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
-        ParseTripModel.getTrips(new ParseTripModel.TripListCallback() {
-            @Override
-            public void onSuccess(List<Trip> trips) {
-                // Sort the trips
-                Collections.sort(trips, new Comparator<Trip>() {
-                    public int compare(Trip m1, Trip m2) {
-                        return m1.getDateTo().compareTo(m2.getDateTo());
-                    }
-                });
+        if (NetworkAlerts.isNetworkAvailable(context)) {
+            fragment.showProgress(true);
+            ParseTripModel.getTrips(new ParseTripModel.TripListCallback() {
+                @Override
+                public void onSuccess(List<Trip> trips) {
+                    // Sort the trips
+                    Collections.sort(trips, new Comparator<Trip>() {
+                        public int compare(Trip m1, Trip m2) {
+                            return m1.getDateTo().compareTo(m2.getDateTo());
+                        }
+                    });
 
-                fragment.showProgress(false);
-                fragment.showNoRequestsView(false);
-                adapter.updateData(trips);
-            }
+                    fragment.showProgress(false);
+                    fragment.showNoRequestsView(false);
+                    adapter.updateData(trips);
+                }
 
-            @Override
-            public void onFailure(String error) {
-                fragment.showProgress(false);
-                Log.d(TAG, "Failed to retrieved the data for the trips: " + error);
-            }
-        });
+                @Override
+                public void onFailure(String error) {
+                    fragment.showProgress(false);
+                    Log.d(TAG, "Failed to retrieved the data for the trips: " + error);
+                }
+            });
+        }
+        else {
+            NetworkAlerts.showNetworkAlert(context);
+        }
     }
 
     public void createTripButtonPressed() {

@@ -3,6 +3,7 @@ package droidsquad.voyage.controller.activityController;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Network;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,7 @@ import droidsquad.voyage.model.objects.Trip;
 import droidsquad.voyage.model.parseModels.ParseModel;
 import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.util.Constants;
+import droidsquad.voyage.util.NetworkAlerts;
 import droidsquad.voyage.view.activity.CreateTripActivity;
 
 public class CreateTripController {
@@ -423,41 +425,54 @@ public class CreateTripController {
      * @param newTrip Trip object to save to the backend
      */
     public void completeSave(final Trip newTrip) {
-        // TODO show progress spinning thingy and wait till the trip has been saved to parse
         // TODO: Change the text on the Snackbars
         if (isEditMode) {
             Log.i(TAG, "Updating the trip on Parse");
             newTrip.setId(trip.getId());
-            ParseTripModel.updateTrip(newTrip, new ParseModel.ParseResponseCallback() {
-                @Override
-                public void onSuccess() {
-                    Intent intent = new Intent();
-                    intent.putExtra(activity.getString(R.string.intent_key_trip), newTrip);
-                    activity.setResult(Constants.RESULT_CODE_TRIP_UPDATED, intent);
-                    activity.finish();
-                }
+            if (NetworkAlerts.isNetworkAvailable(activity)) {
+                activity.showSpinner();
+                ParseTripModel.updateTrip(newTrip, new ParseModel.ParseResponseCallback() {
+                    @Override
+                    public void onSuccess() {
+                        activity.hideSpinner();
+                        Intent intent = new Intent();
+                        intent.putExtra(activity.getString(R.string.intent_key_trip), newTrip);
+                        activity.setResult(Constants.RESULT_CODE_TRIP_UPDATED, intent);
+                        activity.finish();
+                    }
 
-                @Override
-                public void onFailure(String error) {
-                    Snackbar.make(activity.findViewById(android.R.id.content),
-                            error, Snackbar.LENGTH_SHORT);
-                }
-            });
+                    @Override
+                    public void onFailure(String error) {
+                        Snackbar.make(activity.findViewById(android.R.id.content),
+                                error, Snackbar.LENGTH_SHORT);
+                    }
+                });
+            }
+            else {
+                NetworkAlerts.showNetworkAlert(activity);
+            }
         } else {
             Log.i(TAG, "Saving the trip to Parse");
-            ParseTripModel.saveNewTrip(newTrip, new ParseModel.ParseResponseCallback() {
-                @Override
-                public void onSuccess() {
-                    activity.setResult(Constants.RESULT_CODE_TRIP_CREATED);
-                    activity.finish();
-                }
+            if (NetworkAlerts.isNetworkAvailable(activity)) {
+                activity.showSpinner();
+                ParseTripModel.saveNewTrip(newTrip, new ParseModel.ParseResponseCallback() {
+                    @Override
+                    public void onSuccess() {
+                        activity.hideSpinner();
+                        activity.setResult(Constants.RESULT_CODE_TRIP_CREATED);
+                        activity.finish();
+                    }
 
-                @Override
-                public void onFailure(String error) {
-                    Snackbar.make(activity.findViewById(android.R.id.content),
-                            error, Snackbar.LENGTH_SHORT);
-                }
-            });
+                    @Override
+                    public void onFailure(String error) {
+                        Snackbar.make(activity.findViewById(android.R.id.content),
+                                error, Snackbar.LENGTH_SHORT);
+                    }
+                });
+            }
+            else {
+                NetworkAlerts.showNetworkAlert(activity);
+            }
         }
     }
 }

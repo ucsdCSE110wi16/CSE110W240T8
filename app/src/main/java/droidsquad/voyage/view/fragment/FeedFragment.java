@@ -76,7 +76,6 @@ public class FeedFragment extends Fragment {
             }
         });
 
-        showProgress(true);
         return v;
     }
 
