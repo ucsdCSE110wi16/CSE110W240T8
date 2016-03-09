@@ -1,10 +1,11 @@
 package droidsquad.voyage.model.adapters;
 
-import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,17 +14,20 @@ import java.util.List;
 
 import droidsquad.voyage.R;
 import droidsquad.voyage.model.objects.User;
+import droidsquad.voyage.view.activity.AddFriendsActivity;
 
 public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.ViewHolder> {
     private static final String TAG = FBFriendsAdapter.class.getSimpleName();
 
-    private Activity mActivity;
+    private AddFriendsActivity mActivity;
     private OnFriendSelected mListener;
     private List<User> mFriends;
+    private int currentHeight;
 
-    public FBFriendsAdapter(Activity activity) {
+    public FBFriendsAdapter(AddFriendsActivity activity) {
         mActivity = activity;
         mFriends = new ArrayList<>();
+        currentHeight = 1;
     }
 
     @Override
@@ -64,11 +68,11 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
     public void updateResults(ArrayList<User> friends) {
         mFriends = friends;
         notifyDataSetChanged();
+        animateRecyclerView();
     }
 
     public void addFriend(User friend) {
         mFriends.add(friend);
-        notifyDataSetChanged();
     }
 
     /**
@@ -79,6 +83,7 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
     public boolean removeFriend(User friend) {
         if (mFriends.remove(friend)) {
             notifyDataSetChanged();
+            animateRecyclerView();
             return true;
         }
         return false;
@@ -102,5 +107,36 @@ public class FBFriendsAdapter extends RecyclerView.Adapter<FBFriendsAdapter.View
             mNameTextView = (TextView) view.findViewById(R.id.friend_name);
             mProfilePicImageView = (ImageView) view.findViewById(R.id.friend_profile_pic);
         }
+    }
+
+    private void animateRecyclerView() {
+
+        final RecyclerView v = mActivity.getResultsRecyclerView();
+        v.measure(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
+        final int initialHeight = currentHeight;
+        final int targetHeight = (v.getMeasuredHeight() == 0) ? 1 : v.getMeasuredHeight();
+        final int difference = targetHeight - currentHeight;
+
+        v.getLayoutParams().height = currentHeight;
+
+        Animation a = new Animation() {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                v.getLayoutParams().height = interpolatedTime == 1
+                        ? (initialHeight + difference)
+                        : (int) (initialHeight + (difference * interpolatedTime));
+                v.requestLayout();
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int) (targetHeight / v.getContext().getResources().getDisplayMetrics().density));
+        v.startAnimation(a);
+        currentHeight = targetHeight;
     }
 }

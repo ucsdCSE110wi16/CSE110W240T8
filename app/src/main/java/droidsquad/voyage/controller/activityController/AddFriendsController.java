@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,12 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 
 import droidsquad.voyage.R;
-import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.model.adapters.FBFriendsAdapter;
 import droidsquad.voyage.model.adapters.SelectedFBFriendsAdapter;
 import droidsquad.voyage.model.api.FacebookAPI;
-import droidsquad.voyage.model.objects.User;
 import droidsquad.voyage.model.objects.Trip;
+import droidsquad.voyage.model.objects.User;
+import droidsquad.voyage.model.parseModels.ParseTripModel;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.AddFriendsActivity;
 
@@ -43,10 +42,6 @@ public class AddFriendsController {
             public void onSelected(User friend) {
                 if (mResultsAdapter.removeFriend(friend)) {
                     mSelectedFriendsAdapter.addFriend(friend);
-                }
-
-                if (mResultsAdapter.getItemCount() == 0) {
-                    mActivity.getResultsRecyclerView().setVisibility(View.GONE);
                 }
             }
         });
@@ -131,8 +126,6 @@ public class AddFriendsController {
             }
         }
 
-        mActivity.getResultsRecyclerView().setVisibility(
-                (queriedFriends.isEmpty()) ? View.GONE : View.VISIBLE);
         mResultsAdapter.updateResults(queriedFriends);
     }
 

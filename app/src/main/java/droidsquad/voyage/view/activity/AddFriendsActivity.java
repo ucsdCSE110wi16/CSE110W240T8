@@ -78,6 +78,7 @@ public class AddFriendsActivity extends AppCompatActivity {
     private void initUI() {
         mSearchView = (android.support.v7.widget.SearchView) findViewById(R.id.friends_search_view);
         mResultsRecyclerView = (RecyclerView) findViewById(R.id.friends_results_recycler_view);
+        mResultsRecyclerView.getLayoutParams().height = 1;
         mSelectedFriendsRecyclerView = (RecyclerView) findViewById(R.id.selected_friends_recycler_view);
         mExitBackImage = (ImageView) findViewById(R.id.exit_back_image_view);
         mConfirmAddFriendsButton = (AppCompatImageButton) findViewById(R.id.confirm_add_friends);
