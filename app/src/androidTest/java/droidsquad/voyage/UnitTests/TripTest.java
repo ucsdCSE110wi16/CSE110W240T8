@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import droidsquad.voyage.model.objects.Member;
 import droidsquad.voyage.model.objects.Trip;
@@ -117,20 +118,20 @@ public class TripTest {
 
     @Test
     public void testOverlap() {
-        assertEquals(trip1.overlaps(trip1), true);
+        assertEquals(trip1.overlaps(trip1), true); // check trip overlaps with itself
         assertEquals(trip2.overlaps(trip2), true);
 
-        assertEquals(trip1.overlaps(trip2), true);
+        assertEquals(trip1.overlaps(trip2), true); // check trip overlaps with another trip
 
-        calendar.set(2015, 4, 15);
+        calendar.set(2015, 4, 15); // dateFrom of trip2 is after dateTo of trip1, so they won't overlap
         Date dateFrom = calendar.getTime();
         trip2.setDateFrom(dateFrom);
 
-        calendar.set(2015, 4, 15);
+        calendar.set(2015, 4, 25);
         Date dateTo = calendar.getTime();
         trip2.setDateTo(dateTo);
 
-        assertEquals(trip1.overlaps(trip2), false);
+        assertEquals(trip1.overlaps(trip2), false); // check trips that don't overlap
         assertEquals(trip2.overlaps(trip1), false);
     }
 
@@ -142,17 +143,26 @@ public class TripTest {
 
     @Test
     public void testEquals() {
-        assertEquals(trip1.equals(trip1), true);
+        assertEquals(trip1.equals(trip1), true); // check that same trips are equal
         assertEquals(trip2.equals(trip2), true);
 
-        assertEquals(trip1.equals(trip2), false);
+        assertEquals(trip1.equals(trip2), false); // check that different trips with different fields are not equal
         assertEquals(trip2.equals(trip1), false);
+
+        // trips are not equal if at least 1 field is not equal
+        Trip trip3 = new Trip("Different name than Trip1", trip1.getTransportation(), trip1.getOrigin(),
+                trip1.getDestination(), trip1.isPrivate(), trip1.getDateFrom(), trip1.getDateTo());
+        assertEquals(trip1.equals(trip3), false);
+
+        trip3.setName(trip1.getName()); // now all fields are the same, so the trips are equal
+        assertEquals(trip1.equals(trip3), true);
     }
 
     @Test
     public void testAddTripMembers() {
-        User user = new User("123", "ABC", "FirstName", "LastName"); // placeholder
-        Member m1 = new Member(user, true, 1);
+        User user = new User("123", "ABC", "FirstName", "LastName"); // placeholder object to create Members
+
+        Member m1 = new Member(user, true, 1); // boolean true means user added is Invitee
         trip1.addMember(m1);
         assertEquals(trip1.getInvitees().size(), 1);
         assertEquals(trip1.getMembers().size(), 0);
@@ -162,7 +172,7 @@ public class TripTest {
         assertEquals(trip1.getInvitees().size(), 2);
         assertEquals(trip1.getMembers().size(), 0);
 
-        Member m3 = new Member(user, false, 1);
+        Member m3 = new Member(user, false, 1); // boolean false means user added is Member of trip
         trip1.addMember(m3);
         assertEquals(trip1.getInvitees().size(), 2);
         assertEquals(trip1.getMembers().size(), 1);
@@ -171,5 +181,13 @@ public class TripTest {
         trip1.addMember(m4);
         assertEquals(trip1.getInvitees().size(), 2);
         assertEquals(trip1.getMembers().size(), 2);
+
+        List<Member> members = trip1.getMembers(); // check the members were added correctly
+        assertEquals(members.get(0), m3);
+        assertEquals(members.get(1), m4);
+
+        List<Member> invitees = trip1.getInvitees(); // check the invitees were added correctly
+        assertEquals(invitees.get(0), m1);
+        assertEquals(invitees.get(1), m2);
     }
 }

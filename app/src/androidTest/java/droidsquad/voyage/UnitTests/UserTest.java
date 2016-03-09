@@ -21,6 +21,7 @@ public class UserTest {
         user3 = new User("345", "Joe", "Smith");
     }
 
+    // two Users are equal if they have the same id
     @Test
     public void testEquals() {
         assertEquals(user1.equals(user2), true); // both users have same id
