@@ -1,4 +1,4 @@
-package droidsquad.voyage;
+package droidsquad.voyage.ScenarioTests;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;

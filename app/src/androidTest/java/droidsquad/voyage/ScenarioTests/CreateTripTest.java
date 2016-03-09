@@ -1,4 +1,4 @@
-package droidsquad.voyage;
+package droidsquad.voyage.ScenarioTests;
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.pressBack;
@@ -29,6 +29,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 
 import android.support.test.espresso.contrib.PickerActions;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -47,6 +48,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import droidsquad.voyage.R;
 import droidsquad.voyage.util.Constants;
 import droidsquad.voyage.view.activity.CreateTripActivity;
 import droidsquad.voyage.model.parseModels.ParseTripModel;
@@ -100,7 +102,7 @@ public class CreateTripTest {
     public void testTripNameChangeText() {
 
         // check that trip name must be set
-        onView(withId(R.id.create_trip_button))
+        onView(ViewMatchers.withId(R.id.create_trip_button))
                 .perform(click());
         onView(withId(R.id.trip_name))
                 .check(matches(hasErrorText(TRIP_NAME_ERROR)));

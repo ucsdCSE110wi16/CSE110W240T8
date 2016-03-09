@@ -1,6 +1,7 @@
-package droidsquad.voyage;
+package droidsquad.voyage.ScenarioTests;
 
 import android.support.test.espresso.contrib.DrawerActions;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.Toolbar;
@@ -12,6 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import droidsquad.voyage.R;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -36,7 +38,7 @@ public class NavTest {
 
     @Before
     public void setUp() {
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(ViewMatchers.withId(R.id.drawer_layout)).perform(DrawerActions.open());
         sleep(5000);
         onView(withId(R.id.drawer_layout)).check(matches(isOpen()));
     }
