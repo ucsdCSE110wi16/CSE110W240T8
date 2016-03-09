@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF9800</color>
-    <color name="colorPrimaryDark">#EF6C00</color>
+    <color name="colorPrimary">#FF5722</color>
+    <color name="colorPrimaryDark">#E64A19</color>
     <color name="colorAccent">#1DE9B6</color>
     <color name="colorAccentDark">#00BFA5</color>
     <color name="defaultTripCardColor">#fff</color>
