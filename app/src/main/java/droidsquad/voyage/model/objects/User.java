@@ -74,8 +74,8 @@ public class User implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        return ((o instanceof User) &&
-                (id != null)) ? id.equals(((User) o).id) : fbId.equals(((User) o).fbId);
+        return o instanceof User &&
+                ((id != null) ? id.equals(((User) o).id) : fbId.equals(((User) o).fbId));
     }
 
     @Override

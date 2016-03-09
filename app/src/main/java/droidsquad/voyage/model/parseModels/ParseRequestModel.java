@@ -155,7 +155,7 @@ public class ParseRequestModel extends ParseModel {
         ParseMemberModel.removeCurrentUser(tripId, callback);
     }
 
-    public static void sendRequest(final Trip trip, final RequestSentCallback callback) {
+    public static void sendRequest(final Trip trip, final ParseResponseCallback callback) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseTripModel.TRIP_CLASS);
         query.getInBackground(trip.getId(), new GetCallback<ParseObject>() {
             @Override
@@ -174,7 +174,7 @@ public class ParseRequestModel extends ParseModel {
                                 request.isInvitation = false;
 
                                 ParseNotificationModel.sendRequestNotification(parseTrip, request, trip.getAdmin());
-                                callback.onSuccess(parseMember.getObjectId());
+                                callback.onSuccess();
                             } else {
                                 callback.onFailure(e.getMessage());
                             }
@@ -219,23 +219,25 @@ public class ParseRequestModel extends ParseModel {
     }
 
     public static List<Request> getRequestsFromParseTrip(ParseObject parseTrip) {
-        List<ParseObject> parseMembers = parseTrip.getList(ParseTripModel.Field.REQUESTS);
+        Trip trip = ParseTripModel.getTripFromParseObject(parseTrip);
+        List<ParseObject> parseRequests = parseTrip.getList(ParseTripModel.Field.REQUESTS);
         List<Request> requests = new ArrayList<>();
 
-        try {
-            for (ParseObject parseMember : parseMembers) {
-                Member member = ParseMemberModel.getMemberFromParseObject(parseMember);
-                Request request = new Request();
-                request.user = member.user;
-                request.trip = ParseTripModel.getTripFromParseObject(parseTrip);
-                request.memberId = member.id;
-                request.elapsedTime = member.time;
-                request.isInvitation = false;
-                requests.add(request);
+        if (parseRequests != null) {
+            try {
+                for (ParseObject parseMember : parseRequests) {
+                    Member member = ParseMemberModel.getMemberFromParseObject(parseMember);
+                    Request request = new Request();
+                    request.user = member.user;
+                    request.trip = trip;
+                    request.memberId = member.id;
+                    request.elapsedTime = member.time;
+                    request.isInvitation = false;
+                    requests.add(request);
+                }
+            } catch (Exception e) {
+                Log.d(TAG, "Exception occurred while getting requests from trips: " + e.getMessage());
             }
-
-        } catch (Exception e) {
-            Log.d(TAG, "Exception occurred while getting requests from trips: " + e.getMessage());
         }
 
         return requests;
@@ -243,12 +245,6 @@ public class ParseRequestModel extends ParseModel {
 
     public interface RequestListCallback {
         void onSuccess(List<Request> requests);
-
-        void onFailure(String error);
-    }
-
-    public interface RequestSentCallback {
-        void onSuccess(String requestId);
 
         void onFailure(String error);
     }

@@ -53,41 +53,46 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Trip trip = mTrips.get(position);
+        List<User> members = trip.getMembersAsUsersExclusive();
 
         trip.getAdmin().loadProfilePicInto(mFragment.getActivity(), holder.mAdminPhoto);
         holder.mTitle.setText(trip.getName());
-        holder.mCities.setText(trip.getSimpleCitiesStringRepresentation());
         holder.mDates.setText(trip.getSimpleDatesStringRepresentation());
+        holder.mCities.setText(trip.getSimpleCitiesStringRepresentation());
         holder.mCities.setCompoundDrawablesWithIntrinsicBounds(trip.getTransportationIconId(), 0, 0, 0);
-        holder.mMembersAdapter.updateResults(trip.getMembersAsUsersExclusive());
+        holder.mMembersAdapter.updateResults(members);
 
         // Set the correct subhead text based on the number of friends going on the trip
-        int membersSize = holder.mMembersAdapter.getItemCount();
-        if (membersSize == 0) {
+        if (members.size() == 0) {
             holder.mSubhead.setText(String.format(NO_FRIENDS_FORMAT, trip.getAdmin().getFullName()));
-            holder.mViewMembers.setVisibility(View.GONE);
-            holder.mCaretIconView.setVisibility(View.GONE);
-        } else if (membersSize == 1) {
-            holder.mSubhead.setText(String.format(SINGLE_FRIEND_FORMAT,
-                    trip.getAdmin().getFullName(), trip.getMembersAsUsers().get(0).getFullName()));
+            holder.setViewMemberVisibility(View.GONE);
         } else {
-            holder.mSubhead.setText(String.format(FRIENDS_FORMAT,
-                    trip.getAdmin().getFullName(), trip.getMembers().size() - 1));
+            if (members.size() == 1) {
+                holder.mSubhead.setText(String.format(SINGLE_FRIEND_FORMAT,
+                        trip.getAdmin().getFullName(), members.get(0).getFullName()));
+            } else {
+                holder.mSubhead.setText(String.format(FRIENDS_FORMAT,
+                        trip.getAdmin().getFullName(), members.size()));
+            }
+
+            holder.setViewMemberVisibility(View.VISIBLE);
         }
 
         // Disable the ask to join the trip button if user has already requested
+        Request requestSent = null;
         for (Request request : trip.getRequests()) {
             if (request.user.equals(VoyageUser.currentUser())) {
                 holder.mJoinButton.setText("Cancel request");
-                holder.requestSent = true;
-                holder.requestId = request.memberId;
+                requestSent = request;
             }
         }
 
+        final Request finalRequestSent = requestSent;
         holder.mJoinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!holder.requestSent) {
+                if (finalRequestSent != null) {
+                    // If user has been previously invited to the trip then accept the invitation
                     for (Member member : trip.getInvitees()) {
                         if (member.user.equals(VoyageUser.currentUser())) {
                             final Request request = new Request();
@@ -119,36 +124,35 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
                         }
                     }
 
-                    ParseRequestModel.sendRequest(trip, new ParseRequestModel.RequestSentCallback() {
+                    ParseRequestModel.sendRequest(trip, new ParseRequestModel.ParseResponseCallback() {
                         @Override
-                        public void onSuccess(String requestId) {
+                        public void onSuccess() {
                             Log.d(TAG, "Request sent with success");
-                            Snackbar.make(mFragment.getView(), "Trip Request Sent", Snackbar.LENGTH_LONG).show();
                             holder.mJoinButton.setText("Cancel request");
-                            holder.requestSent = true;
-                            holder.requestId = requestId;
                         }
 
                         @Override
                         public void onFailure(String error) {
                             Log.d(TAG, "Failed to send the request: " + error);
+                            Snackbar.make(mFragment.getView(),
+                                    "There was a problem sending the request, please try again later.",
+                                    Snackbar.LENGTH_LONG);
                         }
                     });
                 } else {
-                    ParseTripModel.removeRequestFromTrip(trip.getId(), holder.requestId, new ParseModel.ParseResponseCallback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "Request canceled with success");
-                            Snackbar.make(mFragment.getView(), "Trip Request Cancelled", Snackbar.LENGTH_LONG).show();
-                            holder.mJoinButton.setText("Ask to join");
-                            holder.requestSent = false;
-                        }
+                    ParseTripModel.removeRequestFromTrip(trip.getId(), finalRequestSent.memberId,
+                            new ParseModel.ParseResponseCallback() {
+                                @Override
+                                public void onSuccess() {
+                                    Log.d(TAG, "Request canceled with success");
+                                    holder.mJoinButton.setText("Ask to join");
+                                }
 
-                        @Override
-                        public void onFailure(String error) {
-                            Log.d(TAG, "Failed to cancel the request: " + error);
-                        }
-                    });
+                                @Override
+                                public void onFailure(String error) {
+                                    Log.d(TAG, "Failed to cancel the request: " + error);
+                                }
+                            });
                 }
             }
         });
@@ -218,28 +222,26 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView mAdminPhoto;
         public TextView mTitle;
         public TextView mSubhead;
         public TextView mCities;
         public TextView mDates;
         public TextView mJoinButton;
-        public RecyclerView mMembersRecyclerView;
-        public FeedCardMembersAdapter mMembersAdapter;
+        public ImageView mAdminPhoto;
         public ImageView mCaretIconView;
         public LinearLayout mViewMembers;
-        public boolean requestSent;
-        public String requestId;
+        public RecyclerView mMembersRecyclerView;
+        public FeedCardMembersAdapter mMembersAdapter;
 
         public ViewHolder(View itemVie) {
             super(itemVie);
 
-            mAdminPhoto = (ImageView) itemView.findViewById(R.id.admin_profile_pic);
             mTitle = (TextView) itemView.findViewById(R.id.title);
             mSubhead = (TextView) itemView.findViewById(R.id.subhead);
             mCities = (TextView) itemView.findViewById(R.id.cities);
             mDates = (TextView) itemView.findViewById(R.id.dates);
             mJoinButton = (TextView) itemView.findViewById(R.id.join_button);
+            mAdminPhoto = (ImageView) itemView.findViewById(R.id.admin_profile_pic);
             mCaretIconView = (ImageView) itemView.findViewById(R.id.caret);
             mViewMembers = (LinearLayout) itemVie.findViewById(R.id.view_members);
             mMembersAdapter = new FeedCardMembersAdapter(mFragment.getActivity());
@@ -255,8 +257,6 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
                     toggleExpansion();
                 }
             });
-
-            requestSent = false;
         }
 
         public void toggleExpansion() {
@@ -267,6 +267,11 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
                 mCaretIconView.animate().rotation(0).setDuration(200);
                 collapse(mMembersRecyclerView);
             }
+        }
+
+        public void setViewMemberVisibility(int visibility) {
+            mViewMembers.setVisibility(visibility);
+            mCaretIconView.setVisibility(visibility);
         }
     }
 }

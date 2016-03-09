@@ -28,8 +28,8 @@ public class TripController {
     public TripMembersAdapter mInviteesAdapter;
     public Trip trip;
 
-    public TripController(TripActivity instance) {
-        this.mActivity = instance;
+    public TripController(TripActivity activity) {
+        this.mActivity = activity;
 
         trip = mActivity.getIntent().getParcelableExtra(
                 mActivity.getString(R.string.intent_key_trip));

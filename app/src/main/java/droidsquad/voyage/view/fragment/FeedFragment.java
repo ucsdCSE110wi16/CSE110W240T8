@@ -51,6 +51,8 @@ public class FeedFragment extends Fragment {
         mProgressBar = (ProgressBar) v.findViewById(R.id.trip_list_progress_bar);
         mFab = (FloatingActionButton) v.findViewById(R.id.fab);
 
+        showProgress(true);
+
         RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.trip_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(controller.getAdapter());
@@ -82,7 +84,7 @@ public class FeedFragment extends Fragment {
     /**
      * Navigates to the CreateTripActivity
      */
-    public void createTrip() {
+    public void startCreateTripActivity() {
         Intent intent = new Intent(getContext(), CreateTripActivity.class);
         startActivityForResult(intent, Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY);
     }

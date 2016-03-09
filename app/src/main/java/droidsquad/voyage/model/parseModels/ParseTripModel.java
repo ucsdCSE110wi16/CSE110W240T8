@@ -1,5 +1,6 @@
 package droidsquad.voyage.model.parseModels;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.parse.DeleteCallback;
@@ -128,14 +129,14 @@ public class ParseTripModel extends ParseModel {
     /**
      * Get the parseTrip with the given tripId and include all of the members and users
      *
-     * @param tripId The tripId of the trip to be retrieved
+     * @param tripId   The tripId of the trip to be retrieved
      * @param callback Called on success with the parseTrip object or on failure
      */
     public static void getParseTripWithMembers(String tripId, final ParseObjectCallback callback) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
+        query.include(Field.CREATED_BY);
         query.include(Field.MEMBERS);
         query.include(Field.MEMBERS + "." + ParseMemberModel.Field.USER);
-        query.include(Field.CREATED_BY);
 
         query.getInBackground(tripId, new GetCallback<ParseObject>() {
             @Override
@@ -143,7 +144,7 @@ public class ParseTripModel extends ParseModel {
                 if (e == null) {
                     callback.onSuccess(parseTrip);
                 } else {
-                    callback.onFailure(getParseErrorString(e.getCode()));
+                    callback.onFailure(e.getMessage());
                 }
             }
         });
@@ -205,49 +206,63 @@ public class ParseTripModel extends ParseModel {
      * @param callback Called with the Trips or error on failure
      */
     public static void getTripsFromFriends(final TripListCallback callback) {
-        FacebookAPI.requestFBFriends(new FacebookAPI.FBFriendsArrayCallback() {
+        new AsyncTask<Void, Void, Void>() {
+
             @Override
-            public void onCompleted(List<User> friends) {
-                List<String> fbIds = new ArrayList<>();
-                for (User friend : friends) {
-                    fbIds.add(friend.fbId);
-                }
+            protected Void doInBackground(Void... params) {
+                FacebookAPI.requestFBFriends(new FacebookAPI.FBFriendsArrayCallback() {
 
-                ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
-                userQuery.whereContainedIn(ParseUserModel.Field.Facebook_ID, fbIds);
-
-                ParseQuery<ParseObject> memberQuery = ParseQuery.getQuery(ParseMemberModel.MEMBER_CLASS);
-                memberQuery.whereMatchesQuery(ParseMemberModel.Field.USER, userQuery);
-
-                ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
-                query.whereEqualTo(Field.PRIVATE, false);
-                query.whereNotEqualTo(Field.CREATED_BY, ParseUser.getCurrentUser());
-                query.whereMatchesQuery(Field.MEMBERS, memberQuery);
-                query.include(Field.MEMBERS);
-                query.include(Field.REQUESTS);
-                query.include(Field.REQUESTS + "." + ParseMemberModel.Field.USER);
-
-                getTrips(query, new TripListCallback() {
                     @Override
-                    public void onSuccess(List<Trip> trips) {
-                        for (int i = 0; i < trips.size(); i++) {
-                            for (Member member : trips.get(i).getMembers()) {
-                                if (member.user.equals(VoyageUser.currentUser())) {
-                                    trips.remove(i);
-                                }
-                            }
+                    public void onCompleted(List<User> friends) {
+                        List<String> fbIds = new ArrayList<>();
+
+                        for (User friend : friends) {
+                            fbIds.add(friend.fbId);
                         }
 
-                        callback.onSuccess(trips);
-                    }
+                        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+                        userQuery.whereContainedIn(ParseUserModel.Field.Facebook_ID, fbIds);
 
-                    @Override
-                    public void onFailure(String error) {
-                        callback.onFailure(error);
+                        ParseQuery<ParseObject> memberQuery = ParseQuery.getQuery(ParseMemberModel.MEMBER_CLASS);
+                        memberQuery.whereMatchesQuery(ParseMemberModel.Field.USER, userQuery);
+                        memberQuery.include(ParseMemberModel.Field.USER);
+
+                        ParseQuery<ParseObject> query = ParseQuery.getQuery(TRIP_CLASS);
+                        query.whereEqualTo(Field.PRIVATE, false);
+                        query.whereNotEqualTo(Field.CREATED_BY, ParseUser.getCurrentUser());
+                        query.whereMatchesQuery(Field.MEMBERS, memberQuery);
+
+                        query.include(Field.MEMBERS);
+                        query.include(Field.REQUESTS);
+                        query.include(Field.REQUESTS + "." + ParseMemberModel.Field.USER);
+
+                        getTrips(query, new TripListCallback() {
+                            @Override
+                            public void onSuccess(List<Trip> trips) {
+                                for (int i = 0; i < trips.size(); i++) {
+                                    Trip trip = trips.get(i);
+                                    for (Member member : trip.getMembers()) {
+                                        if (member.user.equals(VoyageUser.currentUser())) {
+                                            trips.remove(i);
+                                            --i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                callback.onSuccess(trips);
+                            }
+
+                            @Override
+                            public void onFailure(String error) {
+                                callback.onFailure(error);
+                            }
+                        });
                     }
                 });
+
+                return null;
             }
-        });
+        }.execute();
     }
 
     /**
@@ -390,9 +405,9 @@ public class ParseTripModel extends ParseModel {
     /**
      * Remove the given user from the given trip
      *
-     * @param tripId   Id of the trip to remove member from
+     * @param tripId    Id of the trip to remove member from
      * @param requestId Id of the request to remove from
-     * @param callback Called on success or failure
+     * @param callback  Called on success or failure
      */
     public static void removeRequestFromTrip(String tripId, final String requestId, final ParseResponseCallback callback) {
         ParseQuery<ParseObject> memberQuery = ParseQuery.getQuery(ParseMemberModel.MEMBER_CLASS);
@@ -458,33 +473,41 @@ public class ParseTripModel extends ParseModel {
      *
      * @param callback Called with the trips as an argument
      */
-    protected static void getTrips(ParseQuery<ParseObject> query, final TripListCallback callback) {
-        query.include(Field.CREATED_BY);
-
-        query.findInBackground(new FindCallback<ParseObject>() {
+    protected static void getTrips(final ParseQuery<ParseObject> query, final TripListCallback callback) {
+        new AsyncTask<Void, Void, List<Trip>>() {
             @Override
-            public void done(List<ParseObject> parseTrips, ParseException e) {
-                if (e == null) {
+            protected List<Trip> doInBackground(Void... params) {
+                query.include(Field.CREATED_BY);
+                List<Trip> trips = new ArrayList<>();
+                List<ParseObject> parseTrips;
+
+                try {
+                    parseTrips = query.find();
                     Log.d(TAG, "Trips Retrieved: " + parseTrips.size());
-                    List<Trip> trips = new ArrayList<>();
 
                     for (ParseObject parseTrip : parseTrips) {
                         Trip trip = getTripFromParseObject(parseTrip);
-                        List<ParseObject> parseMembers = parseTrip.getList(Field.MEMBERS);
 
+                        List<ParseObject> parseMembers = parseTrip.getList(Field.MEMBERS);
                         trip.addMembers(ParseMemberModel.getMembersFromParseObjects(parseMembers));
                         trip.addRequests(ParseRequestModel.getRequestsFromParseTrip(parseTrip));
 
                         trips.add(trip);
                     }
-
-                    callback.onSuccess(trips);
-                } else {
+                } catch (ParseException e) {
                     Log.d(TAG, "Error while getting trips: " + e.getMessage());
-                    callback.onFailure(getParseErrorString(e.getCode()));
+                    callback.onFailure(e.getMessage());
+                    cancel(true);
                 }
+
+                return trips;
             }
-        });
+
+            @Override
+            protected void onPostExecute(List<Trip> trips) {
+                callback.onSuccess(trips);
+            }
+        }.execute();
     }
 
     /**

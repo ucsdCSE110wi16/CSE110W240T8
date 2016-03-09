@@ -61,6 +61,8 @@ public class TripListFragment extends Fragment {
         mFab = (FloatingActionButton) v.findViewById(R.id.fab);
         mNoTripsView = (LinearLayout) v.findViewById(R.id.no_trips_view);
 
+        showProgress(true);
+
         controller.setAdapter(recyclerView);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -101,19 +103,19 @@ public class TripListFragment extends Fragment {
         Snackbar snackbar = Snackbar.make(mFab, "", Snackbar.LENGTH_SHORT);
 
         switch (requestCode) {
-            case Constants.REQUEST_CODE_TRIP_ACTIVITY :
+            case Constants.REQUEST_CODE_TRIP_ACTIVITY:
                 switch (resultCode) {
-                    case Constants.RESULT_CODE_TRIP_DELETED :
+                    case Constants.RESULT_CODE_TRIP_DELETED:
                         snackbar.setText(R.string.snackbar_trip_deleted).show();
                         break;
 
-                    case Constants.RESULT_CODE_TRIP_LEFT :
+                    case Constants.RESULT_CODE_TRIP_LEFT:
                         snackbar.setText(R.string.snackbar_trip_left).show();
                         break;
                 }
                 break;
 
-            case Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY :
+            case Constants.REQUEST_CODE_CREATE_TRIP_ACTIVITY:
                 if (resultCode == Constants.RESULT_CODE_TRIP_CREATED) {
                     snackbar.setText(R.string.snackbar_trip_created).show();
                 }

@@ -1,6 +1,5 @@
 package droidsquad.voyage.controller.fragmentController;
 
-import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,12 +17,10 @@ import droidsquad.voyage.view.fragment.TripListFragment;
 public class TripListController {
     private static final String TAG = TripListController.class.getSimpleName();
 
-    private Context context;
     private TripListFragment fragment;
     private TripCardAdapter adapter;
 
     public TripListController(final TripListFragment fragment) {
-        this.context = fragment.getContext();
         this.fragment = fragment;
         this.adapter = new TripCardAdapter(fragment);
 
@@ -37,15 +34,14 @@ public class TripListController {
 
     // called once from the activity, only needs to be called once
     public void setAdapter(RecyclerView recyclerView) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        recyclerView.setLayoutManager(new LinearLayoutManager(fragment.getContext()));
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
     }
 
     // to be called from the activity on startup and/or data refresh
     public void retrieveData() {
-        if (NetworkAlerts.isNetworkAvailable(context)) {
-            fragment.showProgress(true);
+        if (NetworkAlerts.isNetworkAvailable(fragment.getContext())) {
             ParseTripModel.getTrips(new ParseTripModel.TripListCallback() {
                 @Override
                 public void onSuccess(List<Trip> trips) {
@@ -69,7 +65,7 @@ public class TripListController {
             });
         }
         else {
-            NetworkAlerts.showNetworkAlert(context);
+            NetworkAlerts.showNetworkAlert(fragment.getContext());
         }
     }
 

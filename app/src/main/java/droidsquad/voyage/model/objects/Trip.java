@@ -249,13 +249,6 @@ public class Trip implements Parcelable {
         return invitees;
     }
 
-    public List<Member> getAllMembers() {
-        List<Member> allMembers = new ArrayList<>();
-        allMembers.addAll(members);
-        allMembers.addAll(invitees);
-        return allMembers;
-    }
-
     public Member getMemberWithUserId(String userId) {
         for (Member member : members) {
             if (member.user.id.equals(userId)) {

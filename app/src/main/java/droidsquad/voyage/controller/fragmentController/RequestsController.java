@@ -98,7 +98,6 @@ public class RequestsController {
 
     public void fetchData() {
         if (NetworkAlerts.isNetworkAvailable(mFragment.getContext())) {
-            mFragment.showProgress(true);
             ParseRequestModel.fetchInvitationsAndRequests(new ParseRequestModel.RequestListCallback() {
                 @Override
                 public void onSuccess(final List<Request> requests) {

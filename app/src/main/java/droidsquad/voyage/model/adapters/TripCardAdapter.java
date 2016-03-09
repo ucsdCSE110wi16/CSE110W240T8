@@ -25,13 +25,13 @@ import droidsquad.voyage.view.activity.TripActivity;
 public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHolder> {
     private static final String TAG = TripCardAdapter.class.getSimpleName();
 
-    private List<Trip> trips = new ArrayList<>();
     private Fragment mFragment;
     private OnDataEmptyListener mListener;
+    private List<Trip> trips;
 
     public TripCardAdapter(Fragment fragment) {
-        this.trips = new ArrayList<>();
         this.mFragment = fragment;
+        this.trips = new ArrayList<>();
     }
 
     @Override
@@ -66,7 +66,6 @@ public class TripCardAdapter extends RecyclerView.Adapter<TripCardAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Card clicked for trip: " + trip.getName());
-
                 Intent intent = new Intent(mFragment.getContext(), TripActivity.class);
                 intent.putExtra(mFragment.getString(R.string.intent_key_trip), trip);
                 mFragment.startActivityForResult(intent, Constants.REQUEST_CODE_TRIP_ACTIVITY);
