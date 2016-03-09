@@ -9,7 +9,7 @@ import android.text.format.DateUtils;
 public class Request {
     public User user;
     public Trip trip;
-    public String memberId;
+    public String id;
     public long elapsedTime;
     public boolean isInvitation;
 
@@ -19,5 +19,10 @@ public class Request {
         } else {
             return (String) DateUtils.getRelativeTimeSpanString(elapsedTime);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Request && id.equals(((Request) o).id);
     }
 }

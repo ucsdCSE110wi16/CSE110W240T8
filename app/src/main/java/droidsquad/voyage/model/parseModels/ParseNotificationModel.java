@@ -89,7 +89,7 @@ public class ParseNotificationModel extends ParseModel {
             data.put(Field.ALERT, "asked to join your trip " + parseTrip.get("name"));
             data.put(Field.SENDER_ID, VoyageUser.getId());
             data.put(Field.SENDER_PROFILE_PIC, VoyageUser.getProfilePicURL());
-            data.put(Field.MEMBER_ID, request.memberId);
+            data.put(Field.MEMBER_ID, request.id);
             data.put(Field.TRIP_ID, parseTrip.getObjectId());
             data.put(Field.TYPE, Constants.NOTIFICATION_REQUEST);
         } catch (JSONException e) {

@@ -79,24 +79,20 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
         }
 
         // Disable the ask to join the trip button if user has already requested
-        Request requestSent = null;
-        for (Request request : trip.getRequests()) {
-            if (request.user.equals(VoyageUser.currentUser())) {
-                holder.mJoinButton.setText("Cancel request");
-                requestSent = request;
-            }
-        }
+        holder.mJoinButton.setText((holder.getRequestSent(trip) != null)
+                ? "Cancel request" :  "Ask to join");
 
-        final Request finalRequestSent = requestSent;
         holder.mJoinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (finalRequestSent != null) {
+                final Request requestSent = holder.getRequestSent(trip);
+
+                if (requestSent == null) {
                     // If user has been previously invited to the trip then accept the invitation
                     for (Member member : trip.getInvitees()) {
                         if (member.user.equals(VoyageUser.currentUser())) {
                             final Request request = new Request();
-                            request.memberId = member.id;
+                            request.id = member.id;
                             request.user = member.user;
                             request.trip = trip;
                             request.isInvitation = true;
@@ -140,12 +136,13 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
                         }
                     });
                 } else {
-                    ParseTripModel.removeRequestFromTrip(trip.getId(), finalRequestSent.memberId,
+                    ParseTripModel.removeRequestFromTrip(trip.getId(), requestSent.id,
                             new ParseModel.ParseResponseCallback() {
                                 @Override
                                 public void onSuccess() {
                                     Log.d(TAG, "Request canceled with success");
                                     holder.mJoinButton.setText("Ask to join");
+                                    trip.removeRequest(requestSent);
                                 }
 
                                 @Override
@@ -272,6 +269,15 @@ public class FeedCardAdapter extends RecyclerView.Adapter<FeedCardAdapter.ViewHo
         public void setViewMemberVisibility(int visibility) {
             mViewMembers.setVisibility(visibility);
             mCaretIconView.setVisibility(visibility);
+        }
+
+        public Request getRequestSent(Trip trip) {
+            for (Request request : trip.getRequests()) {
+                if (request.user.equals(VoyageUser.currentUser())) {
+                    return request;
+                }
+            }
+            return null;
         }
     }
 }

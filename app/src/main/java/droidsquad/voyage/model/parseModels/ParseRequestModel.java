@@ -87,9 +87,9 @@ public class ParseRequestModel extends ParseModel {
      */
     public static void acceptRequest(Request request, ParseResponseCallback callback) {
         if (request.isInvitation) {
-            ParseMemberModel.promoteInvitee(request.memberId, callback);
+            ParseMemberModel.promoteInvitee(request.id, callback);
         } else {
-            acceptRequest(request.trip.getId(), request.memberId, callback);
+            acceptRequest(request.trip.getId(), request.id, callback);
         }
     }
 
@@ -141,9 +141,9 @@ public class ParseRequestModel extends ParseModel {
      */
     public static void declineRequest(Request request, final ParseResponseCallback callback) {
         if (request.isInvitation) {
-            ParseTripModel.removeMemberFromTrip(request.trip.getId(), request.memberId, callback);
+            ParseTripModel.removeMemberFromTrip(request.trip.getId(), request.id, callback);
         } else {
-            ParseTripModel.removeRequestFromTrip(request.trip.getId(), request.memberId, callback);
+            ParseTripModel.removeRequestFromTrip(request.trip.getId(), request.id, callback);
         }
     }
 
@@ -161,18 +161,18 @@ public class ParseRequestModel extends ParseModel {
             @Override
             public void done(final ParseObject parseTrip, ParseException e) {
                 if (e == null) {
-                    final ParseObject parseMember = ParseMemberModel.createMemberFromParseUser(ParseUser.getCurrentUser());
-                    parseTrip.add(ParseTripModel.Field.REQUESTS, parseMember);
+                    final ParseObject parseRequest = ParseMemberModel.createMemberFromParseUser(ParseUser.getCurrentUser());
+                    parseTrip.add(ParseTripModel.Field.REQUESTS, parseRequest);
                     parseTrip.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
                                 Request request = new Request();
-                                request.trip = trip;
                                 request.user = VoyageUser.currentUser();
-                                request.memberId = parseMember.getObjectId();
+                                request.id = parseRequest.getObjectId();
+                                request.trip = trip;
                                 request.isInvitation = false;
-
+                                trip.addRequest(request);
                                 ParseNotificationModel.sendRequestNotification(parseTrip, request, trip.getAdmin());
                                 callback.onSuccess();
                             } else {
@@ -199,7 +199,7 @@ public class ParseRequestModel extends ParseModel {
             Request request = new Request();
             request.trip = trip;
             request.user = trip.getAdmin();
-            request.memberId = trip.getInvitees().get(0).id;
+            request.id = trip.getInvitees().get(0).id;
             request.elapsedTime = trip.getInvitees().get(0).time;
             request.isInvitation = true;
             invitations.add(request);
@@ -230,7 +230,7 @@ public class ParseRequestModel extends ParseModel {
                     Request request = new Request();
                     request.user = member.user;
                     request.trip = trip;
-                    request.memberId = member.id;
+                    request.id = member.id;
                     request.elapsedTime = member.time;
                     request.isInvitation = false;
                     requests.add(request);
