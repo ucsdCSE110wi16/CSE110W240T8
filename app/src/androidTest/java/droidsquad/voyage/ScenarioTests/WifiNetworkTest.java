@@ -15,10 +15,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import droidsquad.voyage.R;
 import droidsquad.voyage.view.activity.MainNavDrawerActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.RootMatchers.isDialog;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -28,30 +30,12 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 /**
  * Created by Zemei on 3/7/2016.
  */
+// Preconditions: make sure user is logged in, and make sure there is a good wifi connection
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class WifiNetworkTest {
     @Rule
     public ActivityTestRule<MainNavDrawerActivity> mActivityRule = new ActivityTestRule<>(MainNavDrawerActivity.class);
-
-    /**
-     * Basic checks for dialog that occurs when network wifi is turned off
-     */
-    @Test
-    public void networkOff() {
-        WifiManager wifiManager = (WifiManager)mActivityRule.getActivity().getSystemService(Context.WIFI_SERVICE);
-        wifiManager.setWifiEnabled(false);
-
-        onView(withId(android.R.id.content)).perform(swipeDown());
-        sleep(10000);
-        onView(withText("No Network Connection"))
-                .inRoot(isDialog())
-                .check(matches(isDisplayed()));
-
-        onView(withText("Dismiss"))
-                .inRoot(isDialog())
-                .perform(click());
-    }
 
     /**
      * Check that if the network is on, dialog does not appear
@@ -61,9 +45,37 @@ public class WifiNetworkTest {
         WifiManager wifiManager = (WifiManager)mActivityRule.getActivity().getSystemService(Context.WIFI_SERVICE);
         wifiManager.setWifiEnabled(true);
 
-        onView(withId(android.R.id.content)).perform(swipeDown());
         sleep(10000);
-        //check that everything is fine/dialog doesn't appear
+        onView(withId(R.id.swiperefresh))
+                .perform(swipeDown());
+        sleep(10000);
+
+        onView(withText("No Network Connection"))
+                .check(doesNotExist());
+    }
+
+    /**
+     * Basic checks for dialog that occurs when network wifi is turned off
+     */
+    @Test
+    public void networkOff() {
+        WifiManager wifiManager = (WifiManager)mActivityRule.getActivity().getSystemService(Context.WIFI_SERVICE);
+        wifiManager.setWifiEnabled(false);
+
+        onView(withId(R.id.swiperefresh))
+                .perform(swipeDown());
+        sleep(10000);
+
+        onView(withText("No Network Connection"))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()));
+
+        onView(withText("Dismiss"))
+                .inRoot(isDialog())
+                .perform(click());
+
+        wifiManager.setWifiEnabled(true); // reset wifi to wrap up test
+        sleep(10000);
     }
 
     /**
