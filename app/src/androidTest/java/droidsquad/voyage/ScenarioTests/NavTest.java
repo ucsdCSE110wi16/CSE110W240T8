@@ -27,9 +27,11 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 
 /**
- * PRECONDITION: Please log on to the app before performing these tests.
  * Created by Zemei on 3/8/2016.
  */
+
+// Precondition: Please log in to the app before performing these tests.
+
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class NavTest {

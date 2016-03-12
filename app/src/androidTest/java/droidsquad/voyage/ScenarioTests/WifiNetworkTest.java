@@ -30,7 +30,11 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 /**
  * Created by Zemei on 3/7/2016.
  */
-// Preconditions: make sure user is logged in, and make sure there is a good wifi connection
+
+// Preconditions: Before running tests: please log in to the app, and make sure there is a good wifi
+// connection! Also wifi should be on before running the test, and the activity should begin on the
+// default page (not the phone's wifi settings page, which Espresso is not compatible to deal with)
+
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class WifiNetworkTest {
